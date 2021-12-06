@@ -11,11 +11,14 @@ from pytorch_topological.nn import TotalPersistenceLoss
 import torch.optim as optim
 
 
+import matplotlib.pyplot as plt
+
+
 if __name__ == '__main__':
     n = 100
 
-    X = utils.make_disk(r=0.01, R=0.5, n=n)
-    Y = utils.make_disk(r=0.90, R=1.0, n=n)
+    X = utils.make_disk(r=0.5, R=0.6, n=n)
+    Y = utils.make_disk(r=0.9, R=1.0, n=n)
 
     loss = ModelSpaceLoss(X, Y, loss=TotalPersistenceLoss)
     opt = optim.SGD(loss.parameters(), lr=0.05)
@@ -36,3 +39,10 @@ if __name__ == '__main__':
 
         logging.info(l)
         losses.append(l)
+
+    plt.scatter(X[:, 0], X[:, 1], label='Source')
+    plt.scatter(Y[:, 0], Y[:, 1], label='Target')
+
+    plt.legend()
+    plt.show()
+

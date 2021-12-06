@@ -9,6 +9,7 @@ python = "^3.9"
 giotto-tda = "^0.5.1"
 torch = "^1.10.0"
 giotto-ph = "^0.2.0"
+matplotlib = "^3.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
