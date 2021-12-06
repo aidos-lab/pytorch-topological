@@ -1,16 +1,22 @@
 """Summary statistics for persistence diagrams."""
 
 
+import torch
+
+
 def total_persistence(D, p=2):
     """Calculate total persistence of a persistence diagram.
 
+    This function will calculate the totla persistence of a persistence
+    diagram. Infinite value will be ignored.
+
     Parameters
     ----------
-    D : `np.array`
-        Persistence diagram, assumed to be in the usual `giotto-ph`
-        format: each entry is supposed to be a tuple of the form $(x, y,
-        d)$, with $(x, y)$ being the usual creation--destruction pair,
-        and $d$ denoting the dimension.
+    D : `torch.tensor`
+        Persistence diagram, assumed to be in shape `(n, 2)`, where each
+        entry corresponds to a tuple of the form $(x, y)$, with $x$
+        denoting the creation of a topological feature and $y$ denoting
+        its destruction.
 
     p : float
         Weight parameter for the total persistence calculation.
@@ -19,8 +25,7 @@ def total_persistence(D, p=2):
     -------
     Total persistence of `D`.
     """
-    persistence = np.diff(D[:, 0:2])
-    persistence = persistence[np.isfinite(persistence)]
+    persistence = torch.diff(D)
+    persistence = persistence[torch.isfinite(persistence)]
 
-    # TODO: Normalise?
-    return np.sum(np.power(np.abs(persistence), p))
+    return persistence.abs().pow(p).sum()
