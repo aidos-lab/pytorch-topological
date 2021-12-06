@@ -40,7 +40,7 @@ class ModelSpaceLoss(nn.Module):
     a loss function between the two spaces should be optimised.
     """
 
-    def __init__(self, X, Y):
+    def __init__(self, X, Y, loss):
         """Initialise new module.
 
         Parameters
@@ -52,6 +52,10 @@ class ModelSpaceLoss(nn.Module):
         Y : `np.array`
             Target point cloud. Will be considered fixed and not
             trainable at all.
+
+        loss : `nn.Module`
+            Loss to evaluate between the source and the target point
+            cloud. Will be initialised within this function.
         """
         super().__init__()
 
@@ -60,6 +64,9 @@ class ModelSpaceLoss(nn.Module):
 
         # TODO: make configurable
         self.pd_target = ripser_parallel(self.Y)['dgms']
+        self.pd_target = [torch.as_tensor(pd) for pd in self.pd_target]
+
+        self.loss = loss(Y=self.Y)
 
     def forward(self):
         """Implement forward pass of the loss.
@@ -116,8 +123,8 @@ class ModelSpaceLoss(nn.Module):
             (creators_1d, destroyers_1d), 1
         )
 
-        source_total_persistence = persistence_0d.pow(2).sum() + persistence_1d.pow(2).sum()
-        target_total_persistence = _total_persistence(pd_target[0]) + _total_persistence(pd_target[1])
+        loss = self.loss(
+            [persistence_diagram_0d, persistence_diagram_1d]
+        )
 
-        loss = torch.abs(source_total_persistence - target_total_persistence)
         return loss

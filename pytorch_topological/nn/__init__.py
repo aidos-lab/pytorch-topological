@@ -2,7 +2,10 @@
 
 from .loss import TotalPersistenceLoss
 
+from .vietoris_rips import ModelSpaceLoss
+
 
 __all__ = [
+    'ModelSpaceLoss',
     'TotalPersistenceLoss'
 ]

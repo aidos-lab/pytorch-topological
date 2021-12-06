@@ -4,7 +4,9 @@
 import logging
 
 import pytorch_topological.utils as utils
-import pytorch_topological.nn.vietoris_rips as vr
+
+from pytorch_topological.nn import ModelSpaceLoss
+from pytorch_topological.nn import TotalPersistenceLoss
 
 import torch.optim as optim
 
@@ -15,7 +17,7 @@ if __name__ == '__main__':
     X = utils.make_disk(r=0.01, R=0.5, n=n)
     Y = utils.make_disk(r=0.90, R=1.0, n=n)
 
-    loss = vr.ModelSpaceLoss(X, Y)
+    loss = ModelSpaceLoss(X, Y, loss=TotalPersistenceLoss)
     opt = optim.SGD(loss.parameters(), lr=0.05)
 
     logging.basicConfig(
