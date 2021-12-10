@@ -1,11 +1,11 @@
 """Layers and loss terms for persistence-based optimisation."""
 
-from .loss import TotalPersistenceLoss
+from .loss import SummaryStatisticLoss
 
-from .vietoris_rips import ModelSpaceLoss
+from .vietoris_rips import VietorisRips
 
 
 __all__ = [
-    'ModelSpaceLoss',
-    'TotalPersistenceLoss'
+    'SummaryStatisticLoss'
+    'VietorisRips',
 ]

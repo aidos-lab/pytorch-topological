@@ -16,8 +16,22 @@ class SummaryStatisticLoss(torch.nn.Module):
     """
 
     # TODO: Add weight functions
-    def __init__(self, Y=None, summary_statistic='total_persistence'):
+    def __init__(self, summary_statistic='total_persistence'):
         """Create new loss function based on summary statistic.
+
+        Parameters
+        ----------
+        summary_statistic : str
+            Indicates which summary statistic function to use.
+        """
+        super().__init__()
+
+        import pytorch_topological.utils.summary_statistics as stat
+        self.stat_fn = getattr(stat, summary_statistic, None)
+
+    # TODO: improve documentation
+    def forward(self, X, Y=None):
+        """Calculate loss based on input tensor(s).
 
         Parameters
         ----------
@@ -25,30 +39,17 @@ class SummaryStatisticLoss(torch.nn.Module):
             Optional target tensor. If set, evaluates a difference in
             loss functions as shown in the introduction. If `None`, a
             simpler variant of the loss will be evaluated.
-
-        summary_statistic : str
-            Indicates which summary statistic function to use.
         """
-        super().__init__()
-
-        import pytorch_topological.utils.summary_statistics as stat
-
-        self.Y = Y
-        self.stat_fn = getattr(stat, summary_statistic, None)
-
-    # TODO: improve documentation
-    def forward(self, X):
-        """Calculate loss based on input tensor."""
         stat_src = torch.sum(
             torch.stack([
                 self.stat_fn(D) for D in X
             ])
         )
 
-        if self.Y is not None:
+        if Y is not None:
             stat_target = torch.sum(
                 torch.stack([
-                    self.stat_fn(D) for D in self.Y
+                    self.stat_fn(D) for D in Y
                 ])
             )
 
