@@ -1,34 +1,57 @@
 """Loss terms for various optimisation objectives."""
 
-from torch import nn
-
-from pytorch_topological.utils import total_persistence
-
 import torch
 
 
-class TotalPersistenceLoss(nn.Module):
-    """Implement loss based on total persistence."""
+class SummaryStatisticLoss(torch.nn.Module):
+    r"""Implement loss based on summary statistic.
 
-    def __init__(self, Y=None):
+    This is a generic loss function based on topological summary
+    statistics. It implements a loss of the following form:
+
+    .. math:: \|s(X) - s(Y)\|^p
+
+    In the preceding equation, `s` refers to a function that results in
+    a scalar-valued summary of a persistence diagram.
+    """
+
+    # TODO: Add weight functions
+    def __init__(self, Y=None, summary_statistic='total_persistence'):
+        """Create new loss function based on summary statistic.
+
+        Parameters
+        ----------
+        Y : `torch.tensor` or `None`
+            Optional target tensor. If set, evaluates a difference in
+            loss functions as shown in the introduction. If `None`, a
+            simpler variant of the loss will be evaluated.
+
+        summary_statistic : str
+            Indicates which summary statistic function to use.
+        """
         super().__init__()
 
-        self.Y = Y
+        import pytorch_topological.utils.summary_statistics as stat
 
+        self.Y = Y
+        self.stat_fn = getattr(stat, summary_statistic, None)
+
+    # TODO: improve documentation
     def forward(self, X):
-        total_persistence_src = torch.sum(
+        """Calculate loss based on input tensor."""
+        stat_src = torch.sum(
             torch.stack([
-                total_persistence(D) for D in X
+                self.stat_fn(D) for D in X
             ])
         )
 
         if self.Y is not None:
-            total_persistence_target = torch.sum(
+            stat_target = torch.sum(
                 torch.stack([
-                    total_persistence(D) for D in self.Y
+                    self.stat_fn(D) for D in self.Y
                 ])
             )
 
-            return (total_persistence_target - total_persistence_src).abs()
+            return (stat_target - stat_src).abs()
         else:
-            return total_persistence_src
+            return stat_src.abs()
