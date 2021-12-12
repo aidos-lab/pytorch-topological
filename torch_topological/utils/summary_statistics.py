@@ -50,9 +50,7 @@ def persistent_entropy(D, **kwargs):
     persistence = persistence[torch.isfinite(persistence)].abs()
 
     P = persistence.sum()
-    probabilities = torch.as_tensor([
-        p / P for p in persistence
-    ])
+    probabilities = persistence / P
 
     # Ensures that a probability of zero will just result in
     # a logarithm of zero as well. This is required whenever
