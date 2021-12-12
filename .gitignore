@@ -4,4 +4,5 @@
 *.pyc
 *.swp
 
+dist/
 __pycache__/
