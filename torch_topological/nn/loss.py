@@ -63,3 +63,30 @@ class SummaryStatisticLoss(torch.nn.Module):
             return (stat_target - stat_src).abs().pow(self.p)
         else:
             return stat_src.abs().pow(self.p)
+
+
+class SignatureLoss(torch.nn.Module):
+    def __init__(self, Y=None):
+        super().__init__()
+
+    def forward(self, X, Y):
+        X_pc, X_pi = X
+        Y_pc, Y_pi = Y
+
+        X_dist = torch.cdist(X_pc, X_pc, p=2)
+        Y_dist = torch.cdist(Y_pc, Y_pc, p=2)
+
+        X_sig_X = self._select_distances_from_generators(X_dist, X_pi[0][0])
+        X_sig_Y = self._select_distances_from_generators(X_dist, Y_pi[0][0])
+        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[0][0])
+        Y_sig_X = self._select_distances_from_generators(Y_dist, X_pi[0][0])
+
+        XY_dist = (X_sig_X - Y_sig_X).pow(2).sum()
+        YX_dist = (Y_sig_Y - X_sig_Y).pow(2).sum()
+
+        return XY_dist + YX_dist
+
+    def _select_distances_from_generators(self, dist, gens):
+        # TODO: Incorporate more than edge information.
+        selected_distances = dist[gens[:, 1], gens[:, 2]]
+        return selected_distances
