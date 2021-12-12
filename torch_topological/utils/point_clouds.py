@@ -5,6 +5,24 @@ import numpy as np
 import torch
 
 
+def make_uniform_blob(low=0.0, high=1.0, n=100):
+    """Create blob by uniform sampling.
+
+    Parameters
+    ----------
+    n : int
+        Number of points to sample.
+
+    Returns
+    -------
+    Tensor of shape `(n, 2)`.
+    """
+    assert low <= high, RuntimeError('low > high')
+
+    X = np.random.uniform(low=low, high=high, size=(n, 2))
+    return torch.as_tensor(X)
+
+
 def make_disk(r=0.9, R=1.0, n=100):
     """Create disk by uniform sampling.
 
