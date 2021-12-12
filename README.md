@@ -2,6 +2,8 @@
 
 # `pytorch-topological`: A topological machine learning framework for `pytorch`
 
+![PyPI - License](https://img.shields.io/pypi/l/torch_topological) ![PyPI](https://img.shields.io/pypi/v/torch_topological)
+
 `pytorch-topological` (or `torch_topological`) is a topological machine
 learning framework for [PyTorch](https://pytorch.org). It aims to
 collect *loss terms* and *neural network layers* in order to simplify
