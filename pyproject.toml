@@ -1,8 +1,11 @@
 [tool.poetry]
-name = "pytorch-topological"
+name = "torch_topological"
 version = "0.1.0"
-description = ""
+description = "A framework for topological machine learning based on `pytorch`."
 authors = ["Bastian Rieck <bastian@rieck.me>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+include = ["README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
