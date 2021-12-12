@@ -38,7 +38,7 @@ def persistent_entropy(D, **kwargs):
 def polynomial_function(D, p, q, **kwargs):
     r"""Parametrise polynomial function over persistence diagrams.
 
-    This function follows an approach by Adcock et al. [1] and
+    This function follows an approach by Adcock et al. [Adcock16a]_ and
     parametrises a polynomial function over a persistence diagram.
 
     Parameters
@@ -63,9 +63,9 @@ def polynomial_function(D, p, q, **kwargs):
 
     References
     ----------
-    .. [1] A. Adcock et al., "The Ring of Algebraic Functions on
-    Persistence Bar Codes", *Homology, Homotopy and Applications*,
-    Volume 18, Issue 1, pp. 381--402, 2016.
+    .. [Adcock16a] A. Adcock et al., "The Ring of Algebraic Functions on
+        Persistence Bar Codes", *Homology, Homotopy and Applications*,
+        Volume 18, Issue 1, pp. 381--402, 2016.
     """
     lengths = torch.diff(D)
     means = torch.sum(D, dim=-1, keepdim=True) / 2
