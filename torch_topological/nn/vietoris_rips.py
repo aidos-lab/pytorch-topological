@@ -7,7 +7,7 @@ import torch
 
 
 class VietorisRips(nn.Module):
-    """Optimise persistence-based functions on a Vietoris--Rips complex.
+    """Calculate Vietoris--Rips persistence diagrams.
 
     This module calculates 'differentiable' persistence diagrams between
     up to two spaces. The first space is treated as the source or input,
@@ -30,7 +30,7 @@ class VietorisRips(nn.Module):
         """
         super().__init__()
 
-        self.X = X # nn.Parameter(torch.as_tensor(X), requires_grad=True)
+        self.X = X
         self.Y = Y
 
         # TODO: make configurable
@@ -89,9 +89,5 @@ class VietorisRips(nn.Module):
         persistence_diagram_1d = torch.stack(
             (creators_1d, destroyers_1d), 1
         )
-
-        #loss = self.loss(
-        #    [persistence_diagram_0d, persistence_diagram_1d]
-        #)
 
         return [persistence_diagram_0d, persistence_diagram_1d], self.pd_target
