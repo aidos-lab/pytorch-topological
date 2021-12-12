@@ -4,7 +4,7 @@
 import torch
 
 
-def total_persistence(D, p=2):
+def total_persistence(D, p=2, **kwargs):
     """Calculate total persistence of a persistence diagram.
 
     This function will calculate the totla persistence of a persistence
@@ -31,7 +31,7 @@ def total_persistence(D, p=2):
     return persistence.abs().pow(p).sum()
 
 
-def persistent_entropy(D):
+def persistent_entropy(D, **kwargs):
     """Calculate persistent entropy of a persistence diagram.
 
     Parameters

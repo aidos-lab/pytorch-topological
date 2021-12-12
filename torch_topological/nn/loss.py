@@ -16,17 +16,24 @@ class SummaryStatisticLoss(torch.nn.Module):
     """
 
     # TODO: Add weight functions
-    def __init__(self, summary_statistic='total_persistence'):
+    def __init__(self, summary_statistic='total_persistence', **kwargs):
         """Create new loss function based on summary statistic.
 
         Parameters
         ----------
         summary_statistic : str
             Indicates which summary statistic function to use.
+
+        **kwargs
+            Optional keyword arguments, to be passed to the
+            summary statistic function.
         """
         super().__init__()
 
-        import pytorch_topological.utils.summary_statistics as stat
+        self.p = kwargs.get('p', 1.0)
+        self.kwargs = kwargs
+
+        import torch_topological.utils.summary_statistics as stat
         self.stat_fn = getattr(stat, summary_statistic, None)
 
     # TODO: improve documentation
@@ -42,17 +49,17 @@ class SummaryStatisticLoss(torch.nn.Module):
         """
         stat_src = torch.sum(
             torch.stack([
-                self.stat_fn(D) for D in X
+                self.stat_fn(D, **self.kwargs) for D in X
             ])
         )
 
         if Y is not None:
             stat_target = torch.sum(
                 torch.stack([
-                    self.stat_fn(D) for D in Y
+                    self.stat_fn(D, **self.kwargs) for D in Y
                 ])
             )
 
-            return (stat_target - stat_src).abs()
+            return (stat_target - stat_src).abs().pow(self.p)
         else:
-            return stat_src.abs()
+            return stat_src.abs().pow(self.p)
