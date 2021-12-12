@@ -28,6 +28,7 @@ if __name__ == '__main__':
     # loss = ModelSpaceLoss(X, Y, loss=SummaryStatisticLoss)
     vr = VietorisRips(X, Y)
     loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
+    #loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
     opt = optim.SGD([X], lr=0.05)
 
     logging.basicConfig(
