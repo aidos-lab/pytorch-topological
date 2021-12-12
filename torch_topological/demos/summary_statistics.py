@@ -6,7 +6,9 @@ import logging
 
 from torch_topological.nn import SummaryStatisticLoss
 from torch_topological.nn import VietorisRips
+
 from torch_topological.utils import make_disk
+from torch_topological.utils import make_uniform_blob
 
 import torch
 import torch.optim as optim
@@ -25,7 +27,7 @@ if __name__ == '__main__':
 
     # loss = ModelSpaceLoss(X, Y, loss=SummaryStatisticLoss)
     vr = VietorisRips(X, Y)
-    loss = SummaryStatisticLoss(p=2)
+    loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
     opt = optim.SGD([X], lr=0.05)
 
     logging.basicConfig(
@@ -34,10 +36,10 @@ if __name__ == '__main__':
 
     losses = []
 
-    for i in range(200):
-        pd_source, pd_target = vr()
+    for i in range(500):
+        pi_source, pi_target = vr()
 
-        l = loss(pd_source, pd_target)
+        l = loss(pi_source, pi_target)
 
         l.backward()
         opt.step()

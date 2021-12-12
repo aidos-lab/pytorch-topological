@@ -49,14 +49,14 @@ class SummaryStatisticLoss(torch.nn.Module):
         """
         stat_src = torch.sum(
             torch.stack([
-                self.stat_fn(D, **self.kwargs) for D in X
+                self.stat_fn(D, **self.kwargs) for _, D in X
             ])
         )
 
         if Y is not None:
             stat_target = torch.sum(
                 torch.stack([
-                    self.stat_fn(D, **self.kwargs) for D in Y
+                    self.stat_fn(D, **self.kwargs) for _, D in Y
                 ])
             )
 

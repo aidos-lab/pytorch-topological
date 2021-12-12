@@ -33,9 +33,15 @@ class VietorisRips(nn.Module):
         self.X = X
         self.Y = Y
 
-        # TODO: make configurable
-        self.pd_target = ripser_parallel(self.Y)['dgms']
-        self.pd_target = [torch.as_tensor(pd) for pd in self.pd_target]
+        info = ripser_parallel(self.Y, return_generators=True)
+
+        self.pd_target = [
+            torch.as_tensor(pd) for pd in info['dgms']
+        ]
+
+        self.pp_target = [
+            torch.tensor(gens) for gens in info['gens']
+        ]
 
     def forward(self):
         """Implement forward pass for persistence diagram calculation.
@@ -45,7 +51,11 @@ class VietorisRips(nn.Module):
 
         Returns
         -------
-        Set of persistence diagrams for the source and target space.
+        Tuple containing persistence information for the source and
+        target space, respectively. Each tuple is a list of tuples of
+        the form `(gen, pd)`, where `gen` refers to the set of
+        generators for the respective dimension, and `pd` is the usual
+        persistence diagram.
         """
         X = self.X
 
@@ -90,4 +100,12 @@ class VietorisRips(nn.Module):
             (creators_1d, destroyers_1d), 1
         )
 
-        return [persistence_diagram_0d, persistence_diagram_1d], self.pd_target
+        return (
+            [
+                (generators_0d, persistence_diagram_0d),
+                (generators_1d, persistence_diagram_1d)
+            ],
+            [
+                (gens, pd) for gens, pd in zip(self.pp_target, self.pd_target)
+            ]
+        )
