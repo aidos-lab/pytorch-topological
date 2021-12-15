@@ -15,7 +15,6 @@ class SummaryStatisticLoss(torch.nn.Module):
     a scalar-valued summary of a persistence diagram.
     """
 
-    # TODO: Add weight functions
     def __init__(self, summary_statistic='total_persistence', **kwargs):
         """Create new loss function based on summary statistic.
 
@@ -36,16 +35,30 @@ class SummaryStatisticLoss(torch.nn.Module):
         import torch_topological.utils.summary_statistics as stat
         self.stat_fn = getattr(stat, summary_statistic, None)
 
-    # TODO: improve documentation
     def forward(self, X, Y=None):
-        """Calculate loss based on input tensor(s).
+        r"""Calculate loss based on input tensor(s).
 
         Parameters
         ----------
+        X : `torch.tensor` or `None`
+            Source tensor. Supposed to contain persistence diagrams and
+            persistence pairings.
+
         Y : `torch.tensor` or `None`
             Optional target tensor. If set, evaluates a difference in
             loss functions as shown in the introduction. If `None`, a
             simpler variant of the loss will be evaluated.
+
+        Returns
+        -------
+        Loss based on the summary statistic selected by the client.
+        Given a statistic :math:`s`, the function returns the following
+        expression:
+
+        .. math:: \|s(X) - s(Y)\|^p
+
+        In case no target tensor `Y` has been provided, the latter part
+        of the expression amounts to `0`.
         """
         stat_src = torch.sum(
             torch.stack([
