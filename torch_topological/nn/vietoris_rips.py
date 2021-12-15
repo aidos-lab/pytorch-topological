@@ -44,15 +44,16 @@ class VietorisRips(nn.Module):
             'maxdim': dim,
         }
 
-        info = ripser_parallel(self.Y, **self.ripser_params)
+        if self.Y is not None:
+            info = ripser_parallel(self.Y, **self.ripser_params)
 
-        self.pd_target = [
-            torch.as_tensor(pd) for pd in info['dgms']
-        ]
+            self.pd_target = [
+                torch.as_tensor(pd) for pd in info['dgms']
+            ]
 
-        self.pp_target = [
-            torch.tensor(gens) for gens in info['gens']
-        ]
+            self.pp_target = [
+                torch.tensor(gens) for gens in info['gens']
+            ]
 
     def forward(self):
         """Implement forward pass for persistence diagram calculation.
@@ -111,12 +112,22 @@ class VietorisRips(nn.Module):
             (creators_1d, destroyers_1d), 1
         )
 
-        return (
-            [
-                (generators_0d, persistence_diagram_0d),
-                (generators_1d, persistence_diagram_1d)
-            ],
-            [
-                (gens, pd) for gens, pd in zip(self.pp_target, self.pd_target)
-            ]
-        )
+        if self.Y is not None:
+            return (
+                [
+                    (generators_0d, persistence_diagram_0d),
+                    (generators_1d, persistence_diagram_1d)
+                ],
+                [
+                    (g, p) for g, p in zip(self.pp_target, self.pd_target)
+                ]
+            )
+
+        # TODO: Solve more elegantly
+        else:
+            return (
+                [
+                    (generators_0d, persistence_diagram_0d),
+                    (generators_1d, persistence_diagram_1d)
+                ], []
+            )
