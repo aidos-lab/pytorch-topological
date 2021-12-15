@@ -15,7 +15,7 @@ class VietorisRips(nn.Module):
     persistence diagram information will be cached.
     """
 
-    def __init__(self, X, Y=None):
+    def __init__(self, X, Y=None, dim=1):
         """Initialise new module.
 
         Parameters
@@ -27,13 +27,24 @@ class VietorisRips(nn.Module):
         Y : `np.array`, `torch.tensor`, or `None`
             Target point cloud. Will be considered fixed and not
             trainable at all.
+
+        dim : int
+            Calculates persistent homology up to (and including) the
+            prescribed dimension.
         """
         super().__init__()
 
         self.X = X
         self.Y = Y
 
-        info = ripser_parallel(self.Y, return_generators=True)
+        # Ensures that the same parameters are used whenever calling
+        # `ripser`.
+        self.ripser_params = {
+            'return_generators': True,
+            'maxdim': dim,
+        }
+
+        info = ripser_parallel(self.Y, **self.ripser_params)
 
         self.pd_target = [
             torch.as_tensor(pd) for pd in info['dgms']
@@ -61,7 +72,7 @@ class VietorisRips(nn.Module):
 
         generators = ripser_parallel(
             X.detach(),
-            return_generators=True
+            **self.ripser_params
         )['gens']
 
         # TODO: Is this always required? Can we calculate this in
