@@ -42,9 +42,10 @@ if __name__ == '__main__':
 
         l = loss(pi_source, pi_target)
 
+        opt.zero_grad()
+
         l.backward()
         opt.step()
-        opt.zero_grad()
 
         l = l.detach().numpy()
 

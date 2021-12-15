@@ -86,13 +86,17 @@ class SignatureLoss(torch.nn.Module):
         X_pc, X_pi = X
         Y_pc, Y_pi = Y
 
-        X_dist = torch.cdist(X_pc, X_pc, p=2)
-        Y_dist = torch.cdist(Y_pc, Y_pc, p=2)
+        # TODO: make configurable
+        X_dist = torch.cdist(X_pc, X_pc)
+        Y_dist = torch.cdist(Y_pc, Y_pc)
+
+        X_dist = X_dist / X_dist.max()
+        Y_dist = Y_dist / Y_dist.max()
 
         X_sig_X = self._select_distances_from_generators(X_dist, X_pi[0][0])
         X_sig_Y = self._select_distances_from_generators(X_dist, Y_pi[0][0])
-        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[0][0])
         Y_sig_X = self._select_distances_from_generators(Y_dist, X_pi[0][0])
+        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[0][0])
 
         XY_dist = (X_sig_X - Y_sig_X).pow(2).sum()
         YX_dist = (Y_sig_Y - X_sig_Y).pow(2).sum()

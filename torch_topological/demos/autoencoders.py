@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 
 from torch_topological.data import create_sphere_dataset
 
+from torch_topological.nn import SignatureLoss
+from torch_topological.nn import VietorisRips
+
 
 class LinearAutoencoder(torch.nn.Module):
     """Simple linear autoencoder."""
@@ -39,17 +42,43 @@ class LinearAutoencoder(torch.nn.Module):
         return reconstruction_error
 
 
+class TopologicalAutoencoder(torch.nn.Module):
+    """Wrapper for a topologically-regularised autoencoder."""
+    def __init__(self, model, lam=1.0):
+        super().__init__()
+
+        self.lam = lam
+        self.model = model
+        self.loss = SignatureLoss()
+
+    def forward(self, x):
+        z = self.model.encode(x)
+
+        # TODO: I don't like this syntax at all.
+        pi_x, _ = VietorisRips(x)()
+        pi_z, _ = VietorisRips(z)()
+
+        geom_loss = self.model(x)
+        topo_loss = self.loss([x, pi_x], [z, pi_z])
+
+        loss = geom_loss + self.lam * topo_loss
+        return loss
+
+
+
 if __name__ == '__main__':
-    X, y = create_sphere_dataset()
+    X, y = create_sphere_dataset(n_samples=50, n_spheres=3)
     X = torch.as_tensor(X, dtype=torch.float)
 
     model = LinearAutoencoder(input_dim=X.shape[1])
-    optimizer = optim.SGD(model.parameters(), lr=0.1)
+    topo_model = TopologicalAutoencoder(model, lam=0.1)
 
-    for i in range(500):
-        model.train()
+    optimizer = optim.Adam(topo_model.parameters(), lr=0.1)
 
-        loss = model(X)
+    for i in range(10):
+        topo_model.train()
+
+        loss = topo_model(X)
 
         optimizer.zero_grad()
         loss.backward()
