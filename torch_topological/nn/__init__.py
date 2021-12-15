@@ -8,6 +8,6 @@ from .vietoris_rips import VietorisRips
 
 __all__ = [
     'SignatureLoss',
-    'SummaryStatisticLoss'
+    'SummaryStatisticLoss',
     'VietorisRips',
 ]

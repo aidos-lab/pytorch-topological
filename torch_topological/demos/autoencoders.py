@@ -3,6 +3,9 @@
 import torch
 
 
+from torch_topological.data import create_sphere_dataset
+
+
 class LinearAutoencoder(torch.nn.Module):
     """Simple linear autoencoder."""
     def __init__(self, input_dim, latent_dim=2):
@@ -32,3 +35,9 @@ class LinearAutoencoder(torch.nn.Module):
         x_hat = self.decode(z)
         reconstruction_error = self.loss(x, x_hat)
         return reconstruction_error
+
+
+if __name__ == '__main__':
+    X, y = create_sphere_dataset()
+    print(X, y)
+

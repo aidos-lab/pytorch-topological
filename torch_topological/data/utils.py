@@ -21,7 +21,6 @@ def embed(data, ambient=50):
 
     References
     ----------
-
     .. [tadasets] https://github.com/scikit-tda/tadasets
     """
     n, d = data.shape
