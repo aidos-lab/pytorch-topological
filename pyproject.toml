@@ -8,11 +8,10 @@ readme = "README.md"
 include = ["README.md"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-giotto-tda = "^0.5.1"
-torch = "^1.10.0"
-giotto-ph = "^0.2.0"
+python = ">=3.9"
 matplotlib = "^3.5.0"
+giotto-ph = "^0.2.0"
+torch = "^1.10.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
