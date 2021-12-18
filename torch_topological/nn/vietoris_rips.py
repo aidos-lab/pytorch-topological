@@ -9,33 +9,21 @@ import torch
 class VietorisRips(nn.Module):
     """Calculate Vietoris--Rips persistence diagrams.
 
-    This module calculates 'differentiable' persistence diagrams between
-    up to two spaces. The first space is treated as the source or input,
-    while the second space is treated as the non-trainable target, whose
-    persistence diagram information will be cached.
+    This module calculates 'differentiable' persistence diagrams for
+    point clouds. The underlying topological approximations are done
+    by calculating a Vietoris--Rips complex of the data.
     """
 
-    def __init__(self, X, Y=None, dim=1):
+    def __init__(self, dim=1):
         """Initialise new module.
 
         Parameters
         ----------
-        X : `np.array` or `torch.tensor`
-            Input point cloud, typically denoted as the 'source' point
-            cloud that can be adjusted.
-
-        Y : `np.array`, `torch.tensor`, or `None`
-            Target point cloud. Will be considered fixed and not
-            trainable at all.
-
         dim : int
             Calculates persistent homology up to (and including) the
             prescribed dimension.
         """
         super().__init__()
-
-        self.X = X
-        self.Y = Y
 
         # Ensures that the same parameters are used whenever calling
         # `ripser`.
@@ -44,35 +32,25 @@ class VietorisRips(nn.Module):
             'maxdim': dim,
         }
 
-        if self.Y is not None:
-            info = ripser_parallel(self.Y, **self.ripser_params)
-
-            self.pd_target = [
-                torch.as_tensor(pd) for pd in info['dgms']
-            ]
-
-            self.pp_target = [
-                torch.tensor(gens) for gens in info['gens']
-            ]
-
-    def forward(self):
+    def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
 
-        The forward pass entails calculating persistent homology on the
-        current point cloud and returning a set of persistence diagrams.
+        The forward pass entails calculating persistent homology on
+        a point cloud and returning a set of persistence diagrams.
+
+        Parameters
+        ----------
+        x : `np.array` or `torch.tensor`
+            Input point cloud
 
         Returns
         -------
-        Tuple containing persistence information for the source and
-        target space, respectively. Each tuple is a list of tuples of
-        the form `(gen, pd)`, where `gen` refers to the set of
-        generators for the respective dimension, and `pd` is the usual
-        persistence diagram.
+        List of tuples of the form `(gen, pd)`, where `gen` refers to
+        the set of generators for the respective dimension, while `pd`
+        denotes the persistence diagram.
         """
-        X = self.X
-
         generators = ripser_parallel(
-            X.detach(),
+            x.detach(),
             **self.ripser_params
         )['gens']
 
@@ -81,7 +59,7 @@ class VietorisRips(nn.Module):
         #
         # Calculate distances in the source space and select the
         # appropriate tuples later on.
-        source_distances = torch.cdist(X, X, p=2)
+        source_distances = torch.cdist(x, x, p=2)
 
         generators_0d = generators[0]
         generators_1d = generators[1]
@@ -112,22 +90,7 @@ class VietorisRips(nn.Module):
             (creators_1d, destroyers_1d), 1
         )
 
-        if self.Y is not None:
-            return (
-                [
-                    (generators_0d, persistence_diagram_0d),
-                    (generators_1d, persistence_diagram_1d)
-                ],
-                [
-                    (g, p) for g, p in zip(self.pp_target, self.pd_target)
-                ]
-            )
-
-        # TODO: Solve more elegantly
-        else:
-            return (
-                [
-                    (generators_0d, persistence_diagram_0d),
-                    (generators_1d, persistence_diagram_1d)
-                ], []
-            )
+        return (
+            (generators_0d, persistence_diagram_0d),
+            (generators_1d, persistence_diagram_1d)
+        )

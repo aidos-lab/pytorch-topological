@@ -91,12 +91,14 @@ class TopologicalAutoencoder(torch.nn.Module):
         self.model = model
         self.loss = SignatureLoss()
 
+        # TODO: Decrease dimensionality...
+        self.vr = VietorisRips(dim=1)
+
     def forward(self, x):
         z = self.model.encode(x)
 
-        # TODO: I don't like this syntax at all.
-        pi_x, _ = VietorisRips(x)()
-        pi_z, _ = VietorisRips(z)()
+        pi_x = self.vr(x)
+        pi_z = self.vr(z)
 
         geom_loss = self.model(x)
         topo_loss = self.loss([x, pi_x], [z, pi_z])

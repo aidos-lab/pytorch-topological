@@ -26,7 +26,8 @@ if __name__ == '__main__':
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
     # loss = ModelSpaceLoss(X, Y, loss=SummaryStatisticLoss)
-    vr = VietorisRips(X, Y)
+    vr = VietorisRips()
+    pi_target = vr(Y)
     loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
     #loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
     opt = optim.SGD([X], lr=0.05)
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     losses = []
 
     for i in range(500):
-        pi_source, pi_target = vr()
+        pi_source = vr(X)
 
         l = loss(pi_source, pi_target)
 
