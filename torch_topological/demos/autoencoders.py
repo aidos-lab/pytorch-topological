@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     train_loader = DataLoader(
         data_set,
-        batch_size=256,
+        batch_size=64,
         shuffle=True,
         drop_last=True
     )
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     optimizer = optim.Adam(topo_model.parameters(), lr=0.1)
 
-    for i in range(2):
+    for i in range(10):
         topo_model.train()
 
         for batch, (x, y) in enumerate(train_loader):
@@ -130,8 +130,6 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            print('.')
-
     data_set = SpheresDataset(train=True)
 
     test_loader = DataLoader(
@@ -140,15 +138,19 @@ if __name__ == '__main__':
             batch_size=len(data_set)
     )
 
-    X, y = next(iter(test_loader))
+    # FIXME: Worst results?
+    # X, ynext(iter(test_loader))
+
+    X, y = create_sphere_dataset(n_samples=50, n_spheres=3)
+    X = torch.as_tensor(X, dtype=torch.float)
 
     Z = model.encode(X).detach().numpy()
 
     plt.scatter(
         Z[:, 0], Z[:, 1],
-        c=torch.as_tensor(y, dtype=int),
+        c=y,
         cmap='Set1',
-        marker='*',
+        marker='o',
         alpha=0.9,
     )
     plt.show()
