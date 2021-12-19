@@ -5,6 +5,8 @@ import torch.optim as optim
 
 import matplotlib.pyplot as plt
 
+from tqdm import tqdm
+
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
@@ -120,9 +122,13 @@ if __name__ == '__main__':
     model = LinearAutoencoder(input_dim=data_set.dimension)
     topo_model = TopologicalAutoencoder(model, lam=0.1)
 
-    optimizer = optim.Adam(topo_model.parameters(), lr=0.1)
+    optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
 
-    for i in range(10):
+    n_epochs = 10
+
+    progress = tqdm(range(n_epochs))
+
+    for i in progress:
         topo_model.train()
 
         for batch, (x, y) in enumerate(train_loader):
@@ -131,6 +137,8 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+        progress.set_postfix(loss=loss.item())
 
     data_set = SpheresDataset(train=True)
 
