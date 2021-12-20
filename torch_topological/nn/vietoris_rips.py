@@ -14,7 +14,7 @@ class VietorisRips(nn.Module):
     by calculating a Vietoris--Rips complex of the data.
     """
 
-    def __init__(self, dim=1):
+    def __init__(self, dim=1, p=2):
         """Initialise new module.
 
         Parameters
@@ -22,14 +22,25 @@ class VietorisRips(nn.Module):
         dim : int
             Calculates persistent homology up to (and including) the
             prescribed dimension.
+
+        p : float
+            Exponent for the `p`-norm calculation of distances.
+
+        Notes
+        -----
+        This module currently only supports Minkowski norms. It does not
+        yet support other metrics.
         """
         super().__init__()
+
+        self.dim = dim
+        self.p = p
 
         # Ensures that the same parameters are used whenever calling
         # `ripser`.
         self.ripser_params = {
             'return_generators': True,
-            'maxdim': dim,
+            'maxdim': self.dim,
         }
 
     def forward(self, x):
@@ -56,41 +67,71 @@ class VietorisRips(nn.Module):
 
         # TODO: Is this always required? Can we calculate this in
         # a smarter fashion?
-        #
-        # Calculate distances in the source space and select the
-        # appropriate tuples later on.
-        source_distances = torch.cdist(x, x, p=2)
+        distances = torch.cdist(x, x, p=self.p)
 
-        generators_0d = generators[0]
-        generators_1d = generators[1]
+        # We always have 0D information.
+        persistence_information = \
+            self._extract_generators_and_diagrams(
+                distances,
+                generators,
+                dim0=True,
+            )
 
-        edge_indices_0d = generators_0d[:, 1:]
-        edge_indices_1d = generators_1d[0][:, 0:]
+        # Check whether we have any higher-dimensional information that
+        # we should return.
+        if self.dim >= 1:
+            persistence_information.extend(
+                self._extract_generators_and_diagrams(
+                    distances,
+                    generators,
+                    dim0=False,
+                )
+            )
 
-        destroyers_0d = source_distances[
-            edge_indices_0d[:, 0], edge_indices_0d[:, 1]
-        ]
+        return persistence_information
 
-        creators_1d = source_distances[
-            edge_indices_1d[:, 0], edge_indices_1d[:, 1]
-        ]
+    def _extract_generators_and_diagrams(
+            self,
+            dist,
+            gens,
+            finite=True,
+            dim0=False
+    ):
+        """Extract generators and persistence diagrams from raw data.
 
-        destroyers_1d = source_distances[
-            edge_indices_1d[:, 2], edge_indices_1d[:, 3]
-        ]
+        This convenience function translates between the output of
+        `ripser_parallel` and the required output of this function.
+        """
+        index = 1 if not dim0 else 0
+        gens = gens[index]
 
-        persistence_0d = destroyers_0d
-        persistence_1d = destroyers_1d - creators_1d
+        # TODO: Handling of infinite features not provided yet, but the
+        # index shift is already correct.
+        if not finite:
+            index += 1
 
-        persistence_diagram_0d = torch.stack(
-            (torch.zeros_like(persistence_0d), destroyers_0d), 1
-        )
+        if dim0:
+            # In a Vietoris--Rips complex, all vertices are created at
+            # time zero.
+            creators = torch.zeros_like(torch.as_tensor(gens)[:, 0])
+            destroyers = dist[gens[:, 1], gens[:, 2]]
 
-        persistence_diagram_1d = torch.stack(
-            (creators_1d, destroyers_1d), 1
-        )
+            persistence_diagram = torch.stack(
+                (creators, destroyers), 1
+            )
 
-        return (
-            (generators_0d, persistence_diagram_0d),
-            (generators_1d, persistence_diagram_1d)
-        )
+            return [(gens, persistence_diagram)]
+        else:
+            result = []
+
+            for gens_ in gens:
+                creators = dist[gens_[:, 0], gens_[:, 1]]
+                destroyers = dist[gens_[:, 2], gens_[:, 3]]
+
+                persistence_diagram = torch.stack(
+                    (creators, destroyers), 1
+                )
+
+                result.append((gens_, persistence_diagram))
+
+        return result
