@@ -51,14 +51,15 @@ class SummaryStatisticLoss(torch.nn.Module):
 
         Returns
         -------
-        Loss based on the summary statistic selected by the client.
-        Given a statistic :math:`s`, the function returns the following
-        expression:
+        float
+            Loss based on the summary statistic selected by the client.
+            Given a statistic :math:`s`, the function returns the
+            following expression:
 
-        .. math:: \|s(X) - s(Y)\|^p
+            .. math:: \|s(X) - s(Y)\|^p
 
-        In case no target tensor `Y` has been provided, the latter part
-        of the expression amounts to `0`.
+            In case no target tensor `Y` has been provided, the latter part
+            of the expression amounts to `0`.
         """
         stat_src = torch.sum(
             torch.stack([
@@ -94,11 +95,11 @@ class SignatureLoss(torch.nn.Module):
     References
     ----------
     .. [Moor20a] M. Moor et al., "Topological Autoencoders",
-    *Proceedings of the 37th International Conference on Machine
-    Learning**, PMLR 119, pp. 7045--7054, 2020.
+        *Proceedings of the 37th International Conference on Machine
+        Learning*, PMLR 119, pp. 7045--7054, 2020.
     """
 
-    def __init__(self, p=2, normalise=True):
+    def __init__(self, p=2, normalise=True, dimensions=0):
         """Create new loss instance.
 
         Parameters
@@ -109,6 +110,10 @@ class SignatureLoss(torch.nn.Module):
         normalise : bool
             If set, normalises distances for each point cloud. This can
             be useful when working with batches.
+
+        dimensions : int or tuple of int
+            Dimensions to use in the signature calculation. Following
+            [Moor20a]_, this is set by default to `0`.
         """
         super().__init__()
 
