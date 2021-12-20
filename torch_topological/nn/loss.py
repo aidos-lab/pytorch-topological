@@ -79,31 +79,83 @@ class SummaryStatisticLoss(torch.nn.Module):
 
 
 class SignatureLoss(torch.nn.Module):
-    def __init__(self, Y=None):
+    """Implement topological signature loss.
+
+    This module implements the topological signature loss first
+    described in [Moor20a]_. In contrast to the original code provided
+    by the authors, this module also provides extensions to
+    higher-dimensional generators if desired.
+
+    The module can be used in conjunction with any set of generators and
+    persistence diagrams, i.e. with any set of persistence pairings and
+    persistence diagrams. At the moment, it is restricted to calculating
+    a Minkowski distances for the loss calculation.
+
+    References
+    ----------
+    .. [Moor20a] M. Moor et al., "Topological Autoencoders",
+    *Proceedings of the 37th International Conference on Machine
+    Learning**, PMLR 119, pp. 7045--7054, 2020.
+    """
+
+    def __init__(self, p=2, normalise=True):
+        """Create new loss instance.
+
+        Parameters
+        ----------
+        p : float
+            Exponent for the `p`-norm calculation of distances.
+
+        normalise : bool
+            If set, normalises distances for each point cloud. This can
+            be useful when working with batches.
+        """
         super().__init__()
 
+        self.p = p
+        self.normalise = normalise
+
+    # TODO: Improve documentation and nomenclature.
     def forward(self, X, Y):
+        """Calculate signature loss between two data sets."""
         X_pc, X_pi = X
         Y_pc, Y_pi = Y
 
-        # TODO: make configurable
-        X_dist = torch.cdist(X_pc, X_pc)
-        Y_dist = torch.cdist(Y_pc, Y_pc)
+        X_dist = torch.cdist(X_pc, X_pc, self.p)
+        Y_dist = torch.cdist(Y_pc, Y_pc, self.p)
 
-        X_dist = X_dist / X_dist.max()
-        Y_dist = Y_dist / Y_dist.max()
+        if self.normalise:
+            X_dist = X_dist / X_dist.max()
+            Y_dist = Y_dist / Y_dist.max()
 
-        X_sig_X = self._select_distances_from_generators(X_dist, X_pi[0][0])
-        X_sig_Y = self._select_distances_from_generators(X_dist, Y_pi[0][0])
-        Y_sig_X = self._select_distances_from_generators(Y_dist, X_pi[0][0])
-        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[0][0])
+        X_sig_X = self._select_distances_from_generators(X_dist, X_pi[1][0])
+        X_sig_Y = self._select_distances_from_generators(X_dist, Y_pi[1][0])
+        Y_sig_X = self._select_distances_from_generators(Y_dist, X_pi[1][0])
+        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[1][0])
 
-        XY_dist = (X_sig_X - Y_sig_X).pow(2).sum()
-        YX_dist = (Y_sig_Y - X_sig_Y).pow(2).sum()
+        XY_dist = 0.5 * (X_sig_X - Y_sig_X).pow(2).sum()
+        YX_dist = 0.5 * (Y_sig_Y - X_sig_Y).pow(2).sum()
 
         return XY_dist + YX_dist
 
     def _select_distances_from_generators(self, dist, gens):
-        # TODO: Incorporate more than edge information.
-        selected_distances = dist[gens[:, 1], gens[:, 2]]
+        # Dimension 0: only a mapping of vertices--edges is present, and
+        # we must *only* access the edges.
+        if gens.shape[1] == 3:
+            selected_distances = dist[gens[:, 1], gens[:, 2]]
+
+        # Dimension > 0: we can access all distances
+        else:
+            creator_distances = dist[gens[:, 0], gens[:, 1]]
+            destroyer_distances = dist[gens[:, 2], gens[:, 3]]
+
+            # Need to use `torch.abs` here because of the way the
+            # signature lookup works. We are *not* guaranteed  to
+            # get 'valid' persistence values when using a pairing
+            # from space X to access distances from space Y,  for
+            # instance.
+            selected_distances = torch.abs(
+                destroyer_distances - creator_distances
+            )
+
         return selected_distances
