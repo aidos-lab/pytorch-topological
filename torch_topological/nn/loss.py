@@ -2,6 +2,8 @@
 
 import torch
 
+from torch_topological.utils import is_iterable
+
 
 class SummaryStatisticLoss(torch.nn.Module):
     r"""Implement loss based on summary statistic.
@@ -119,6 +121,12 @@ class SignatureLoss(torch.nn.Module):
 
         self.p = p
         self.normalise = normalise
+        self.dimensions = dimensions
+
+        # Ensure that we can iterate over the dimensions later on, as
+        # this simplifies the code.
+        if not is_iterable(self.dimensions):
+            self.dimensions = [self.dimensions]
 
     # TODO: Improve documentation and nomenclature.
     def forward(self, X, Y):
@@ -133,17 +141,34 @@ class SignatureLoss(torch.nn.Module):
             X_dist = X_dist / X_dist.max()
             Y_dist = Y_dist / Y_dist.max()
 
-        X_sig_X = self._select_distances_from_generators(X_dist, X_pi[0][0])
-        X_sig_Y = self._select_distances_from_generators(X_dist, Y_pi[0][0])
-        Y_sig_X = self._select_distances_from_generators(Y_dist, X_pi[0][0])
-        Y_sig_Y = self._select_distances_from_generators(Y_dist, Y_pi[0][0])
+        X_sig_X = [
+            self._select_distances(X_dist, X_pi[dim][0])
+            for dim in self.dimensions
+        ]
+        X_sig_Y = [
+            self._select_distances(X_dist, Y_pi[dim][0])
+            for dim in self.dimensions
+        ]
+        Y_sig_X = [
+            self._select_distances(Y_dist, X_pi[dim][0])
+            for dim in self.dimensions
+        ]
+        Y_sig_Y = [
+            self._select_distances(Y_dist, Y_pi[dim][0])
+            for dim in self.dimensions
+        ]
 
-        XY_dist = 0.5 * (X_sig_X - Y_sig_X).pow(2).sum()
-        YX_dist = 0.5 * (Y_sig_Y - X_sig_Y).pow(2).sum()
+        XY_dist = [
+            0.5 * (XX - YX).pow(2).sum() for XX, YX in zip(X_sig_X, Y_sig_X)
+        ]
 
-        return XY_dist + YX_dist
+        YX_dist = [
+            0.5 * (YY - XY).pow(2).sum() for YY, XY in zip(Y_sig_Y, X_sig_Y)
+        ]
 
-    def _select_distances_from_generators(self, dist, gens):
+        return torch.stack(XY_dist).sum() + torch.stack(YX_dist).sum()
+
+    def _select_distances(self, dist, gens):
         # Dimension 0: only a mapping of vertices--edges is present, and
         # we must *only* access the edges.
         if gens.shape[1] == 3:
