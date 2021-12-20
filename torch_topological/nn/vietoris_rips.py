@@ -1,4 +1,4 @@
-"""Minimise functions based on Vietoris--Rips complexes."""
+"""Vietoris--Rips complex calculation module(s)."""
 
 from gph import ripser_parallel
 from torch import nn
