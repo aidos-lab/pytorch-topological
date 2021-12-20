@@ -120,7 +120,7 @@ if __name__ == '__main__':
     )
 
     model = LinearAutoencoder(input_dim=data_set.dimension)
-    topo_model = TopologicalAutoencoder(model, lam=10)
+    topo_model = TopologicalAutoencoder(model, lam=0.5)
 
     optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
 
