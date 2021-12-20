@@ -21,8 +21,8 @@ class SpheresDataset(Dataset):
     def __init__(
         self,
         train=True,
-        n_samples=50,
-        n_spheres=3,
+        n_samples=100,
+        n_spheres=11,
         r=5,
         test_fraction=0.1,
         seed=42
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     )
 
     model = LinearAutoencoder(input_dim=data_set.dimension)
-    topo_model = TopologicalAutoencoder(model, lam=0.1)
+    topo_model = TopologicalAutoencoder(model, lam=10)
 
     optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
 
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     # FIXME: Worst results?
     # X, ynext(iter(test_loader))
 
-    X, y = create_sphere_dataset(n_samples=50, n_spheres=3)
+    X, y = create_sphere_dataset(n_samples=100, n_spheres=11)
     X = torch.as_tensor(X, dtype=torch.float)
 
     Z = model.encode(X).detach().numpy()
