@@ -7,6 +7,9 @@ from torch.utils.data import DataLoader
 
 from torch_topological.data import make_annulus
 
+from torch_topological.nn import SummaryStatisticLoss
+from torch_topological.nn import VietorisRips
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -82,44 +85,77 @@ class Discriminator(torch.nn.Module):
         return self.model(x)
 
 
+class AdversarialLoss(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.vr = VietorisRips(dim=1)
+        self.loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
+
+    def forward(self, real, synthetic):
+
+        loss = 0.0
+
+        for x, y in zip(real, synthetic):
+            pi_real = self.vr(x)
+            pi_synthetic = self.vr(y)
+
+            loss += self.loss(pi_real, pi_synthetic)
+
+        return loss
+
+
 if __name__ == '__main__':
 
-    n_epochs = 10
+    n_epochs = 5
     shape = (100, 2)
-    latent_dim = 100
+    latent_dim = 200
 
     data_loader = DataLoader(
         AnnulusDataset(),
         shuffle=True,
-        batch_size=32,
+        batch_size=8,
     )
 
     generator = Generator(shape=shape, latent_dim=latent_dim)
     discriminator = Discriminator(shape=shape)
+    adversarial_loss = AdversarialLoss()
+
+    opt_g = torch.optim.Adam(generator.parameters(), lr=1e-4)
+    opt_d = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
 
     for epoch in range(n_epochs):
-        for batch, (point_cloud, _) in enumerate(data_loader):
+        for batch, (pc_real, _) in enumerate(data_loader):
             z = torch.autograd.Variable(
                 torch.Tensor(
                     np.random.normal(
                         0,
                         1,
-                        (point_cloud.shape[0], latent_dim)
+                        (pc_real.shape[0], latent_dim)
                     )
                 )
             )
 
-            point_clouds = generator(z)
-            quasi_probs = discriminator(point_clouds)
+            opt_g.zero_grad()
+
+            pc_synthetic = generator(z)
+            quasi_probs = discriminator(pc_synthetic)
+
+            loss = adversarial_loss(pc_real, pc_synthetic)
+            loss.backward()
+
+            print(loss.item())
+
+            opt_g.step()
 
             print('z.shape =', z.shape)
-            print('point_clouds.shape =', point_clouds.shape)
+            print('pc_real.shape =', pc_real.shape)
             print('quasi_probs.shape =', quasi_probs.shape)
 
     # TODO: This is a rather stupid way of visualising the output of
     # this training routine while writing it. I hope to *eventually*
     # get rid of this...
-    pc = point_clouds.detach().numpy()[0]
+    pc = pc_synthetic.detach().numpy()[0]
 
     plt.scatter(pc[:, 0], pc[:, 1])
     plt.show()
