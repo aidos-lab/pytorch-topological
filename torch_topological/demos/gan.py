@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from torch_topological.data import make_annulus
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class AnnulusDataset(Dataset):
@@ -59,6 +60,28 @@ class Generator(torch.nn.Module):
         return point_cloud
 
 
+class Discriminator(torch.nn.Module):
+    def __init__(self, shape):
+        super().__init__()
+
+        input_dim = np.prod(shape)
+
+        # Inspired by the original GAN. THERE CAN ONLY BE ONE!
+        self.model = torch.nn.Sequential(
+            torch.nn.Linear(input_dim, 64),
+            torch.nn.ReLU(),
+            torch.nn.Linear(64, 32),
+            torch.nn.ReLU(),
+            torch.nn.Linear(32, 1),
+            torch.nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        # Flatten point cloud
+        x = x.view(x.size(0), -1)
+        return self.model(x)
+
+
 if __name__ == '__main__':
 
     n_epochs = 10
@@ -72,6 +95,7 @@ if __name__ == '__main__':
     )
 
     generator = Generator(shape=shape, latent_dim=latent_dim)
+    discriminator = Discriminator(shape=shape)
 
     for epoch in range(n_epochs):
         for batch, (point_cloud, _) in enumerate(data_loader):
@@ -85,8 +109,17 @@ if __name__ == '__main__':
                 )
             )
 
-            print('z.shape =', z.shape)
-
             point_clouds = generator(z)
+            quasi_probs = discriminator(point_clouds)
 
+            print('z.shape =', z.shape)
             print('point_clouds.shape =', point_clouds.shape)
+            print('quasi_probs.shape =', quasi_probs.shape)
+
+    # TODO: This is a rather stupid way of visualising the output of
+    # this training routine while writing it. I hope to *eventually*
+    # get rid of this...
+    pc = point_clouds.detach().numpy()[0]
+
+    plt.scatter(pc[:, 0], pc[:, 1])
+    plt.show()
