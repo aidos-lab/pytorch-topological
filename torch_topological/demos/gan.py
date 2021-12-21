@@ -21,6 +21,7 @@ class AnnulusDataset(Dataset):
         ]
 
         X = torch.stack(X)
+        X = torch.as_tensor(X, dtype=torch.float)
 
         self.data = X
         self.labels = [1] * len(X)
@@ -44,7 +45,7 @@ class Generator(torch.nn.Module):
         def _make_layer(input_dim, output_dim):
             layers = [
                 torch.nn.Linear(input_dim, output_dim),
-                torch.nn.ReLU()
+                torch.nn.LeakyReLU(0.2)
             ]
             return layers
 
@@ -71,11 +72,11 @@ class Discriminator(torch.nn.Module):
 
         # Inspired by the original GAN. THERE CAN ONLY BE ONE!
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(input_dim, 64),
-            torch.nn.ReLU(),
-            torch.nn.Linear(64, 32),
-            torch.nn.ReLU(),
-            torch.nn.Linear(32, 1),
+            torch.nn.Linear(input_dim, 512),
+            torch.nn.LeakyReLU(0.2),
+            torch.nn.Linear(512, 256),
+            torch.nn.LeakyReLU(0.2),
+            torch.nn.Linear(256, 1),
             torch.nn.Sigmoid(),
         )
 
@@ -107,7 +108,7 @@ class AdversarialLoss(torch.nn.Module):
 
 if __name__ == '__main__':
 
-    n_epochs = 5
+    n_epochs = 200
     shape = (100, 2)
     latent_dim = 200
 
@@ -119,7 +120,7 @@ if __name__ == '__main__':
 
     generator = Generator(shape=shape, latent_dim=latent_dim)
     discriminator = Discriminator(shape=shape)
-    adversarial_loss = AdversarialLoss()
+    adversarial_loss = torch.nn.BCELoss() # AdversarialLoss()
 
     opt_g = torch.optim.Adam(generator.parameters(), lr=1e-4)
     opt_d = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
@@ -136,26 +137,37 @@ if __name__ == '__main__':
                 )
             )
 
+            real_labels = torch.as_tensor([1.0] * len(pc_real)).view(-1, 1)
+            fake_labels = torch.as_tensor([0.0] * len(pc_real)).view(-1, 1)
+
             opt_g.zero_grad()
 
             pc_synthetic = generator(z)
-            quasi_probs = discriminator(pc_synthetic)
 
-            loss = adversarial_loss(pc_real, pc_synthetic)
-            loss.backward()
-
-            print(loss.item())
+            #generator_loss = adversarial_loss(pc_real, pc_synthetic)
+            generator_loss = adversarial_loss(
+                discriminator(pc_synthetic), real_labels
+            )
+            generator_loss.backward()
 
             opt_g.step()
 
-            print('z.shape =', z.shape)
-            print('pc_real.shape =', pc_real.shape)
-            print('quasi_probs.shape =', quasi_probs.shape)
+            opt_d.zero_grad()
 
-    # TODO: This is a rather stupid way of visualising the output of
-    # this training routine while writing it. I hope to *eventually*
-    # get rid of this...
-    pc = pc_synthetic.detach().numpy()[0]
+            real_loss = adversarial_loss(discriminator(pc_real), real_labels)
+            fake_loss = adversarial_loss(
+                discriminator(pc_synthetic).detach(), fake_labels
+            )
 
-    plt.scatter(pc[:, 0], pc[:, 1])
+            discriminator_loss = 0.5 * (real_loss + fake_loss)
+            discriminator_loss.backward()
+
+            opt_d.step()
+
+
+    output = pc_synthetic.detach().numpy()
+
+    for X_ in output:
+        plt.scatter(X_[:, 0], X_[:, 1])
+
     plt.show()
