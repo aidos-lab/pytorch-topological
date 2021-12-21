@@ -57,8 +57,8 @@ def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
     References
     ----------
     .. [Moor20a] M. Moor et al., "Topological Autoencoders",
-    *Proceedings of the 37th International Conference on Machine
-    Learning**, PMLR 119, pp. 7045--7054, 2020.
+        *Proceedings of the 37th International Conference on Machine
+        Learning*, PMLR 119, pp. 7045--7054, 2020.
     """
     np.random.seed(seed)
 
