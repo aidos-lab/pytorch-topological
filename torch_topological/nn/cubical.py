@@ -46,8 +46,10 @@ class Cubical(nn.Module):
 
         # We need the persistence pairs first, even though we are *not*
         # using them directly here.
-        cubical_complex.persistence()
+        dgm  =cubical_complex.persistence()
         cofaces = cubical_complex.cofaces_of_persistence_pairs()
+
+        print(dgm)
 
         # TODO: Make this configurable
         dim = 0
@@ -97,7 +99,10 @@ class Cubical(nn.Module):
             print(x[1, 3], x[1, 0], x[3, 0])
 
             # TODO: Most efficient way to generate diagram again?
-            print(x.ravel()[regular_pairs[:, 0]])
+            persistence_diagram = torch.stack((
+                x.ravel()[regular_pairs[:, 0]],
+                x.ravel()[regular_pairs[:, 1]]
+            ), 1)
 
             # Create a persistence diagram. We need access to the
             # original input tensor here.
@@ -105,4 +110,10 @@ class Cubical(nn.Module):
             #    (x[creators], x[destroyers])
             #)
 
-            print(persistence_diagram)
+            print('persistence_diagram =', persistence_diagram)
+
+            return [(gens, persistence_diagram)]
+
+        # Default return value. Erring on the side of caution here by
+        # being super verbose.
+        return [([], [])]
