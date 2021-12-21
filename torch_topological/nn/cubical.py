@@ -46,10 +46,8 @@ class Cubical(nn.Module):
 
         # We need the persistence pairs first, even though we are *not*
         # using them directly here.
-        dgm = cubical_complex.persistence()
+        cubical_complex.persistence()
         cofaces = cubical_complex.cofaces_of_persistence_pairs()
-
-        print(dgm)
 
         max_dim = len(x.shape)
 
