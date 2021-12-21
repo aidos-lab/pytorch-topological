@@ -96,7 +96,8 @@ class Cubical(nn.Module):
             print(x)
             print(x[1, 3], x[1, 0], x[3, 0])
 
-            print(x[creators.T.long()])
+            # TODO: Most efficient way to generate diagram again?
+            print(x.ravel()[regular_pairs[:, 0]])
 
             # Create a persistence diagram. We need access to the
             # original input tensor here.
