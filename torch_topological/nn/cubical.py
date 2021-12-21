@@ -64,11 +64,14 @@ class Cubical(nn.Module):
     def _extract_generators_and_diagrams(self, x, cofaces, dim):
         xs = x.shape
 
+        
         # Handle regular pairs first
         try:
             regular_pairs = cofaces[0][dim]
         except IndexError:
             regular_pairs = None
+
+        result = []
 
         if regular_pairs is not None:
             # Notice that `creators` and `destroyers` refer to pixel
@@ -77,13 +80,13 @@ class Cubical(nn.Module):
                     np.column_stack(
                         np.unravel_index(regular_pairs[:, 0], xs)
                     ),
-                    dtype=torch.int
+                    dtype=torch.long
             )
             destroyers = torch.as_tensor(
                     np.column_stack(
                         np.unravel_index(regular_pairs[:, 1], xs)
                     ),
-                    dtype=torch.int
+                    dtype=torch.long
             )
             gens = torch.as_tensor(torch.hstack((creators, destroyers)))
 
@@ -112,8 +115,57 @@ class Cubical(nn.Module):
 
             print('persistence_diagram =', persistence_diagram)
 
-            return [(gens, persistence_diagram)]
+            result.append((gens, persistence_diagram))
 
-        # Default return value. Erring on the side of caution here by
-        # being super verbose.
-        return [([], [])]
+        # Next, let's try the infinite pairs.
+        try:
+            infinite_pairs = torch.as_tensor(
+                cofaces[1][dim], dtype=torch.long
+            )
+        except IndexError:
+            infinite_pairs = None
+
+        if infinite_pairs is not None:
+            print('infinite_pairs =', infinite_pairs)
+
+            # 'Pair off' all the indices
+            max_index = torch.argmax(x)
+            fake_destroyers = torch.empty_like(infinite_pairs).fill_(max_index)
+
+            infinite_pairs = torch.stack(
+                (infinite_pairs, fake_destroyers), 1
+            )
+
+            print('infinite pairs, fixed =', infinite_pairs)
+
+        return result
+
+    # Internal utility function to handle the 'heavy lifting:'
+    # creates tensors from sets of persistence pairs.
+    def _create_tensors_from_pairs(self, x, pairs):
+
+        xs = x.shape
+
+        # Notice that `creators` and `destroyers` refer to pixel
+        # coordinates in the image.
+        creators = torch.as_tensor(
+                np.column_stack(
+                    np.unravel_index(pairs[:, 0], xs)
+                ),
+                dtype=torch.long
+        )
+        destroyers = torch.as_tensor(
+                np.column_stack(
+                    np.unravel_index(pairs[:, 1], xs)
+                ),
+                dtype=torch.long
+        )
+        gens = torch.as_tensor(torch.hstack((creators, destroyers)))
+
+        # TODO: Most efficient way to generate diagram again?
+        persistence_diagram = torch.stack((
+            x.ravel()[pairs[:, 0]],
+            x.ravel()[pairs[:, 1]]
+        ), 1)
+
+        return (gens, persistence_diagram)
