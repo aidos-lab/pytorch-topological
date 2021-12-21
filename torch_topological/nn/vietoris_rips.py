@@ -43,6 +43,7 @@ class VietorisRips(nn.Module):
             'maxdim': self.dim,
         }
 
+    # TODO: Handle batches?
     def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
 
