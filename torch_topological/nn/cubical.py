@@ -62,9 +62,6 @@ class Cubical(nn.Module):
             )
 
     def _extract_generators_and_diagrams(self, x, cofaces, dim):
-        xs = x.shape
-
-        
         # Handle regular pairs first
         try:
             regular_pairs = cofaces[0][dim]
@@ -74,48 +71,9 @@ class Cubical(nn.Module):
         result = []
 
         if regular_pairs is not None:
-            # Notice that `creators` and `destroyers` refer to pixel
-            # coordinates in the image.
-            creators = torch.as_tensor(
-                    np.column_stack(
-                        np.unravel_index(regular_pairs[:, 0], xs)
-                    ),
-                    dtype=torch.long
+            result.append(
+                self._create_tensors_from_pairs(x, regular_pairs)
             )
-            destroyers = torch.as_tensor(
-                    np.column_stack(
-                        np.unravel_index(regular_pairs[:, 1], xs)
-                    ),
-                    dtype=torch.long
-            )
-            gens = torch.as_tensor(torch.hstack((creators, destroyers)))
-
-            print('creators =', creators)
-            print('destroyers =', destroyers)
-
-            print('gens =', gens)
-
-            print(x.shape)
-            print(creators.shape)
-
-            print(x)
-            print(x[1, 3], x[1, 0], x[3, 0])
-
-            # TODO: Most efficient way to generate diagram again?
-            persistence_diagram = torch.stack((
-                x.ravel()[regular_pairs[:, 0]],
-                x.ravel()[regular_pairs[:, 1]]
-            ), 1)
-
-            # Create a persistence diagram. We need access to the
-            # original input tensor here.
-            #persistence_diagram = torch.hstack(
-            #    (x[creators], x[destroyers])
-            #)
-
-            print('persistence_diagram =', persistence_diagram)
-
-            result.append((gens, persistence_diagram))
 
         # Next, let's try the infinite pairs.
         try:
@@ -126,8 +84,6 @@ class Cubical(nn.Module):
             infinite_pairs = None
 
         if infinite_pairs is not None:
-            print('infinite_pairs =', infinite_pairs)
-
             # 'Pair off' all the indices
             max_index = torch.argmax(x)
             fake_destroyers = torch.empty_like(infinite_pairs).fill_(max_index)
@@ -136,7 +92,9 @@ class Cubical(nn.Module):
                 (infinite_pairs, fake_destroyers), 1
             )
 
-            print('infinite pairs, fixed =', infinite_pairs)
+            result.append(
+                self._create_tensors_from_pairs(x, infinite_pairs)
+            )
 
         return result
 
