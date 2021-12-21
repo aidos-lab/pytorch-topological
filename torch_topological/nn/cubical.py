@@ -46,20 +46,24 @@ class Cubical(nn.Module):
 
         # We need the persistence pairs first, even though we are *not*
         # using them directly here.
-        dgm  =cubical_complex.persistence()
+        dgm = cubical_complex.persistence()
         cofaces = cubical_complex.cofaces_of_persistence_pairs()
 
         print(dgm)
 
-        # TODO: Make this configurable
-        dim = 0
+        max_dim = len(x.shape)
 
-        persistence_information = \
+        # TODO: Make this configurable; is it possible that users only
+        # want to return a *part* of the data?
+        persistence_information = [
             self._extract_generators_and_diagrams(
                 x,
                 cofaces,
                 dim
-            )
+            ) for dim in range(0, max_dim)
+        ]
+
+        return persistence_information
 
     def _extract_generators_and_diagrams(self, x, cofaces, dim):
         pairs = torch.empty((0, 2), dtype=torch.long)
