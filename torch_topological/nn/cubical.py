@@ -62,20 +62,18 @@ class Cubical(nn.Module):
             )
 
     def _extract_generators_and_diagrams(self, x, cofaces, dim):
-        # Handle regular pairs first
+        pairs = torch.empty((0, 2), dtype=torch.long)
+
         try:
-            regular_pairs = cofaces[0][dim]
-        except IndexError:
-            regular_pairs = None
-
-        result = []
-
-        if regular_pairs is not None:
-            result.append(
-                self._create_tensors_from_pairs(x, regular_pairs)
+            regular_pairs = torch.as_tensor(
+                cofaces[0][dim], dtype=torch.long
             )
+            pairs = torch.cat(
+                (pairs, regular_pairs)
+            )
+        except IndexError:
+            pass
 
-        # Next, let's try the infinite pairs.
         try:
             infinite_pairs = torch.as_tensor(
                 cofaces[1][dim], dtype=torch.long
@@ -92,11 +90,11 @@ class Cubical(nn.Module):
                 (infinite_pairs, fake_destroyers), 1
             )
 
-            result.append(
-                self._create_tensors_from_pairs(x, infinite_pairs)
+            pairs = torch.cat(
+                (pairs, infinite_pairs)
             )
 
-        return result
+        return self._create_tensors_from_pairs(x, pairs)
 
     # Internal utility function to handle the 'heavy lifting:'
     # creates tensors from sets of persistence pairs.
