@@ -27,11 +27,6 @@ Alternatively, use `pip` to install the package:
 pip install -U torch-topological
 ```
 
-# Dependencies
-
-`torch_topological` is making heavy use of [`giotto-ph`](https://github.com/giotto-ai/giotto-ph),
-a high-performance implementation of [`Ripser`](https://github.com/Ripser/ripser).
-
 # Acknowledgements
 
 Our software and research does not exist in a vacuum. `pytorch-topological` is standing
@@ -48,6 +43,8 @@ projects that provide a glimpse into the wonderful world of topological
 machine learning:
 
 - [`difftda`](https://github.com/MathieuCarriere/difftda) by [Mathieu Carrière](https://github.com/MathieuCarriere)
+
+- [`Ripser`](https://github.com/Ripser/ripser) by [Ulrich Bauer](https://github.com/ubauer)
 
 - [`TopologyLayer`](https://github.com/bruel-gabrielsson/TopologyLayer) by [Rickard Brüel Gabrielsson](https://github.com/bruel-gabrielsson)
 
