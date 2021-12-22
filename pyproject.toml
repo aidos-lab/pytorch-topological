@@ -19,6 +19,7 @@ pytest = "^5.2"
 Sphinx = "^4.3.1"
 sphinx-rtd-theme = "^1.0.0"
 tqdm = "^4.62.3"
+torchvision = "^0.11.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
