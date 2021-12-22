@@ -31,3 +31,12 @@ pip install -U torch-topological
 
 `torch_topological` is making heavy use of [`giotto-ph`](https://github.com/giotto-ai/giotto-ph),
 a high-performance implementation of [`Ripser`](https://github.com/Ripser/ripser).
+
+# Acknowledgements
+
+Our software and research does not exist in a vacuum. `pytorch-topological` is standing
+on the shoulders of proverbial giants. In particular, we want to the
+following projects:
+
+[`giotto-tda`](https://github.com/giotto-ai/giotto-tda)
+<img src="logos/giotto.jpg" height=128 alt="`giotto` icon" />
