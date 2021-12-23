@@ -35,28 +35,50 @@ class WassersteinDistanceLoss(torch.nn.Module):
         dist_D11 = self._distance_to_diagonal(D1)
         dist_D22 = self._distance_to_diagonal(D2)
 
+        # n x m matrix containing the distances between 'regular'
+        # persistence pairs of both persistence diagrams.
         dist = torch.cdist(D1, D2, p=torch.inf)
 
-        print('dist =', dist)
-
+        # Extend the matrix with a column of distances of samples in D1
+        # to their respective projection on the diagonal.
         upper_blocks = torch.hstack((dist, dist_D11[:, None]))
+
+        # Create a lower row of distances of samples in D2 to their
+        # respective projection on the diagonal. The ordering needs
+        # to follow the ordering of samples in D2. Note how one `0`
+        # needs to be added to the row in order to balance it. The
+        # entry intuitively describes the cost between *projected*
+        # points, so it has to be zero.
         lower_blocks = torch.cat((dist_D22, torch.tensor(0).unsqueeze(0)))
 
+        # Full (n + 1 ) x (m + 1) matrix containing *all* distances. By
+        # construction, M[[i, n] contains distances to projected points
+        # in D1, whereas M[m, j] does the same for points in D2. Only a
+        # cell M[i, j] with 0 <= i < n and 0 <= j < m contains a proper
+        # distance.
         M = torch.vstack((upper_blocks, lower_blocks))
-        print('all_dist =', M)
-        print(M.shape)
 
         return M
+
 
     def forward(self, D1, D2):
         n = len(D1)
         m = len(D2)
-        M = self._make_distance_matrix(D1, D2)
+
+        dist = self._make_distance_matrix(D1, D2)
+
+        # Create weight vectors. Since the last entries of entries
+        # describe the m points coming from D2, we have to set the
+        # last entry accordingly.
+
         a = torch.ones(n + 1)
         b = torch.ones(m + 1)
 
-        return ot.emd2(a, b, M)
+        a[-1] = m
+        b[-1] = n
 
+        # TODO: Make settings configurable?
+        return ot.emd2(a, b, dist)
 
 
 PD1 = [
