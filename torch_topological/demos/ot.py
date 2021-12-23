@@ -15,8 +15,21 @@ class WassersteinDistanceLoss(torch.nn.Module):
 
         self.p = p
 
+    def _project_to_diagonal(self, diagram):
+        x = diagram[:, 0]
+        y = diagram[:, 1]
+
+        # TODO: Is this the closest point in all p-norms?
+        return 0.5 * torch.stack(((x + y), (x + y)), 1)
+
     def _distance_to_diagonal(self, diagram):
-        return (diagram[:, 1] - diagram[:, 0]).abs() * 2 ** (1.0 / self.p)
+        x = diagram[:, 0]
+        y = diagram[:, 1]
+
+        if np.isfinite(self.p):
+            return (y - x).abs() * 0.5 ** (1.0 / self.p)
+        else:
+            return ((y - x).abs() * 0.5)
 
     def _make_distance_matrix(self, D1, D2):
         dist_D11 = self._distance_to_diagonal(D1)
