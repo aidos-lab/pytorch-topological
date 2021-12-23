@@ -1,5 +1,7 @@
 """Layers and loss terms for persistence-based optimisation."""
 
+from .distances import WassersteinDistance
+
 from .loss import SignatureLoss
 from .loss import SummaryStatisticLoss
 
@@ -12,4 +14,5 @@ __all__ = [
     'SignatureLoss',
     'SummaryStatisticLoss',
     'VietorisRips',
+    'WassersteinDistance',
 ]
