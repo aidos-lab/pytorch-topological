@@ -16,7 +16,6 @@ class WassersteinDistance(torch.nn.Module):
     be more appropriate.
     """
 
-    # TODO: q is still unused
     def __init__(self, p=torch.inf, q=1):
         """Create new Wasserstein distance calculation module.
 
@@ -76,6 +75,7 @@ class WassersteinDistance(torch.nn.Module):
         # cell M[i, j] with 0 <= i < n and 0 <= j < m contains a proper
         # distance.
         M = torch.vstack((upper_blocks, lower_blocks))
+        M = M.pow(self.q)
 
         return M
 
@@ -119,4 +119,4 @@ class WassersteinDistance(torch.nn.Module):
             # TODO: Make settings configurable?
             total_cost += ot.emd2(a, b, dist)
 
-        return total_cost
+        return total_cost.pow(1.0 / self.q)
