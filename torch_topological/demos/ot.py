@@ -10,10 +10,12 @@ from ot.datasets import make_1D_gauss as gauss
 
 
 class WassersteinDistanceLoss(torch.nn.Module):
-    def __init__(self, p=2):
+    # TODO: q is still unused
+    def __init__(self, p=torch.inf, q=1):
         super().__init__()
 
         self.p = p
+        self.q = q
 
     def _project_to_diagonal(self, diagram):
         x = diagram[:, 0]
@@ -23,13 +25,11 @@ class WassersteinDistanceLoss(torch.nn.Module):
         return 0.5 * torch.stack(((x + y), (x + y)), 1)
 
     def _distance_to_diagonal(self, diagram):
-        x = diagram[:, 0]
-        y = diagram[:, 1]
-
-        if np.isfinite(self.p):
-            return (y - x).abs() * 0.5 ** (1.0 / self.p)
-        else:
-            return ((y - x).abs() * 0.5)
+        return torch.linalg.vector_norm(
+            diagram - self._project_to_diagonal(diagram),
+            self.p,
+            dim=1
+        )
 
     def _make_distance_matrix(self, D1, D2):
         dist_D11 = self._distance_to_diagonal(D1)
