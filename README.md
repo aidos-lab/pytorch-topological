@@ -52,3 +52,5 @@ machine learning:
 
 - [`torchph`](https://github.com/c-hofer/torchph) by [Christoph Hofer](https://github.com/c-hofer) and [Roland Kwitt](https://github.com/rkwitt)
 
+Finally, `pytorch-topological` makes heavy use of [`POT`](https://pythonot.github.io), the Python Optimal Transport Library.
+We are indebted to the many contributors of all these projects.
