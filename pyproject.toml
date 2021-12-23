@@ -13,6 +13,7 @@ matplotlib = "^3.5.0"
 giotto-ph = "^0.2.0"
 torch = "^1.10.1"
 gudhi = "^3.4.1"
+POT = "^0.8.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
