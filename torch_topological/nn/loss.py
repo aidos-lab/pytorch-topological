@@ -53,7 +53,7 @@ class SummaryStatisticLoss(torch.nn.Module):
 
         Returns
         -------
-        float
+        torch.tensor
             Loss based on the summary statistic selected by the client.
             Given a statistic :math:`s`, the function returns the
             following expression:
@@ -183,7 +183,7 @@ class SignatureLoss(torch.nn.Module):
             # signature lookup works. We are *not* guaranteed  to
             # get 'valid' persistence values when using a pairing
             # from space X to access distances from space Y,  for
-            # instance.
+            # instance, hence some of values could be *negative*.
             selected_distances = torch.abs(
                 destroyer_distances - creator_distances
             )
