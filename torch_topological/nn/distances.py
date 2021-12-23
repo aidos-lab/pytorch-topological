@@ -5,8 +5,32 @@ import torch
 
 
 class WassersteinDistance(torch.nn.Module):
+    """Implement Wasserstein distance between persistence diagrams.
+
+    This module calculates the Wasserstein between two persistence
+    diagrams. The Wasserstein distance is arguably the most common
+    metric that is applied when dealing with such diagrams. Notice
+    that calculating the metric involves solving optimal transport
+    problems, which are known to suffer from scalability problems.
+    When dealing with large persistence diagrams, other losses may
+    be more appropriate.
+    """
+
     # TODO: q is still unused
     def __init__(self, p=torch.inf, q=1):
+        """Create new Wasserstein distance calculation module.
+
+        Parameters
+        ----------
+        p : float or `inf`
+            Specifies the exponent of the norm to calculate. By default,
+            `p = torch.inf`, corresponding to the *maximum norm*.
+
+        q: float
+            Specifies the order of Wasserstein metric to calculate. This
+            raises all internal matching costs to the power of `q`, hence
+            subsequently returning the `q`-th root of the total cost.
+        """
         super().__init__()
 
         self.p = p
@@ -55,23 +79,44 @@ class WassersteinDistance(torch.nn.Module):
 
         return M
 
+    def forward(self, X, Y):
+        """Calculate Wasserstein metric based on input tensors.
 
-    def forward(self, D1, D2):
-        n = len(D1)
-        m = len(D2)
+        Parameters
+        ----------
+        X : `torch.tensor` or `None`
+            First tensor. Supposed to contain persistence diagrams and
+            persistence pairings.
 
-        dist = self._make_distance_matrix(D1, D2)
+        Y : `torch.tensor` or `None`
+            Second tensor. Supposed to contain persistence diagrams and
+            persistence pairings.
 
-        # Create weight vectors. Since the last entries of entries
-        # describe the m points coming from D2, we have to set the
-        # last entry accordingly.
+        Returns
+        -------
+        torch.tensor
+            A single scalar tensor containing the distance between the
+            persistence diagrams contained in `X` and `Y`.
+        """
+        total_cost = 0.0
 
-        a = torch.ones(n + 1)
-        b = torch.ones(m + 1)
+        for ((_, D1), (_, D2)) in zip(X, Y):
+            n = len(D1)
+            m = len(D2)
 
-        a[-1] = m
-        b[-1] = n
+            dist = self._make_distance_matrix(D1, D2)
 
-        # TODO: Make settings configurable?
-        return ot.emd2(a, b, dist)
+            # Create weight vectors. Since the last entries of entries
+            # describe the m points coming from D2, we have to set the
+            # last entry accordingly.
 
+            a = torch.ones(n + 1)
+            b = torch.ones(m + 1)
+
+            a[-1] = m
+            b[-1] = n
+
+            # TODO: Make settings configurable?
+            total_cost += ot.emd2(a, b, dist)
+
+        return total_cost
