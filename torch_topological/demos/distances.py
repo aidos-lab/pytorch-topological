@@ -1,7 +1,6 @@
 """Demo for distance minimisations of a point cloud."""
 
-
-import logging
+from tqdm import tqdm
 
 from torch_topological.nn import VietorisRips
 from torch_topological.nn import WassersteinDistance
@@ -30,13 +29,10 @@ if __name__ == '__main__':
 
     opt = optim.SGD([X], lr=0.1)
 
-    logging.basicConfig(
-        level=logging.INFO
-    )
+    n_iterations = 500
+    progress = tqdm(range(n_iterations))
 
-    losses = []
-
-    for i in range(500):
+    for i in progress:
 
         opt.zero_grad()
 
@@ -46,8 +42,7 @@ if __name__ == '__main__':
         loss.backward()
         opt.step()
 
-        logging.info(loss.item())
-        losses.append(loss.item())
+        progress.set_postfix(loss=loss.item())
 
     X = X.detach().numpy()
 
