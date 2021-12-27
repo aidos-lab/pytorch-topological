@@ -6,8 +6,8 @@ from torch import nn
 import torch
 
 
-class VietorisRips(nn.Module):
-    """Calculate Vietoris--Rips persistence diagrams.
+class VietorisRipsComplex(nn.Module):
+    """Calculate Vietoris--Rips complex of a data set.
 
     This module calculates 'differentiable' persistence diagrams for
     point clouds. The underlying topological approximations are done

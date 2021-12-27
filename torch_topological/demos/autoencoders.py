@@ -14,7 +14,7 @@ from torch.utils.data import random_split
 from torch_topological.data import create_sphere_dataset
 
 from torch_topological.nn import SignatureLoss
-from torch_topological.nn import VietorisRips
+from torch_topological.nn import VietorisRipsComplex
 
 
 class SpheresDataset(Dataset):
@@ -94,7 +94,7 @@ class TopologicalAutoencoder(torch.nn.Module):
         self.loss = SignatureLoss()
 
         # TODO: Decrease dimensionality...
-        self.vr = VietorisRips(dim=1)
+        self.vr = VietorisRipsComplex(dim=1)
 
     def forward(self, x):
         z = self.model.encode(x)

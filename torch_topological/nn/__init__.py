@@ -6,13 +6,13 @@ from .loss import SignatureLoss
 from .loss import SummaryStatisticLoss
 
 from .cubical import Cubical
-from .vietoris_rips import VietorisRips
+from .vietoris_rips_complex import VietorisRipsComplex
 
 
 __all__ = [
     'Cubical',
     'SignatureLoss',
     'SummaryStatisticLoss',
-    'VietorisRips',
+    'VietorisRipsComplex',
     'WassersteinDistance',
 ]

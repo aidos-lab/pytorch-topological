@@ -5,7 +5,7 @@ import logging
 
 
 from torch_topological.nn import SummaryStatisticLoss
-from torch_topological.nn import VietorisRips
+from torch_topological.nn import VietorisRipsComplex
 
 from torch_topological.utils import make_disk
 from torch_topological.utils import make_uniform_blob
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
     # loss = ModelSpaceLoss(X, Y, loss=SummaryStatisticLoss)
-    vr = VietorisRips()
+    vr = VietorisRipsComplex(dim=2)
     pi_target = vr(Y)
     loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
     #loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)

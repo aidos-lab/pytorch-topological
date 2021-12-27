@@ -2,7 +2,7 @@
 
 from tqdm import tqdm
 
-from torch_topological.nn import VietorisRips
+from torch_topological.nn import VietorisRipsComplex
 from torch_topological.nn import WassersteinDistance
 
 from torch_topological.utils import make_disk
@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
-    vr = VietorisRips(dim=1)
+    vr = VietorisRipsComplex(dim=1)
 
     pi_target = vr(Y)
     loss_fn = WassersteinDistance(q=2)
