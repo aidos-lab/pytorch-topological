@@ -3,6 +3,33 @@
 import numpy as np
 
 
+def sample_from_unit_cube(N, d=3, random_state=None):
+    """Sample points uniformly from unit cube in `d` dimensions.
+
+    Parameters
+    ----------
+    N : int
+        Number of points to sample
+
+    d : int
+        Number of dimensions.
+
+    random_state : `np.random.RandomState` or int
+        Optional random state to use for the pseudo-random number
+        generator.
+
+    Returns
+    -------
+    np.array
+        Sampled coordinates in an `np.array` of shape `N, d`.
+    """
+    if random_state is not None:
+        np.random.seed(random_state)
+
+    X = np.random.uniform(size=(N, d))
+    return X
+
+
 def make_annulus(N, r, R, **kwargs):
     """Sample points from annulus.
 
