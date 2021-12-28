@@ -30,6 +30,29 @@ def sample_from_unit_cube(N, d=3, random_state=None):
     return X
 
 
+def sample_from_torus(N, d=3, random_state=None):
+    """Sample points uniformly from torus and embed it in `d` dimensions.
+
+    Parameters
+    ----------
+    N : int
+        Number of points to sample
+
+    d : int
+        Number of dimensions.
+
+    random_state : `np.random.RandomState` or int
+        Optional random state to use for the pseudo-random number
+        generator.
+
+    Returns
+    -------
+    np.array
+        Sampled coordinates in an `np.array` of shape `N, d`.
+    """
+    pass
+
+
 def make_annulus(N, r, R, **kwargs):
     """Sample points from annulus.
 
