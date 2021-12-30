@@ -2,6 +2,10 @@
 
 This example demonstrates how to use various topological summary
 statistics in order to change the shape of an input point cloud.
+The script can either demonstrate how to adjust the shape of two
+point clouds, i.e. using a summary statistic as a loss function,
+or how to change the shape of a *single* point cloud. By default
+two point clouds will be used.
 """
 
 import argparse
@@ -9,6 +13,7 @@ import argparse
 import matplotlib.pyplot as plt
 
 from torch_topological.data import sample_from_disk
+from torch_topological.data import sample_from_unit_cube
 
 from torch_topological.nn import SummaryStatisticLoss
 from torch_topological.nn import VietorisRipsComplex
@@ -27,13 +32,19 @@ def main(args):
     p = args.p
     q = args.q
 
-    X = sample_from_disk(n=n, r=0.5, R=0.6)
-    Y = sample_from_disk(n=n, r=0.9, R=1.0)
-
-    X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
-
     vr = VietorisRipsComplex(dim=2)
-    pi_target = vr(Y)
+
+    if args.single:
+        X = sample_from_unit_cube(n=n, d=2)
+    else:
+        X = sample_from_disk(n=n, r=0.5, R=0.6)
+        Y = sample_from_disk(n=n, r=0.9, R=1.0)
+        pi_target = vr(Y)
+
+    # Make source point cloud adjustable by treating it as a parameter.
+    # This enables topological loss functions to influence the shape of
+    # `X`.
+    X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
     loss_fn = SummaryStatisticLoss(
         summary_statistic=statistic,
@@ -48,7 +59,10 @@ def main(args):
     for i in progress:
         pi_source = vr(X)
 
-        loss = loss_fn(pi_source, pi_target)
+        if not args.single:
+            loss = loss_fn(pi_source, pi_target)
+        else:
+            loss = loss_fn(pi_source)
 
         opt.zero_grad()
         loss.backward()
@@ -58,8 +72,11 @@ def main(args):
 
     X = X.detach().numpy()
 
-    plt.scatter(X[:, 0], X[:, 1], label='Source')
-    plt.scatter(Y[:, 0], Y[:, 1], label='Target')
+    if args.single:
+        plt.scatter(X[:, 0], X[:, 1], label='Output')
+    else:
+        plt.scatter(X[:, 0], X[:, 1], label='Source')
+        plt.scatter(Y[:, 0], Y[:, 1], label='Target')
 
     plt.legend()
     plt.show()
@@ -91,6 +108,12 @@ if __name__ == '__main__':
         ],
         default='polynomial_function',
         help='Name of summary statistic to use for the loss'
+    )
+
+    parser.add_argument(
+        '-S', '--single',
+        action='store_true',
+        help='If set, uses only a single point cloud'
     )
 
     parser.add_argument(
