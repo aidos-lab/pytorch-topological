@@ -23,17 +23,24 @@ def main(args):
     """Run example."""
     n = args.n_samples
     n_iterations = args.n_iterations
+    statistic = args.statistic
+    p = args.p
+    q = args.q
 
     X = sample_from_disk(n=n, r=0.5, R=0.6)
     Y = sample_from_disk(n=n, r=0.9, R=1.0)
 
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
-    # loss = ModelSpaceLoss(X, Y, loss=SummaryStatisticLoss)
     vr = VietorisRipsComplex(dim=2)
     pi_target = vr(Y)
-    loss_fn = SummaryStatisticLoss('polynomial_function', p=2, q=2)
-    #loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
+
+    loss_fn = SummaryStatisticLoss(
+        summary_statistic=statistic,
+        p=p,
+        q=q
+    )
+
     opt = optim.SGD([X], lr=0.05)
 
     progress = tqdm(range(n_iterations))
@@ -82,18 +89,21 @@ if __name__ == '__main__':
             'polynomial_function',
             'total_persistence',
         ],
+        default='polynomial_function',
         help='Name of summary statistic to use for the loss'
     )
 
     parser.add_argument(
         '-p',
         type=float,
+        default=2.0,
         help='Outer exponent for summary statistic loss calculation'
     )
 
     parser.add_argument(
         '-q',
         type=float,
+        default=2.0,
         help='Inner exponent for summary statistic loss calculation. Will '
              'only be used for certain summary statistics.'
     )
