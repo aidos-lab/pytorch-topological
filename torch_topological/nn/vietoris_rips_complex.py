@@ -45,7 +45,6 @@ class VietorisRipsComplex(nn.Module):
             'maxdim': self.dim,
         }
 
-    # TODO: Handle batches?
     def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
 
@@ -54,14 +53,52 @@ class VietorisRipsComplex(nn.Module):
 
         Parameters
         ----------
-        x : `np.array` or `torch.tensor`
-            Input point cloud
+        x : array_like
+            Input point cloud(s). `x` can either be a 2D array of shape
+            `(n, d)`, which is treated as a single point cloud, or a 3D
+            array/tensor of the form `(b, n, d)`, with `b` representing
+            the batch size.
 
         Returns
         -------
-        List of tuples of the form `(gen, pd)`, where `gen` refers to
-        the set of generators for the respective dimension, while `pd`
-        denotes the persistence diagram.
+        list of :class:`PersistenceInformation`
+            List of tuples of the form `(gen, pd)`, where `gen` refers to
+            the set of generators for the respective dimension, while `pd`
+            denotes the persistence diagram. If `x` is a 3D array, returns
+            a list of list, in which the first dimension denotes the batch
+            and the second dimension refers to the individual instances of
+            :class:`PersistenceInformation` elements.
+        """
+        # Check whether individual batches need to be handled (3D array)
+        # or not (2D array).
+        if len(x.shape) == 3:
+
+            # TODO: This is rather ugly and inefficient but it is the
+            # easiest workaround for now.
+            return [
+                self._forward(x_) for x_ in x
+            ]
+        else:
+            return self._forward(x)
+
+    def _forward(self, x):
+        """Handle a *single* point cloud.
+
+        This internal function handles the calculation of topological
+        features for a single point cloud, i.e. an `array_like` of 2D
+        shape.
+
+        Parameters
+        ----------
+        x : array_like of shape `(n, d)`
+            Single input point cloud.
+
+        Returns
+        -------
+        list of class:`PersistenceInformation`
+            List of persistence information data structures, containing
+            the persistence diagram and the persistence pairing of some
+            dimension in the input data set.
         """
         generators = ripser_parallel(
             x.detach(),
