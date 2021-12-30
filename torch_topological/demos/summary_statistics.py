@@ -1,18 +1,20 @@
-"""Demo for total persistence minimisation of a point cloud."""
+"""Demo for summary statistics minimisation of a point cloud.
 
+This example demonstrates how to use various topological summary
+statistics in order to change the shape of an input point cloud.
+"""
 
 import logging
 
+from torch_topological.data import sample_from_disk
 
 from torch_topological.nn import SummaryStatisticLoss
 from torch_topological.nn import VietorisRipsComplex
 
-from torch_topological.utils import make_disk
-from torch_topological.utils import make_uniform_blob
+from tqdm import tqdm
 
 import torch
 import torch.optim as optim
-
 
 import matplotlib.pyplot as plt
 
@@ -20,8 +22,8 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     n = 100
 
-    X = make_disk(r=0.5, R=0.6, n=n)
-    Y = make_disk(r=0.9, R=1.0, n=n)
+    X = sample_from_disk(n=n, r=0.5, R=0.6)
+    Y = sample_from_disk(n=n, r=0.9, R=1.0)
 
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
