@@ -3,6 +3,7 @@
 
 import torch
 
+from torch_topological.nn import PersistenceInformation
 from torch_topological.nn import WassersteinDistance
 
 
@@ -25,4 +26,7 @@ PD2 = torch.as_tensor(PD2, dtype=torch.float)
 print(PD1)
 print(PD2)
 print(WassersteinDistance()._make_distance_matrix(PD1, PD2))
-print('wd = ', WassersteinDistance()([([],PD1)], [([], PD2)]))
+print('wd = ', WassersteinDistance()(
+    [PersistenceInformation([], PD1)],
+    [PersistenceInformation([], PD2)])
+)
