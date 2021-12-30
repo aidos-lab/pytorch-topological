@@ -7,12 +7,18 @@ def embed(data, ambient=50):
 
     Parameters
     ----------
-    data : array-like
-        Input data set
+    data : array_like
+        Input data set; needs to have shape `(n, d)`, i.e. samples are
+        in the rows, dimensions are in the columns.
 
     ambient : int
         Dimension of embedding space. Must be greater than
         dimensionality of data.
+
+    Returns
+    -------
+    array_like
+        Input array of shape `(n, D)`, with `D = ambient`.
 
     Notes
     -----
@@ -34,5 +40,4 @@ def embed(data, ambient=50):
     q, r = np.linalg.qr(random_rotation)
 
     base = np.dot(base, q)
-
     return base

@@ -20,8 +20,8 @@ def sample_from_unit_cube(N, d=3, random_state=None):
 
     Returns
     -------
-    np.array
-        Sampled coordinates in an `np.array` of shape `N, d`.
+    np.array of shape `(N, d)`
+        Array of sampled coordinates.
     """
     if random_state is not None:
         np.random.seed(random_state)
@@ -30,7 +30,7 @@ def sample_from_unit_cube(N, d=3, random_state=None):
     return X
 
 
-def sample_from_torus(N, d=3, random_state=None):
+def sample_from_torus(N, d=3, r=1.0, R=2.0, random_state=None):
     """Sample points uniformly from torus and embed it in `d` dimensions.
 
     Parameters
@@ -41,16 +41,48 @@ def sample_from_torus(N, d=3, random_state=None):
     d : int
         Number of dimensions.
 
+    r : float
+        Radius of the 'tube' of the torus.
+
+    R : float
+        Radius of the torus, i.e. the distance from the centre of the
+        'tube' to the centre of the torus.
+
     random_state : `np.random.RandomState` or int
         Optional random state to use for the pseudo-random number
         generator.
 
     Returns
     -------
-    np.array
-        Sampled coordinates in an `np.array` of shape `N, d`.
+    np.array of shape `(N, d)`
+        Array of sampled coordinates.
     """
-    pass
+    if random_state is not None:
+        np.random.seed(random_state)
+
+    angles = []
+
+    while len(angles) < N:
+        x = np.random.uniform(0, 2 * np.pi)
+        y = np.random.uniform(0, 1 / np.pi)
+
+        f = (1.0 + (r/R) * np.cos(x)) / (2 * np.pi)
+
+        if y < f:
+            psi = np.random.uniform(0, 2 * np.pi)
+            angles.append((x, psi))
+
+    X = []
+
+    for theta, psi in angles:
+        x = (R + r * np.cos(theta)) * np.cos(psi)
+        y = (R + r * np.cos(theta)) * np.sin(psi)
+        z = r * np.sin(theta)
+
+        X.append((x, y, z))
+
+    X = np.asarray(X)
+    return X
 
 
 def sample_from_annulus(N, r, R, random_state=None):
@@ -77,7 +109,7 @@ def sample_from_annulus(N, r, R, random_state=None):
     Returns
     -------
     np.array of shape `(N, 2)`
-        Array of (x, y) coordinates.
+        Array of sampled coordinates.
     """
     if r >= R:
         raise RuntimeError(
