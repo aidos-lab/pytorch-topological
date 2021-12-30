@@ -12,12 +12,23 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
     -----------
     n : int
         Number of data points in shape.
+
+    d : int
+        Dimension of the sphere.
+
     r : float
         Radius of sphere.
-    ambient : int, default=None
+
+    ambient : int or None
         Embed the sphere into a space with ambient dimension equal to
-        `ambient`. The sphere is randomly rotated in this high
-        dimensional space.
+        `ambient`. The sphere is randomly rotated into this
+        high-dimensional space.
+
+    Returns
+    -------
+    np.array
+        Array of sampled coordinates. If `ambient` is set, array will be
+        of shape `(n, ambient)`. Else, array will be of shape `(n, d)`.
 
     Notes
     -----
@@ -37,8 +48,8 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
     if noise:
         data += noise * np.random.randn(*data.shape)
 
-    if ambient:
-        assert ambient > d, "Must embed in higher dimensions"
+    if ambient is not None:
+        assert ambient > d
         data = embed(data, ambient)
 
     return data
