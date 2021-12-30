@@ -1,4 +1,4 @@
-from pytorch_topological import __version__
+from torch_topological import __version__
 
 
 def test_version():
