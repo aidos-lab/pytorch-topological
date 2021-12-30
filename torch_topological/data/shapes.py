@@ -3,12 +3,12 @@
 import numpy as np
 
 
-def sample_from_unit_cube(N, d=3, random_state=None):
+def sample_from_unit_cube(n, d=3, random_state=None):
     """Sample points uniformly from unit cube in `d` dimensions.
 
     Parameters
     ----------
-    N : int
+    n : int
         Number of points to sample
 
     d : int
@@ -20,22 +20,22 @@ def sample_from_unit_cube(N, d=3, random_state=None):
 
     Returns
     -------
-    np.array of shape `(N, d)`
+    np.array of shape `(n, d)`
         Array of sampled coordinates.
     """
     if random_state is not None:
         np.random.seed(random_state)
 
-    X = np.random.uniform(size=(N, d))
+    X = np.random.uniform(size=(n, d))
     return X
 
 
-def sample_from_torus(N, d=3, r=1.0, R=2.0, random_state=None):
+def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
     """Sample points uniformly from torus and embed it in `d` dimensions.
 
     Parameters
     ----------
-    N : int
+    n : int
         Number of points to sample
 
     d : int
@@ -62,7 +62,7 @@ def sample_from_torus(N, d=3, r=1.0, R=2.0, random_state=None):
 
     angles = []
 
-    while len(angles) < N:
+    while len(angles) < n:
         x = np.random.uniform(0, 2 * np.pi)
         y = np.random.uniform(0, 1 / np.pi)
 
@@ -85,7 +85,7 @@ def sample_from_torus(N, d=3, r=1.0, R=2.0, random_state=None):
     return X
 
 
-def sample_from_annulus(N, r, R, random_state=None):
+def sample_from_annulus(n, r, R, random_state=None):
     """Sample points from a 2D annulus.
 
     This function samples `N` points from an annulus with inner radius `r`
@@ -93,7 +93,7 @@ def sample_from_annulus(N, r, R, random_state=None):
 
     Parameters
     ----------
-    N : int
+    n : int
         Number of points to sample
 
     r : float
@@ -108,7 +108,7 @@ def sample_from_annulus(N, r, R, random_state=None):
 
     Returns
     -------
-    np.array of shape `(N, 2)`
+    np.array of shape `(n, 2)`
         Array of sampled coordinates.
     """
     if r >= R:
@@ -119,26 +119,26 @@ def sample_from_annulus(N, r, R, random_state=None):
     if random_state is not None:
         np.random.seed(random_state)
 
-    thetas = np.random.uniform(0, 2 * np.pi, N)
+    thetas = np.random.uniform(0, 2 * np.pi, n)
 
     # Need to sample based on squared radii to account for density
     # differences.
-    radii = np.sqrt(np.random.uniform(r ** 2, R ** 2, N))
+    radii = np.sqrt(np.random.uniform(r ** 2, R ** 2, n))
 
     X = np.column_stack((radii * np.cos(thetas), radii * np.sin(thetas)))
-    return X, np.linspace(0, 1, N)
+    return X
 
 
 # TODO: Improve documentation
-def sample_from_double_annulus(N, random_state=None):
-    """Sample N points from a double annulus."""
+def sample_from_double_annulus(n, random_state=None):
+    """Sample n points from a double annulus."""
     if random_state is not None:
         np.random.seed(random_state)
 
     X = []
     y = []
 
-    for i in range(N):
+    for i in range(n):
         while True:
             t = [
                     np.random.uniform(-50, 50, 1)[0],
