@@ -62,11 +62,12 @@ class VietorisRipsComplex(nn.Module):
         Returns
         -------
         list of :class:`PersistenceInformation`
-            List of tuples of the form `(gen, pd)`, where `gen` refers to
-            the set of generators for the respective dimension, while `pd`
-            denotes the persistence diagram. If `x` is a 3D array, returns
-            a list of list, in which the first dimension denotes the batch
-            and the second dimension refers to the individual instances of
+            List of :class:`PersistenceInformation`, containing both the
+            persistence diagrams and the generators, i.e. the
+            *pairings*, of a certain dimension of topological features.
+            If `x` is a 3D array, returns a list of lists, in which the
+            first dimension denotes the batch and the second dimension
+            refers to the individual instances of
             :class:`PersistenceInformation` elements.
         """
         # Check whether individual batches need to be handled (3D array)
