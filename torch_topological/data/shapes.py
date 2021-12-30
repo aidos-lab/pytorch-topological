@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from .utils import embed
+
 
 def sample_from_unit_cube(n, d=3, random_state=None):
     """Sample points uniformly from unit cube in `d` dimensions.
@@ -28,6 +30,64 @@ def sample_from_unit_cube(n, d=3, random_state=None):
 
     X = np.random.uniform(size=(n, d))
     return X
+
+
+def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
+    """Sample `n` data points from a `d`-sphere in `d + 1` dimensions.
+
+    Parameters
+    -----------
+    n : int
+        Number of data points in shape.
+
+    d : int
+        Dimension of the sphere.
+
+    r : float
+        Radius of sphere.
+
+    noise : float or None
+        Optional noise factor. If set, data coordinates will be
+        perturbed by a standard normal distribution, scaled by
+        `noise`.
+
+    ambient : int or None
+        Embed the sphere into a space with ambient dimension equal to
+        `ambient`. The sphere is randomly rotated into this
+        high-dimensional space.
+
+    Returns
+    -------
+    np.array
+        Array of sampled coordinates. If `ambient` is set, array will be
+        of shape `(n, ambient)`. Else, array will be of shape `(n, d + 1)`.
+
+    Notes
+    -----
+    This function was originally authored by Nathaniel Saul as part of
+    the `tadasets` package. [tadasets]_
+
+    References
+    ----------
+    .. [tadasets] https://github.com/scikit-tda/tadasets
+
+    """
+    data = np.random.randn(n, d+1)
+
+    # Normalize points to the sphere
+    data = r * data / np.sqrt(np.sum(data**2, 1)[:, None])
+
+    if noise:
+        data += noise * np.random.randn(*data.shape)
+
+    if ambient is not None:
+        assert ambient > d
+        data = embed(data, ambient)
+
+    return data
+
+
+
 
 
 def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
