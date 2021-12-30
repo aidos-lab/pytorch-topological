@@ -84,13 +84,13 @@ class WassersteinDistance(torch.nn.Module):
 
         Parameters
         ----------
-        X : torch.tensor or None
-            First tensor. Supposed to contain persistence diagrams and
-            persistence pairings.
+        X : list of :class:`PersistenceInformation`
+            Topological features of the first space. Supposed to contain
+            persistence diagrams and persistence pairings.
 
-        Y : torch.tensor or None
-            Second tensor. Supposed to contain persistence diagrams and
-            persistence pairings.
+        Y : list of :class:`PersistenceInformation`
+            Topological features of the second space. Supposed to
+            contain persistence diagrams and persistence pairings.
 
         Returns
         -------
@@ -100,7 +100,10 @@ class WassersteinDistance(torch.nn.Module):
         """
         total_cost = 0.0
 
-        for ((_, D1), (_, D2)) in zip(X, Y):
+        for pers_info in zip(X, Y):
+            D1 = pers_info[0].diagram
+            D2 = pers_info[1].diagram
+
             n = len(D1)
             m = len(D2)
 
