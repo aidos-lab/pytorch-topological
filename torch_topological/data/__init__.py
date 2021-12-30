@@ -2,11 +2,14 @@
 
 from .shapes import sample_from_annulus
 from .shapes import sample_from_double_annulus
-
-from .spheres import create_sphere_dataset
+from .shapes import sample_from_sphere
+from .shapes import sample_from_torus
+from .shapes import sample_from_unit_cube
 
 __all__ = [
-    'create_sphere_dataset'
     'sample_from_annulus',
     'sample_from_double_annulus',
+    'sample_from_sphere',
+    'sample_from_torus',
+    'sample_from_unit_cube',
 ]
