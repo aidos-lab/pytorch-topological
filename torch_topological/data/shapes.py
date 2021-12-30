@@ -53,8 +53,8 @@ def sample_from_torus(N, d=3, random_state=None):
     pass
 
 
-def make_annulus(N, r, R, **kwargs):
-    """Sample points from annulus.
+def sample_from_annulus(N, r, R, random_state=None):
+    """Sample points from a 2D annulus.
 
     This function samples `N` points from an annulus with inner radius `r`
     and outer radius `R`.
@@ -70,21 +70,22 @@ def make_annulus(N, r, R, **kwargs):
     R : float
         Outer radius of annulus
 
-    **kwargs:
-        Optional keyword arguments, such as a fixed random state for the
-        pseudo-random number generator.
+    random_state : `np.random.RandomState` or int
+        Optional random state to use for the pseudo-random number
+        generator.
 
     Returns
     -------
-    Array of (x, y) coordinates.
+    np.array of shape `(N, 2)`
+        Array of (x, y) coordinates.
     """
     if r >= R:
         raise RuntimeError(
             'Inner radius must be less than or equal to outer radius'
         )
 
-    if kwargs.get('random_state'):
-        np.random.seed(kwargs['random_state'])
+    if random_state is not None:
+        np.random.seed(random_state)
 
     thetas = np.random.uniform(0, 2 * np.pi, N)
 
@@ -97,8 +98,7 @@ def make_annulus(N, r, R, **kwargs):
 
 
 # TODO: Improve documentation
-# TODO: Improve `random_state` handling
-def make_double_annulus(N, random_state=None):
+def sample_from_double_annulus(N, random_state=None):
     """Sample N points from a double annulus."""
     if random_state is not None:
         np.random.seed(random_state)

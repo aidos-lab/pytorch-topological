@@ -6,8 +6,6 @@ import torchvision
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
-from torch_topological.data import make_annulus
-
 from torch_topological.nn import Cubical
 from torch_topological.nn import SummaryStatisticLoss
 
