@@ -84,11 +84,11 @@ class WassersteinDistance(torch.nn.Module):
 
         Parameters
         ----------
-        X : `torch.tensor` or `None`
+        X : torch.tensor or None
             First tensor. Supposed to contain persistence diagrams and
             persistence pairings.
 
-        Y : `torch.tensor` or `None`
+        Y : torch.tensor or None
             Second tensor. Supposed to contain persistence diagrams and
             persistence pairings.
 

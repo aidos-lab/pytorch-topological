@@ -1,5 +1,7 @@
 """Layers and loss terms for persistence-based optimisation."""
 
+from .data import PersistenceInformation
+
 from .distances import WassersteinDistance
 
 from .loss import SignatureLoss
@@ -11,6 +13,7 @@ from .vietoris_rips_complex import VietorisRipsComplex
 
 __all__ = [
     'Cubical',
+    'PersistenceInformation',
     'SignatureLoss',
     'SummaryStatisticLoss',
     'VietorisRipsComplex',

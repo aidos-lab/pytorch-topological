@@ -3,6 +3,8 @@
 from gph import ripser_parallel
 from torch import nn
 
+from torch_topological.nn import PersistenceInformation
+
 import torch
 
 
@@ -121,11 +123,11 @@ class VietorisRipsComplex(nn.Module):
                 (creators, destroyers), 1
             )
 
-            return [(gens, persistence_diagram)]
+            return [PersistenceInformation(gens, persistence_diagram, 0)]
         else:
             result = []
 
-            for gens_ in gens:
+            for index, gens_ in enumerate(gens):
                 creators = dist[gens_[:, 0], gens_[:, 1]]
                 destroyers = dist[gens_[:, 2], gens_[:, 3]]
 
@@ -133,6 +135,15 @@ class VietorisRipsComplex(nn.Module):
                     (creators, destroyers), 1
                 )
 
-                result.append((gens_, persistence_diagram))
+                # Dimension zero is handled differently, so we need to
+                # use an offset here.
+                dimension = index + 1
+
+                result.append(
+                    PersistenceInformation(
+                        gens_,
+                        persistence_diagram,
+                        dimension)
+                )
 
         return result

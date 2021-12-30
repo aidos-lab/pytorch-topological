@@ -42,14 +42,14 @@ class SummaryStatisticLoss(torch.nn.Module):
 
         Parameters
         ----------
-        X : `torch.tensor` or `None`
-            Source tensor. Supposed to contain persistence diagrams and
-            persistence pairings.
+        X : list of :class:`PersistenceInformation`
+            Source information. Supposed to contain persistence diagrams
+            and persistence pairings.
 
-        Y : `torch.tensor` or `None`
-            Optional target tensor. If set, evaluates a difference in
-            loss functions as shown in the introduction. If `None`, a
-            simpler variant of the loss will be evaluated.
+        Y : list of :class:`PersistenceInformation` or None
+            Optional target information. If set, evaluates a difference
+            in loss functions as shown in the introduction. If `None`,
+            a simpler variant of the loss will be evaluated.
 
         Returns
         -------
@@ -65,14 +65,14 @@ class SummaryStatisticLoss(torch.nn.Module):
         """
         stat_src = torch.sum(
             torch.stack([
-                self.stat_fn(D, **self.kwargs) for _, D in X
+                self.stat_fn(pi.diagram, **self.kwargs) for pi in X
             ])
         )
 
         if Y is not None:
             stat_target = torch.sum(
                 torch.stack([
-                    self.stat_fn(D, **self.kwargs) for _, D in Y
+                    self.stat_fn(pi.diagram, **self.kwargs) for pi in Y
                 ])
             )
 
@@ -142,19 +142,19 @@ class SignatureLoss(torch.nn.Module):
             Y_dist = Y_dist / Y_dist.max()
 
         X_sig_X = [
-            self._select_distances(X_dist, X_pi[dim][0])
+            self._select_distances(X_dist, X_pi[dim].pairing)
             for dim in self.dimensions
         ]
         X_sig_Y = [
-            self._select_distances(X_dist, Y_pi[dim][0])
+            self._select_distances(X_dist, Y_pi[dim].pairing)
             for dim in self.dimensions
         ]
         Y_sig_X = [
-            self._select_distances(Y_dist, X_pi[dim][0])
+            self._select_distances(Y_dist, X_pi[dim].pairing)
             for dim in self.dimensions
         ]
         Y_sig_Y = [
-            self._select_distances(Y_dist, Y_pi[dim][0])
+            self._select_distances(Y_dist, Y_pi[dim].pairing)
             for dim in self.dimensions
         ]
 
