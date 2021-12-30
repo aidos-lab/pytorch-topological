@@ -7,50 +7,12 @@ import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 
-from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from torch.utils.data import random_split
 
-from torch_topological.data import create_sphere_dataset
+from torch_topological.datasets import Spheres
 
 from torch_topological.nn import SignatureLoss
 from torch_topological.nn import VietorisRipsComplex
-
-
-class SpheresDataset(Dataset):
-    def __init__(
-        self,
-        train=True,
-        n_samples=100,
-        n_spheres=11,
-        r=5,
-        test_fraction=0.1,
-        seed=42
-    ):
-        X, y = create_sphere_dataset(
-                n_samples=n_samples,
-                n_spheres=n_spheres,
-                r=r,
-                seed=seed)
-
-        X = torch.as_tensor(X, dtype=torch.float)
-
-        test_size = int(test_fraction * len(X))
-        train_size = len(X) - test_size
-
-        X_train, X_test = random_split(X, [train_size, test_size])
-        y_train, y_test = random_split(y, [train_size, test_size])
-
-        self.data = X_train if train else X_test
-        self.labels = y_train if train else y_test
-
-        self.dimension = X.shape[1]
-
-    def __getitem__(self, index):
-        return self.data[index], self.labels[index]
-
-    def __len__(self):
-        return len(self.data)
 
 
 class LinearAutoencoder(torch.nn.Module):
@@ -110,7 +72,7 @@ class TopologicalAutoencoder(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    data_set = SpheresDataset()
+    data_set = Spheres()
 
     train_loader = DataLoader(
         data_set,
@@ -140,7 +102,7 @@ if __name__ == '__main__':
 
         progress.set_postfix(loss=loss.item())
 
-    data_set = SpheresDataset(train=True)
+    data_set = Spheres(train=True)
 
     test_loader = DataLoader(
             data_set,
@@ -149,7 +111,9 @@ if __name__ == '__main__':
     )
 
     # FIXME: Worst results?
-    # X, ynext(iter(test_loader))
+    # X, y = next(iter(test_loader))
+
+    from torch_topological.datasets.spheres import create_sphere_dataset
 
     X, y = create_sphere_dataset(n_samples=100, n_spheres=11)
     X = torch.as_tensor(X, dtype=torch.float)

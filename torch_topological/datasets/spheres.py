@@ -2,6 +2,11 @@
 
 import numpy as np
 
+import torch
+
+from torch.utils.data import Dataset
+from torch.utils.data import random_split
+
 from torch_topological.data import sample_from_sphere
 
 
@@ -51,3 +56,40 @@ def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
         label_index += n_sphere_samples
 
     return X, y
+
+
+class Spheres(Dataset):
+    def __init__(
+        self,
+        train=True,
+        n_samples=100,
+        n_spheres=11,
+        r=5,
+        test_fraction=0.1,
+        seed=42
+    ):
+        X, y = create_sphere_dataset(
+                n_samples=n_samples,
+                n_spheres=n_spheres,
+                r=r,
+                seed=seed)
+
+        X = torch.as_tensor(X, dtype=torch.float)
+
+        test_size = int(test_fraction * len(X))
+        train_size = len(X) - test_size
+
+        X_train, X_test = random_split(X, [train_size, test_size])
+        y_train, y_test = random_split(y, [train_size, test_size])
+
+        self.data = X_train if train else X_test
+        self.labels = y_train if train else y_test
+
+        self.dimension = X.shape[1]
+
+    def __getitem__(self, index):
+        return self.data[index], self.labels[index]
+
+    def __len__(self):
+        return len(self.data)
+
