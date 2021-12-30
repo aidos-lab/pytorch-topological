@@ -82,9 +82,9 @@ if __name__ == '__main__':
     )
 
     model = LinearAutoencoder(input_dim=data_set.dimension)
-    topo_model = TopologicalAutoencoder(model, lam=0.5)
+    topo_model = TopologicalAutoencoder(model, lam=0.1)
 
-    optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
+    optimizer = optim.Adam(topo_model.parameters(), lr=1e-3)
 
     n_epochs = 10
 
@@ -111,12 +111,12 @@ if __name__ == '__main__':
     )
 
     # FIXME: Worst results?
-    # X, y = next(iter(test_loader))
+    X, y = next(iter(test_loader))
 
     from torch_topological.datasets.spheres import create_sphere_dataset
 
-    X, y = create_sphere_dataset(n_samples=100, n_spheres=11)
-    X = torch.as_tensor(X, dtype=torch.float)
+    #X, y = create_sphere_dataset(n_samples=100, n_spheres=11)
+    #X = torch.as_tensor(X, dtype=torch.float)
 
     Z = model.encode(X).detach().numpy()
 
