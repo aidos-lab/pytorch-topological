@@ -7,6 +7,8 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   torch_topological.data
+   torch_topological.datasets
    torch_topological.nn
    torch_topological.utils
 

@@ -4,10 +4,10 @@ torch\_topological.utils package
 Submodules
 ----------
 
-torch\_topological.utils.point\_clouds module
----------------------------------------------
+torch\_topological.utils.general module
+---------------------------------------
 
-.. automodule:: torch_topological.utils.point_clouds
+.. automodule:: torch_topological.utils.general
    :members:
    :undoc-members:
    :show-inheritance:
