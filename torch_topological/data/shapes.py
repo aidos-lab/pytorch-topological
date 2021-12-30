@@ -1,8 +1,42 @@
 """Contains sampling routines for various simple geometric objects."""
 
 import numpy as np
+import torch
 
 from .utils import embed
+
+
+def sample_from_disk(n=100, r=0.9, R=1.0):
+    """Sample points from disk.
+
+    Parameters
+    ----------
+    n : int
+        Number of points to sample.
+
+    r: float
+        Minimum radius, i.e. the radius of the inner circle of a perfect
+        sampling.
+
+    R : float
+        Maximum radius, i.e. the radius of the outer circle of a perfect
+        sampling.
+
+    Returns
+    -------
+    torch.tensor of shape `(n, 2)`
+        Tensor containing the sampled coordinates.
+    """
+    assert r <= R, RuntimeError('r > R')
+
+    length = np.random.uniform(r, R, size=n)
+    angle = np.pi * np.random.uniform(0, 2, size=n)
+
+    x = np.sqrt(length) * np.cos(angle)
+    y = np.sqrt(length) * np.sin(angle)
+
+    X = np.vstack((x, y)).T
+    return torch.as_tensor(X)
 
 
 def sample_from_unit_cube(n, d=3, random_state=None):
@@ -22,14 +56,14 @@ def sample_from_unit_cube(n, d=3, random_state=None):
 
     Returns
     -------
-    np.array of shape `(n, d)`
-        Array of sampled coordinates.
+    torch.tensor of shape `(n, d)`
+        Tensor containing the sampled coordinates.
     """
     if random_state is not None:
         np.random.seed(random_state)
 
     X = np.random.uniform(size=(n, d))
-    return X
+    return torch.as_tensor(X)
 
 
 def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
@@ -58,8 +92,8 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
 
     Returns
     -------
-    np.array
-        Array of sampled coordinates. If `ambient` is set, array will be
+    torch.tensor
+        Tensor of sampled coordinates. If `ambient` is set, array will be
         of shape `(n, ambient)`. Else, array will be of shape `(n, d + 1)`.
 
     Notes
@@ -84,10 +118,7 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
         assert ambient > d
         data = embed(data, ambient)
 
-    return data
-
-
-
+    return torch.as_tensor(data)
 
 
 def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
@@ -114,8 +145,8 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
 
     Returns
     -------
-    np.array of shape `(N, d)`
-        Array of sampled coordinates.
+    torch.tensor of shape `(n, d)`
+        Tensor of sampled coordinates.
     """
     if random_state is not None:
         np.random.seed(random_state)
@@ -142,7 +173,7 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
         X.append((x, y, z))
 
     X = np.asarray(X)
-    return X
+    return torch.as_tensor(X)
 
 
 def sample_from_annulus(n, r, R, random_state=None):
@@ -168,8 +199,8 @@ def sample_from_annulus(n, r, R, random_state=None):
 
     Returns
     -------
-    np.array of shape `(n, 2)`
-        Array of sampled coordinates.
+    torch.tensor of shape `(n, 2)`
+        Tensor containing sampled coordinates.
     """
     if r >= R:
         raise RuntimeError(
@@ -186,7 +217,7 @@ def sample_from_annulus(n, r, R, random_state=None):
     radii = np.sqrt(np.random.uniform(r ** 2, R ** 2, n))
 
     X = np.column_stack((radii * np.cos(thetas), radii * np.sin(thetas)))
-    return X
+    return torch.as_tensor(X)
 
 
 # TODO: Improve documentation

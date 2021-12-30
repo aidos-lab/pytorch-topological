@@ -1,6 +1,5 @@
 """Summary statistics for persistence diagrams."""
 
-
 import torch
 
 
