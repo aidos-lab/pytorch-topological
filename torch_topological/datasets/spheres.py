@@ -1,5 +1,10 @@
 """Create `SPHERES` data set."""
 
+import numpy as np
+
+from torch_topological.data import sample_from_sphere
+
+
 # TODO: Finish documentation
 # TODO: Harmonise API
 def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
