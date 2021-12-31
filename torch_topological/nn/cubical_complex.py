@@ -35,8 +35,12 @@ class CubicalComplex(nn.Module):
 
         Parameters
         ----------
-        x : `np.array` or `torch.tensor`
-            Input point cloud
+        x : array_like
+            Input image(s). `x` can either be a 2D array of shape `(H, W)`,
+            which is treated as a single image, or a 3D array/tensor of the
+            form `(C, H, W)`, with `C` representing the number of channels,
+            or a 4D array/tensor of the form `(B, C, H, W)`, with `B` being
+            the batch size.
 
         Returns
         -------
@@ -49,6 +53,29 @@ class CubicalComplex(nn.Module):
             refers to the individual instances of
             :class:`PersistenceInformation` elements.
 
+        """
+        # Check which shape to handle.
+        if len(x.shape) == 2:
+            return self._forward(x)
+
+    def _forward(self, x):
+        """Handle a single-channel image.
+
+        This internal function handles the calculation of topological
+        features for a single-channel image, i.e. an `array_like`  of
+        2D shape.
+
+        Parameters
+        ----------
+        x : array_like of shape `(H, W)`
+            Single-channel input image.
+
+        Returns
+        -------
+        list of class:`PersistenceInformation`
+            List of persistence information data structures, containing
+            the persistence diagram and the persistence pairing of some
+            dimension in the input data set.
         """
         cubical_complex = gudhi.CubicalComplex(
             dimensions=x.shape,
