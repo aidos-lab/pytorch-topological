@@ -7,12 +7,12 @@ from .distances import WassersteinDistance
 from .loss import SignatureLoss
 from .loss import SummaryStatisticLoss
 
-from .cubical import Cubical
+from .cubical_complex import CubicalComplex
 from .vietoris_rips_complex import VietorisRipsComplex
 
 
 __all__ = [
-    'Cubical',
+    'CubicalComplex',
     'PersistenceInformation',
     'SignatureLoss',
     'SummaryStatisticLoss',

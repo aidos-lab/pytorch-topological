@@ -1,6 +1,8 @@
-"""Cubical complex calculation module(s)."""
+"""Cubical complex calculation module."""
 
 from torch import nn
+
+from torch_topological.nn import PersistenceInformation
 
 import gudhi
 import torch
@@ -8,12 +10,15 @@ import torch
 import numpy as np
 
 
-class Cubical(nn.Module):
-    """Calculate cubical complex persisistence diagrams.
+class CubicalComplex(nn.Module):
+    """Calculate cubical complex persistence diagrams.
 
     This module calculates 'differentiable' persistence diagrams for
     point clouds. The underlying topological approximations are done
-    by calculating a Vietoris--Rips complex of the data.
+    by calculating a cubical complex of the data.
+
+    Cubical complexes are an excellent choice whenever data exhibits
+    a highly-structured form, such as *images*.
     """
 
     # TODO: Handle different dimensions?
@@ -35,9 +40,15 @@ class Cubical(nn.Module):
 
         Returns
         -------
-        List of tuples of the form `(gen, pd)`, where `gen` refers to
-        the set of generators for the respective dimension, while `pd`
-        denotes the persistence diagram.
+        list of :class:`PersistenceInformation`
+            List of :class:`PersistenceInformation`, containing both the
+            persistence diagrams and the generators, i.e. the
+            *pairings*, of a certain dimension of topological features.
+            If `x` is a 3D array, returns a list of lists, in which the
+            first dimension denotes the batch and the second dimension
+            refers to the individual instances of
+            :class:`PersistenceInformation` elements.
+
         """
         cubical_complex = gudhi.CubicalComplex(
             dimensions=x.shape,
@@ -96,11 +107,11 @@ class Cubical(nn.Module):
                 (pairs, infinite_pairs)
             )
 
-        return self._create_tensors_from_pairs(x, pairs)
+        return self._create_tensors_from_pairs(x, pairs, dim)
 
     # Internal utility function to handle the 'heavy lifting:'
     # creates tensors from sets of persistence pairs.
-    def _create_tensors_from_pairs(self, x, pairs):
+    def _create_tensors_from_pairs(self, x, pairs, dim):
 
         xs = x.shape
 
@@ -126,4 +137,8 @@ class Cubical(nn.Module):
             x.ravel()[pairs[:, 1]]
         ), 1)
 
-        return (gens, persistence_diagram)
+        return PersistenceInformation(
+                pairing=gens,
+                diagram=persistence_diagram,
+                dimension=dim
+        )
