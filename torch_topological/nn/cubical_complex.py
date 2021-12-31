@@ -58,6 +58,18 @@ class CubicalComplex(nn.Module):
         if len(x.shape) == 2:
             return self._forward(x)
 
+        # Handle channels
+        elif len(x.shape) == 3:
+            return [
+                self._forward(x_) for x_ in x
+            ]
+
+        # Handle full batch
+        elif len(x.shape) == 4:
+            return [
+                    [self._forward(x__) for x__ in x_] for x_ in x
+            ]
+
     def _forward(self, x):
         """Handle a single-channel image.
 
