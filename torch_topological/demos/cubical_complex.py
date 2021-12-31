@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from torch_topological.nn import Cubical
+from torch_topological.nn import CubicalComplex
 from torch_topological.nn import SummaryStatisticLoss
 
 from sklearn.datasets import make_circles
@@ -40,13 +40,13 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam([X], lr=1e-2)
     loss_fn = SummaryStatisticLoss('total_persistence', p=1)
 
-    cubical = Cubical()
+    cubical_complex = CubicalComplex()
 
-    persistence_information_target = cubical(Y)
+    persistence_information_target = cubical_complex(Y)
     persistence_information_target = [persistence_information_target[0]]
 
     for i in range(500):
-        persistence_information = cubical(X)
+        persistence_information = cubical_complex(X)
         persistence_information = [persistence_information[0]]
 
         optimizer.zero_grad()
