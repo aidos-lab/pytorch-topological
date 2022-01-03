@@ -79,8 +79,14 @@ class Spheres(Dataset):
         test_size = int(test_fraction * len(X))
         train_size = len(X) - test_size
 
-        X_train, X_test = random_split(X, [train_size, test_size])
-        y_train, y_test = random_split(y, [train_size, test_size])
+        indices = torch.as_tensor(np.arange(len(X)), dtype=torch.long)
+
+        train_indices, test_indices = random_split(
+            indices, [train_size, test_size]
+        )
+
+        X_train, X_test = X[train_indices], X[test_indices]
+        y_train, y_test = y[train_indices], y[test_indices]
 
         self.data = X_train if train else X_test
         self.labels = y_train if train else y_test
