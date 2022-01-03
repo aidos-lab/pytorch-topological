@@ -159,11 +159,13 @@ class SignatureLoss(torch.nn.Module):
         ]
 
         XY_dist = [
-            0.5 * (XX - YX).pow(2).sum() for XX, YX in zip(X_sig_X, Y_sig_X)
+            0.5 * torch.linalg.vector_norm(XX - YX, ord=self.p)
+            for XX, YX in zip(X_sig_X, Y_sig_X)
         ]
 
         YX_dist = [
-            0.5 * (YY - XY).pow(2).sum() for YY, XY in zip(Y_sig_Y, X_sig_Y)
+            0.5 * torch.linalg.vector_norm(YY - XY, ord=self.p)
+            for YY, XY in zip(Y_sig_Y, X_sig_Y)
         ]
 
         return torch.stack(XY_dist).sum() + torch.stack(YX_dist).sum()
