@@ -56,7 +56,7 @@ class TopologicalAutoencoder(torch.nn.Module):
         self.loss = SignatureLoss()
 
         # TODO: Decrease dimensionality...
-        self.vr = VietorisRipsComplex(dim=1)
+        self.vr = VietorisRipsComplex(dim=0)
 
     def forward(self, x):
         z = self.model.encode(x)
@@ -72,21 +72,22 @@ class TopologicalAutoencoder(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    data_set = Spheres()
+    n_spheres = 11
+    data_set = Spheres(n_spheres=n_spheres)
 
     train_loader = DataLoader(
         data_set,
-        batch_size=64,
+        batch_size=32,
         shuffle=True,
         drop_last=True
     )
 
     model = LinearAutoencoder(input_dim=data_set.dimension)
-    topo_model = TopologicalAutoencoder(model, lam=0.1)
+    topo_model = TopologicalAutoencoder(model, lam=10)
 
-    optimizer = optim.Adam(topo_model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
 
-    n_epochs = 10
+    n_epochs = 5
 
     progress = tqdm(range(n_epochs))
 
@@ -102,22 +103,19 @@ if __name__ == '__main__':
 
         progress.set_postfix(loss=loss.item())
 
-    data_set = Spheres(train=True)
+    data_set = Spheres(
+        train=False,
+        n_samples=2000,
+        n_spheres=n_spheres,
+    )
 
     test_loader = DataLoader(
             data_set,
-            shuffle=True,
+            shuffle=False,
             batch_size=len(data_set)
     )
 
-    # FIXME: Worst results?
     X, y = next(iter(test_loader))
-
-    from torch_topological.datasets.spheres import create_sphere_dataset
-
-    #X, y = create_sphere_dataset(n_samples=100, n_spheres=11)
-    #X = torch.as_tensor(X, dtype=torch.float)
-
     Z = model.encode(X).detach().numpy()
 
     plt.scatter(
