@@ -29,3 +29,49 @@ def is_iterable(x):
         result = False
 
     return result
+
+
+def nesting_level(x):
+    """Calculate nesting level of a list of objects.
+
+    To convert between sparse and dense representations of topological
+    features, we need to determine the nesting level of an input list.
+    The nesting level is defined as the maximum number of times we can
+    recurse into the object while still obtaining lists.
+
+    Parameters
+    ----------
+    x : list
+        Input list of objects.
+
+    Returns
+    -------
+    int
+        Nesting level of `x`. If `x` has no well-defined nesting level,
+        for example because `x` is not a list of something, will return
+        `0`.
+
+    Notes
+    -----
+    This function is implemented recursively. It is therefore a bad idea
+    to apply it to objects with an extremely high nesting level.
+
+    Examples
+    --------
+    >>> nesting_level([1, 2, 3])
+    1
+
+    >>> nesting_level([[1, 2], [3, 4]])
+    2
+    """
+    # This is really only supposed to work with lists. Anything fancier,
+    # for example a `torch.tensor`, can already be used as a dense data
+    # structure.
+    if not isinstance(x, list):
+        return 0
+
+    # Empty lists have a nesting level of 1.
+    if len(x) == 0:
+        return 1
+    else:
+        return max(nesting_level(y) for y in x) + 1
