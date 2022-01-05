@@ -59,14 +59,37 @@ def make_tensor(x):
             lambda a: (len(a.diagram), a.dimension), chain.from_iterable(x)
         ))
 
-        print(list(M))
+        # Get maximum dimension
+        dim = max(M, key=itemgetter(1))[1]
 
-        N = max(M, key=itemgetter(0))[0]
-        D = max(M, key=itemgetter(1))[1]
+        # Get *sum* of maximum number of entries for each dimension.
+        # This is calculated over all batches.
+        N = sum([
+            max([L for L in M if L[1] == d], key=itemgetter(0))[0]
+            for d in range(dim + 1)
+        ])
 
-        print(B, N, D)
+        tensors = [
+            make_tensor_from_persistence_information(pers_infos)
+            for pers_infos in x
+        ]
 
-        make_tensor_from_persistence_information(x[0][0])
+        # Pad all tensors to length N in the first dimension, then turn
+        # them into a batch.
+        result = torch.stack(
+                list(
+                    map(
+                        lambda t: torch.nn.functional.pad(
+                                t,
+                                (0, 0, N - len(t), 0),
+                                mode='constant',
+                                value=torch.nan),
+                        tensors
+                    )
+                )
+        )
+
+        return result
 
 
 def make_tensor_from_persistence_information(
