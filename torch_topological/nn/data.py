@@ -36,7 +36,7 @@ class PersistenceInformation(namedtuple(
 
     Due to its lightweight nature, no validity checks are performed, but
     all calculation modules should return a sequence of instances of the
-    `PersistenceInformation` class.
+    :class:`PersistenceInformation` class.
     """
 
     __slots__ = ()
@@ -69,19 +69,63 @@ def make_tensor(x):
         make_tensor_from_persistence_information(x[0][0])
 
 
-def make_tensor_from_persistence_information(pers_info):
-    """Convert (sequence) of persistence information entries to tensor."""
-    if is_iterable(pers_info) or \
+def make_tensor_from_persistence_information(
+    pers_info,
+    extract_generators=False
+):
+    """Convert (sequence) of persistence information entries to tensor.
+
+    This function converts instance(s) of :class:`PersistenceInformation`
+    objects into a single tensor. No padding will be performed. A client
+    may specify what type of information to extract from the object. For
+    instance, by default, the function will extract persistence diagrams
+    but this behaviour can be changed by setting `extract_generators` to
+    `true`.
+
+    Parameters
+    ----------
+    pers_info : :class:`PersistenceInformation` or iterable thereof
+        Input persistence information object(s). The function is able to
+        handle both single objects and sequences. This has no bearing on
+        the length of the returned tensor.
+
+    extract_generators : bool
+        If set, extracts generators instead of persistence diagram from
+        `pers_info`.
+
+    Returns
+    -------
+    torch.tensor
+        Tensor of shape `(n, 3)`, where `n` is the sum of all features,
+        over all dimensions in the input `pers_info`. Each triple shall
+        be of the form `(creation, destruction, dim)` for a persistence
+        diagram. If the client requested generators to be returned, the
+        first two entries of the triple refer to *indices* with respect
+        to the input data set. Depending on the algorithm employed, the
+        meaning of these indices can change. Please refer to the module
+        used to calculate persistent homology for more details.
+    """
+    # Looks a little bit cumbersome, but since `namedtuple` is iterable
+    # as well, we need to ensure that we are actually dealing with more
+    # than one instance here.
+    if len(pers_info) > 1 and not \
             isinstance(pers_info[0], PersistenceInformation):
         pers_info = [pers_info]
 
-    pairs = torch.cat(
-        [torch.as_tensor(x.diagram, dtype=torch.float) for x in pers_info]
-    )
+    # TODO: This might not always work since the size of generators
+    # changes in different dimensions.
+    if extract_generators:
+        pairs = torch.cat(
+            [torch.as_tensor(x.pairing, dtype=torch.float) for x in pers_info],
+        ).long()
+    else:
+        pairs = torch.cat(
+            [torch.as_tensor(x.diagram, dtype=torch.float) for x in pers_info],
+        ).float()
 
     dimensions = torch.cat(
         [
-            torch.as_tensor([x.dimension] * len(x.diagram), dtype=torch.float)
+            torch.as_tensor([x.dimension] * len(x.diagram), dtype=torch.long)
             for x in pers_info
         ]
     )
