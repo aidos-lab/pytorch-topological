@@ -9,6 +9,8 @@ from torch_topological.nn.layers import StructureElementLayer
 
 from torch.utils.data import DataLoader
 
+from tqdm import tqdm
+
 import torch
 
 
@@ -26,7 +28,7 @@ class TopologicalModel(torch.nn.Module):
             torch.nn.Linear(self.latent_dim, output_dim),
         )
 
-        self.vr = VietorisRipsComplex()
+        self.vr = VietorisRipsComplex(dim=0)
 
     def forward(self, x):
         pers_info = self.vr(x)
@@ -38,7 +40,7 @@ class TopologicalModel(torch.nn.Module):
 if __name__ == '__main__':
 
     batch_size = 32
-    n_epochs = 10
+    n_epochs = 50
     n_elements = 10
 
     data_set = SphereVsTorus(n_point_clouds=2 * batch_size)
@@ -52,15 +54,23 @@ if __name__ == '__main__':
 
     model = TopologicalModel(n_elements)
     loss_fn = torch.nn.CrossEntropyLoss()
-    opt = torch.optim.Adam(model.parameters(), lr=1e-3)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    for epoch in range(n_epochs):
+    progress = tqdm(range(n_epochs))
+
+    for epoch in progress:
         for batch, (x, y) in enumerate(loader):
-            pred = model(x)
-            loss = loss_fn(pred, y)
-
-            print(loss.item())
+            output = model(x)
+            loss = loss_fn(output, y)
 
             opt.zero_grad()
             loss.backward()
             opt.step()
+
+            pred = torch.argmax(output, dim=1)
+            acc = (pred == y).sum() / len(y)
+
+            progress.set_postfix(
+                    loss=f'{loss.item():.08f}',
+                    acc=f'{acc:.02f}'
+            )
