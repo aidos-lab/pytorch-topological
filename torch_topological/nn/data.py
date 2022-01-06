@@ -42,7 +42,36 @@ class PersistenceInformation(namedtuple(
 
 
 def make_tensor(x):
-    """Create dense tensor representation from sparse inputs."""
+    """Create dense tensor representation from sparse inputs.
+
+    This function turns sparse inputs of :class:`PersistenceInformation`
+    objects into 'dense' tensor representations, thus providing a useful
+    integration into differentiable layers.
+
+    The dimension of the resulting tensor depends on maximum number of
+    topological features, summed over all dimensions in the data. This
+    is similar to the format in `giotto-ph`.
+
+    Parameters
+    ----------
+    x : list of (list of ...) :class:`PersistenceInformation`
+        Input, consisting of a (potentially) nested list of
+        :class:`PersistenceInformation` objects as obtained
+        from a persistent homology calculation module, such
+        as :class:`VietorisRipsComplex`.
+
+    Returns
+    -------
+    torch.tensor
+        Dense tensor representation of `x`. The output is best
+        understood by considering some examples: given a batch
+        obtained from :class:`VietorisRipsComplex`, our tensor
+        will have shape `(B, N, 3)`. `B` is the batch size and
+        `N` is the sum of maximum lengths of diagrams relative
+        to this batch. Each entry will consist of a creator, a
+        destroyer, and a dimension. Dummy entries, used to pad
+        the batch, can be detected as `torch.nan`.
+    """
     level = nesting_level(x)
 
     # Internal utility function for calculating the length of the output
