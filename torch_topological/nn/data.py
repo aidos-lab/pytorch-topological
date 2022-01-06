@@ -46,10 +46,20 @@ def make_tensor(x):
     """Create dense tensor representation from sparse inputs."""
     level = nesting_level(x)
 
-    # List of lists: the first axis is treated as the batch axis, while
-    # the second axis is treated as the dimension of diagrams or pairs.
-    if level == 2:
-        B = len(x)
+    # Internal utility function for calculating the length of the output
+    # tensor. This is required to ensure that all inputs can be *merged*
+    # into a single output tensor.
+    def _calculate_length(x, level):
+
+        # Simple base case; should never occur in practice but let's be
+        # consistent here.
+        if len(x) == 0:
+            return 0
+
+        # `chain.from_iterable()` only removes one layer of nesting, but
+        # we may have more.
+        elif level > 2:
+            x = list(chain.from_iterable(x))
 
         # Collect information that we need to create the full tensor. An
         # entry of the resulting list contains the length of the diagram
@@ -69,6 +79,13 @@ def make_tensor(x):
             for d in range(dim + 1)
         ])
 
+        return N
+
+    N = _calculate_length(x, level)
+
+    # List of lists: the first axis is treated as the batch axis, while
+    # the second axis is treated as the dimension of diagrams or pairs.
+    if level == 2:
         tensors = [
             make_tensor_from_persistence_information(pers_infos)
             for pers_infos in x
