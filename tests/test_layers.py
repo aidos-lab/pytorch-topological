@@ -10,7 +10,7 @@ batch_size = 64
 
 
 class TestStructureElementLayer:
-    data_set = SphereVsTorus(n_point_clouds=3 * batch_size)
+    data_set = SphereVsTorus(n_point_clouds=batch_size)
     loader = DataLoader(
         data_set,
         batch_size=batch_size,
@@ -25,4 +25,3 @@ class TestStructureElementLayer:
             pers_info = make_tensor(self.vr(x))
 
             assert pers_info is not None
-            assert len(pers_info) == batch_size
