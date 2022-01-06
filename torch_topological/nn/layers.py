@@ -52,7 +52,7 @@ class StructureElementLayer(torch.nn.Module):
         x = centres - batch
         x = x.pow(2)
         x = torch.mul(x, sharpness)
-        x = torch.sum(x, 2)
+        x = torch.nansum(x, 2)
         x = torch.exp(-x)
         x = x.view(B, self.n_elements, -1)
         x = torch.sum(x, 2)
