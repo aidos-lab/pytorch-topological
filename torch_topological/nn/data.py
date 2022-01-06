@@ -6,7 +6,6 @@ from itertools import chain
 
 from operator import itemgetter
 
-from torch_topological.utils import is_iterable
 from torch_topological.utils import nesting_level
 
 import torch
@@ -105,6 +104,49 @@ def make_tensor(x):
                     )
                 )
         )
+
+        return result
+
+    # List of lists of lists: this indicates image-based data, where we
+    # also have a set of tensors for each channel. The internal layout,
+    # i.e. our input, has the following structure:
+    #
+    # B x C x D
+    #
+    # Each variable being the length of the respective list. We want an
+    # output of the following shape:
+    #
+    # B x C x N x 3
+    #
+    # Here, `N` is the maximum length of an individual persistence
+    # information object.
+    else:
+        tensors = [
+            [
+                make_tensor_from_persistence_information(pers_infos)
+                for pers_infos in batch
+            ]
+            for batch in x
+        ]
+
+        # Pad all tensors to length N in the first dimension, then turn
+        # them into a batch. We first stack over channels (inner), then
+        # over the batch (outer).
+        result = torch.stack([
+            torch.stack(
+                list(
+                    map(
+                        lambda t: torch.nn.functional.pad(
+                                t,
+                                (0, 0, N - len(t), 0),
+                                mode='constant',
+                                value=torch.nan),
+                        batch_tensors
+                    )
+                )
+            )
+            for batch_tensors in tensors
+        ])
 
         return result
 
