@@ -6,6 +6,8 @@ from torchvision.transforms import ToTensor
 
 from torch_topological.datasets import SphereVsTorus
 
+from torch_topological.nn.data import make_tensor
+
 from torch_topological.nn import CubicalComplex
 from torch_topological.nn import VietorisRipsComplex
 
@@ -15,12 +17,12 @@ batch_size = 64
 
 
 class TestVietorisRipsComplexBatchHandling:
-    data_set = SphereVsTorus(n_point_clouds=50)
+    data_set = SphereVsTorus(n_point_clouds=3 * batch_size)
     loader = DataLoader(
         data_set,
         batch_size=batch_size,
         shuffle=True,
-        drop_last=True,
+        drop_last=False,
     )
 
     vr = VietorisRipsComplex(dim=1)
@@ -31,6 +33,10 @@ class TestVietorisRipsComplexBatchHandling:
 
             assert pers_info is not None
             assert len(pers_info) == batch_size
+
+            pers_info_dense = make_tensor(pers_info)
+
+            assert pers_info_dense is not None
 
 
 class TestCubicalComplexBatchHandling:
@@ -50,7 +56,7 @@ class TestCubicalComplexBatchHandling:
         batch_size=batch_size,
         shuffle=True,
         drop_last=True,
-            )
+    )
 
     cc = CubicalComplex()
 
@@ -60,3 +66,7 @@ class TestCubicalComplexBatchHandling:
 
             assert pers_info is not None
             assert len(pers_info) == batch_size
+
+            pers_info_dense = make_tensor(pers_info)
+
+            assert pers_info_dense is not None
