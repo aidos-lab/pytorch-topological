@@ -8,10 +8,16 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Started
 
    usage
    examples/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Modules
+
+   nn
 
 Indices and tables
 ==================
