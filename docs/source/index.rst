@@ -11,6 +11,7 @@
    :caption: Contents:
 
    usage
+   examples/index
 
 Indices and tables
 ==================
