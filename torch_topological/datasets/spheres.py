@@ -15,7 +15,10 @@ from torch_topological.data import sample_from_sphere
 def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
     """Create data set of high-dimensional spheres.
 
-    Create 'SPHERES' data set described in Moor et al. [Moor20a]_.
+    Create `SPHERES` data set described in Moor et al. [Moor20a]_. The
+    data sets consists of `n` spheres, enclosed by a single sphere. It
+    is a perfect example of simple manifolds, being arranged in simple
+    pattern, that is nevertheless challenging to embed by algorithms.
 
     Notes
     -----
