@@ -14,19 +14,37 @@ class CubicalComplex(nn.Module):
     """Calculate cubical complex persistence diagrams.
 
     This module calculates 'differentiable' persistence diagrams for
-    point clouds. The underlying topological approximations are done
-    by calculating a cubical complex of the data.
+    structured data, such as images. This is achieved by calculating
+    a *cubical complex*.
 
-    Cubical complexes are an excellent choice whenever data exhibits
-    a highly-structured form, such as *images*.
+    Cubical complexes are the natural choice for calculating topological
+    features of highly-structured inputs. See [Rieck20a]_ for an example
+    of how to apply such topological features in practice.
+
+    References
+    ----------
+    .. [Rieck20a] B. Rieck et al., "Uncovering the Topology of
+    Time-Varying fMRI Data Using Cubical Complex", *Advances in Neural
+    Information Processing Systems 33*, pp. 6900--6912, 2020.
     """
 
     # TODO: Handle different dimensions?
-    def __init__(self):
-        """Initialise new module."""
+    def __init__(self, superlevel=False):
+        """Initialise new module.
+
+        Parameters
+        ----------
+        superlevel : bool
+            Indicates whether to calculate topological features based on
+            superlevel sets. By default, *sublevel set filtrations* are
+            used.
+        """
         super().__init__()
 
-    # TODO: Handle batches?
+        # TODO: This is handled somewhat inelegantly below. Might be
+        # smarter to update.
+        self.superlevel = superlevel
+
     def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
 
@@ -89,6 +107,9 @@ class CubicalComplex(nn.Module):
             the persistence diagram and the persistence pairing of some
             dimension in the input data set.
         """
+        if self.superlevel:
+            x = -x
+
         cubical_complex = gudhi.CubicalComplex(
             dimensions=x.shape,
             top_dimensional_cells=x.flatten()
