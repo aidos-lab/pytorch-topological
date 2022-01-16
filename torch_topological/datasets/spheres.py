@@ -95,19 +95,40 @@ def create_sphere_dataset(n_samples=500, n_spheres=11, d=100, r=5, seed=None):
 
 
 class Spheres(Dataset):
+    """Data set containing multiple spheres, enclosed by a larger one.
+
+    This is a `Dataset` instance of the `SPHERES` data set described by
+    Moor et al. [Moor20a]_. The class provides a convenient interface
+    for making use of that data set in machine learning tasks.
+    """
+
     def __init__(
         self,
         train=True,
+        test_fraction=0.1,
         n_samples=100,
         n_spheres=11,
         r=5,
-        test_fraction=0.1,
     ):
+        """Create new instance of `SPHERES` data set.
+
+        This class wraps the `SPHERES` data set for subsequent use in
+        machine learning tasks. See :func:`create_sphere_dataset` for
+        more details on the supported parameters.
+
+        Parameters
+        ----------
+        train : bool
+            If set, create and store training portion of data set.
+
+        test_fraction : float
+            Fraction of generated samples to be used as the test portion
+            of the data set.
+        """
         X, y = create_sphere_dataset(
                 n_samples=n_samples,
                 n_spheres=n_spheres,
-                r=r,
-                seed=seed)
+                r=r)
 
         X = torch.as_tensor(X, dtype=torch.float)
 
@@ -129,8 +150,29 @@ class Spheres(Dataset):
         self.dimension = X.shape[1]
 
     def __getitem__(self, index):
+        """Return data point and label of a specific point.
+
+        Parameters
+        ----------
+        index : int
+            Index of point in data set. Invalid indices will raise an
+            exception.
+
+        Returns
+        -------
+        tuple of `torch.tensor` and `torch.tensor`
+            The point at the specific index and its label, indicating
+            the sphere it belongs to. See :func:`create_sphere_dataset`
+            for more details on the specifics of label assignment.
+        """
         return self.data[index], self.labels[index]
 
     def __len__(self):
-        return len(self.data)
+        """Return number of points in data set.
 
+        Returns
+        -------
+        int
+            Number of samples in data set.
+        """
+        return len(self.data)
