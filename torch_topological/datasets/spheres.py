@@ -12,13 +12,40 @@ from torch_topological.data import sample_from_sphere
 
 # TODO: Finish documentation
 # TODO: Harmonise API
-def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
+def create_sphere_dataset(n_samples=500, n_spheres=11, d=100, r=5):
     """Create data set of high-dimensional spheres.
 
     Create `SPHERES` data set described in Moor et al. [Moor20a]_. The
     data sets consists of `n` spheres, enclosed by a single sphere. It
     is a perfect example of simple manifolds, being arranged in simple
     pattern, that is nevertheless challenging to embed by algorithms.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of points to sample per sphere.
+
+    n_spheres : int
+        Total number of spheres to create. The algorithm will always
+        create the *last* sphere to enclose the previous ones. Hence,
+        if `n_spheres = 3`, two spheres will be enclosed by a larger
+        one.
+
+    d : int
+        Dimension of spheres to sample from. A `d`-sphere will be
+        embedded in `d+1` dimensions.
+
+    r : float
+        Radius of smaller spheres. The radius of the larger enclosing
+        sphere will be `5 * r`.
+
+    Returns
+    -------
+    Tuple of `np.array`, `np.array`
+        Array containing the coordinates of the spheres. The second
+        array contains the respective labels, ranging from `0` to
+        `n_spheres - 1`. This array can be used for visualisation
+        purposes.
 
     Notes
     -----
@@ -30,14 +57,12 @@ def create_sphere_dataset(n_samples=500, d=100, n_spheres=11, r=5, seed=42):
         *Proceedings of the 37th International Conference on Machine
         Learning*, PMLR 119, pp. 7045--7054, 2020.
     """
-    np.random.seed(seed)
-
     variance = 10 / np.sqrt(d)
     shift_matrix = np.random.normal(0, variance, [n_spheres, d+1])
 
     spheres = []
     n_datapoints = 0
-    for i in np.arange(n_spheres-1):
+    for i in np.arange(n_spheres - 1):
         sphere = sample_from_sphere(n=n_samples, d=d, r=r)
         spheres.append(sphere + shift_matrix[i, :])
         n_datapoints += n_samples
