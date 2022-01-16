@@ -51,6 +51,10 @@ pip install -U torch-topological
 `torch_topological` is still a work in progress. Check out [some example
 code](./torch_topological/examples) and stay tuned for more information.
 
+# Contributing
+
+Check out the [contribution guidelines](CONTRIBUTING.md).
+
 # Acknowledgements
 
 Our software and research does not exist in a vacuum. `pytorch-topological` is standing
