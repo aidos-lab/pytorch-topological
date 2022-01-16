@@ -9,6 +9,28 @@ learning framework for [PyTorch](https://pytorch.org). It aims to
 collect *loss terms* and *neural network layers* in order to simplify
 building the next generation of topology-based machine learning tools.
 
+# Topological machine learning in a nutshell 
+
+*Topological machine learning* refers to a new class of machine learning
+algorithms that are able to make use of topological features in data
+sets. In contrast to methods based on a purely geometrical point of
+view, topological features are capable of focusing on *connectivity
+aspects* of a data set. This provides an interesting fresh perspective
+that can be used to create powerful hybrid algorithms, capable of
+yielding more insights into data.
+
+This is an *emerging research field*, firmly rooted in computational
+topology and topological data analysis. If you want to learn more about
+how topology and geometry can work in tandem, here are a few resources
+to get you started:
+
+- Amézquita et al., [*The Shape of Things to Come: Topological Data Analysis and Biology,
+  from Molecules to Organisms*](https://doi.org/10.1002/dvdy.175), Developmental Dynamics
+  Volume 249, Issue 7, pp. 816--833, 2020.
+
+- Hensel et al., [*A Survey of Topological Machine Learning Methods*](https://www.frontiersin.org/articles/10.3389/frai.2021.681108/full),
+  Frontiers in Artificial Intelligence, 2021.
+
 # Installation
 
 It is recommended to use the excellent [`poetry`](https://python-poetry.org) framework
@@ -26,8 +48,8 @@ pip install -U torch-topological
 
 # Usage
 
-`torch_topological` is still a work in progress. Stay tuned for more
-information.
+`torch_topological` is still a work in progress. Check out [some example
+code](./torch_topological/examples) and stay tuned for more information.
 
 # Acknowledgements
 
