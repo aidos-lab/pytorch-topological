@@ -25,7 +25,6 @@ class RandomDataSet(Dataset):
 
 
 class TestCubicalComplex:
-    cc = CubicalComplex()
     batch_size = 64
 
     def test_2d(self):
@@ -40,7 +39,9 @@ class TestCubicalComplex:
             drop_last=False
         )
 
+        cc = CubicalComplex(dim=3)
+
         for batch in loader:
-            pers_info = self.cc(batch)
+            pers_info = cc(batch)
 
             assert pers_info is not None
