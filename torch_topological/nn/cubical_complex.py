@@ -29,7 +29,7 @@ class CubicalComplex(nn.Module):
     """
 
     # TODO: Handle different dimensions?
-    def __init__(self, superlevel=False):
+    def __init__(self, superlevel=False, dim=None):
         """Initialise new module.
 
         Parameters
@@ -38,12 +38,22 @@ class CubicalComplex(nn.Module):
             Indicates whether to calculate topological features based on
             superlevel sets. By default, *sublevel set filtrations* are
             used.
+
+        dim : int or `None`
+            If set, describes dimension of input data. This is meant to
+            be the dimension of an individual image **without** channel
+            information, if any. The value of `dim` will change the way
+            an input tensor is being handled: additional dimensions, if
+            present, will be treated as batches or channels. If not set
+            to an integer value, :func:`forward` will just *guess* what
+            to do with an input (which should work in most cases).
         """
         super().__init__()
 
         # TODO: This is handled somewhat inelegantly below. Might be
         # smarter to update.
         self.superlevel = superlevel
+        self.dim = dim
 
     def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
@@ -54,11 +64,18 @@ class CubicalComplex(nn.Module):
         Parameters
         ----------
         x : array_like
-            Input image(s). `x` can either be a 2D array of shape `(H, W)`,
-            which is treated as a single image, or a 3D array/tensor of the
-            form `(C, H, W)`, with `C` representing the number of channels,
-            or a 4D array/tensor of the form `(B, C, H, W)`, with `B` being
-            the batch size.
+            Input image(s). If `dim` has not been set, will *guess* how
+            to handle the input as follows: `x` can either be a 2D array
+            of shape `(H, W)`, which is treated as a single image, or
+            a 3D array/tensor of the form `(C, H, W)`, with `C`
+            representing the number of channels, or a 4D array/tensor of
+            the form `(B, C, H, W)`, with `B` being the batch size. If
+            `dim` has been set, the same handling strategy applies, but
+            the *last* `dim` dimensions of the tensor are being used for
+            the cubical complex calculation. All subsequent dimensions
+            will be assumed to represent batches or channels (in this
+            order). Hence, if `dim` is set, the tensor must at most have
+            `dim + 2` dimensions.
 
         Returns
         -------
@@ -69,21 +86,35 @@ class CubicalComplex(nn.Module):
             If `x` is a 3D array, returns a list of lists, in which the
             first dimension denotes the batch and the second dimension
             refers to the individual instances of
-            :class:`PersistenceInformation` elements.
+            :class:`PersistenceInformation` elements. Similar for
+            higher-order tensors.
 
         """
-        # Check which shape to handle.
-        if len(x.shape) == 2:
+        # Dimension was provided; this makes calculating the *effective*
+        # dimension of the tensor much easier: take everything but the
+        # last `self.dim` dimensions.
+        if self.dim is not None:
+            shape = x.shape[:-self.dim]
+            dims = len(shape)
+
+        # No dimension was provided; just use the shape provided by the
+        # client.
+        else:
+            dims = len(x.shape)
+
+        # Handle single image; nothing much to do here.
+        if dims == 0:
             return self._forward(x)
 
-        # Handle channels
-        elif len(x.shape) == 3:
+        # Handle image with channels, e.g. tensor of the form `(C, H, W)`.
+        elif dims == 1:
             return [
                 self._forward(x_) for x_ in x
             ]
 
-        # Handle full batch
-        elif len(x.shape) == 4:
+        # Handle image with channels and batch index, e.g. tensor of
+        # the form `(B, C, H, W)`.
+        elif dims == 2:
             return [
                     [self._forward(x__) for x__ in x_] for x_ in x
             ]
