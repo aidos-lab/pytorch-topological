@@ -5,6 +5,8 @@ from torch.utils.data import DataLoader
 
 import numpy as np
 
+import torch
+
 
 class RandomDataSet(Dataset):
     def __init__(self, n_samples, dim, side_length, n_channels):
@@ -26,6 +28,18 @@ class RandomDataSet(Dataset):
 
 class TestCubicalComplex:
     batch_size = 32
+
+    def test_single_image(self):
+        x = np.random.default_rng().normal(size=(32, 32))
+        x = torch.as_tensor(x)
+        cc = CubicalComplex()
+
+        pers_info = cc(x)
+
+        assert pers_info is not None
+        assert len(pers_info) == 2
+        assert pers_info[0].dimension == 0
+        assert pers_info[1].dimension == 1
 
     def test_2d(self):
         for n_channels in [1, 3]:
