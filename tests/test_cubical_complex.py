@@ -25,13 +25,31 @@ class RandomDataSet(Dataset):
 
 
 class TestCubicalComplex:
-    batch_size = 64
+    batch_size = 32
 
     def test_2d(self):
-        pass
+        for n_channels in [1, 3]:
+            for squeeze in [False, True]:
+                data_set = RandomDataSet(128, 2, 8, n_channels)
+                loader = DataLoader(
+                    data_set,
+                    self.batch_size,
+                    shuffle=True,
+                    drop_last=False
+                )
+
+                if squeeze:
+                    data_set.data = data_set.data.squeeze()
+
+                cc = CubicalComplex(dim=2)
+
+                for batch in loader:
+                    pers_info = cc(batch)
+
+                    assert pers_info is not None
 
     def test_3d(self):
-        data_set = RandomDataSet(1024, 3, 8, 1)
+        data_set = RandomDataSet(128, 3, 8, 1)
         loader = DataLoader(
             data_set,
             self.batch_size,
@@ -45,3 +63,4 @@ class TestCubicalComplex:
             pers_info = cc(batch)
 
             assert pers_info is not None
+            assert len(pers_info) == self.batch_size
