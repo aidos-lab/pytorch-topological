@@ -60,6 +60,17 @@ class CubicalComplex(nn.Module):
 
         The forward pass entails calculating persistent homology on a
         cubical complex and returning a set of persistence diagrams.
+        The way the input will be interpreted depends on the presence
+        of the `dim` attribute of this class. If `dim` is set, the
+        *last* `dim` dimensions of an input tensor will be considered to
+        contain the image data. If `dim` is not set, image dimensions
+        will be guessed as follows:
+
+        1. Tensor of `dim = 2`: a single 2D image
+        2. Tensor of `dim = 3`: a single 2D image with channels
+        3. Tensor of `dim = 4`: a batch of 2D images with channels
+
+        See parameters for more details.
 
         Parameters
         ----------
@@ -100,19 +111,19 @@ class CubicalComplex(nn.Module):
         # No dimension was provided; just use the shape provided by the
         # client.
         else:
-            dims = len(x.shape)
+            dims = len(x.shape) - 2
 
-        # Handle single image; nothing much to do here.
+        # No additional dimensions present: a single image
         if dims == 0:
             return self._forward(x)
 
-        # Handle image with channels, e.g. tensor of the form `(C, H, W)`.
+        # Handle image with channels, such as a tensor of the form `(C, H, W)`
         elif dims == 1:
             return [
                 self._forward(x_) for x_ in x
             ]
 
-        # Handle image with channels and batch index, e.g. tensor of
+        # Handle image with channels and batch index, such as a tensor of
         # the form `(B, C, H, W)`.
         elif dims == 2:
             return [
@@ -123,13 +134,15 @@ class CubicalComplex(nn.Module):
         """Handle a single-channel image.
 
         This internal function handles the calculation of topological
-        features for a single-channel image, i.e. an `array_like`  of
-        2D shape.
+        features for a single-channel image, i.e. an `array_like`.
 
         Parameters
         ----------
-        x : array_like of shape `(H, W)`
-            Single-channel input image.
+        x : array_like of shape `(d_1, d_2, ..., d_d)`
+            Single-channel input image of arbitrary dimensions. Batch
+            dimensions and channel dimensions have to to be handled by
+            the calling function explicitly. This function interprets
+            its input as a high-dimensional image.
 
         Returns
         -------
