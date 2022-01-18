@@ -41,6 +41,19 @@ class TestCubicalComplex:
         assert pers_info[0].dimension == 0
         assert pers_info[1].dimension == 1
 
+    def test_image_with_channels(self):
+        x = np.random.default_rng().normal(size=(3, 32, 32))
+        x = torch.as_tensor(x)
+        cc = CubicalComplex()
+
+        pers_info = cc(x)
+
+        assert pers_info is not None
+        assert len(pers_info) == 3
+        assert len(pers_info[0]) == 2
+        assert pers_info[0][0].dimension == 0
+        assert pers_info[1][1].dimension == 1
+
     def test_2d(self):
         for n_channels in [1, 3]:
             for squeeze in [False, True]:
