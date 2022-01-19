@@ -6,8 +6,7 @@ to get you started:
 
 - Check out the [road map](ROADMAP.md) of the project for a high-level
   overview of current directions.
-
-- Checkout out [open issues](/issues) in case you are looking for things
+- Check out [open issues](/issues) in case you are looking for things
   to tackle.
 
 ## Pull requests
