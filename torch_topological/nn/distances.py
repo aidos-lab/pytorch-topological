@@ -67,7 +67,9 @@ class WassersteinDistance(torch.nn.Module):
         # needs to be added to the row in order to balance it. The
         # entry intuitively describes the cost between *projected*
         # points, so it has to be zero.
-        lower_blocks = torch.cat((dist_D22, torch.tensor(0).unsqueeze(0)))
+        lower_blocks = torch.cat(
+            (dist_D22, torch.tensor(0, device=dist_D22.device).unsqueeze(0))
+        )
 
         # Full (n + 1 ) x (m + 1) matrix containing *all* distances. By
         # construction, M[[i, n] contains distances to projected points
