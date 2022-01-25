@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from torch_topological.nn import CubicalComplex
 from torch_topological.nn import SummaryStatisticLoss
+from torch_topological.nn import WassersteinDistance
 
 from sklearn.datasets import make_circles
 
@@ -28,17 +29,24 @@ def _make_data(n_cells, n_samples=1000):
 
 if __name__ == '__main__':
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('Device', device)
+
     np.random.seed(23)
 
     Y = _make_data(50)
     Y = torch.as_tensor(Y, dtype=torch.float)
     X = torch.as_tensor(
-        Y + np.random.normal(scale=0.05, size=Y.shape), dtype=float
+        Y + np.random.normal(scale=0.05, size=Y.shape),
+        dtype=torch.float,
+        device=device,
     )
-    X = torch.nn.Parameter(X, requires_grad=True)
+    Y = Y.to(device)
+    X = torch.nn.Parameter(X, requires_grad=True).to(device)
 
     optimizer = torch.optim.Adam([X], lr=1e-2)
     loss_fn = SummaryStatisticLoss('total_persistence', p=1)
+    loss_fn = WassersteinDistance()
 
     cubical_complex = CubicalComplex()
 
@@ -61,7 +69,7 @@ if __name__ == '__main__':
         loss.backward()
         optimizer.step()
 
-    X = X.detach().numpy()
+    X = X.cpu().detach().numpy()
 
     plt.imshow(X)
     plt.show()
