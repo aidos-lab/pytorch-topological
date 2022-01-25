@@ -115,8 +115,8 @@ class WassersteinDistance(torch.nn.Module):
             # describe the m points coming from D2, we have to set the
             # last entry accordingly.
 
-            a = torch.ones(n + 1)
-            b = torch.ones(m + 1)
+            a = torch.ones(n + 1, device=dist.device)
+            b = torch.ones(m + 1, device=dist.device)
 
             a[-1] = m
             b[-1] = n
