@@ -6,6 +6,7 @@ from torchvision.transforms import ToTensor
 
 from torch_topological.datasets import SphereVsTorus
 
+from torch_topological.nn.data import batch_iter
 from torch_topological.nn.data import make_tensor
 
 from torch_topological.nn import CubicalComplex
@@ -37,6 +38,19 @@ class TestVietorisRipsComplexBatchHandling:
             pers_info_dense = make_tensor(pers_info)
 
             assert pers_info_dense is not None
+
+    def test_batch_iter(self):
+        for (x, y) in self.loader:
+            pers_info = self.vr(x)
+
+            assert pers_info is not None
+            assert len(pers_info) == batch_size
+
+            # This is just to confirm that we can properly iterate over
+            # this batch. Here, `batch_iter` is a little bit like `NoP`,
+            # but in general, more complicated nested structures may be
+            # present.
+            assert sum( 1 for x in batch_iter(pers_info)) == batch_size
 
 
 class TestCubicalComplexBatchHandling:

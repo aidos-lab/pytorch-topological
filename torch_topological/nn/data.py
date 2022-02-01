@@ -243,3 +243,21 @@ def make_tensor_from_persistence_information(
 
     result = torch.column_stack((pairs, dimensions))
     return result
+
+
+# TODO: Improve documentation
+def batch_iter(x):
+    """Iterate over batches from input data.
+
+    This utility function simplifies working with 'sparse' data sets
+    consisting of :class:`PersistenceInformation` instances. It will
+    present inputs in the order in which they appear in a batch such
+    that instances belonging to the same data set are kept together.
+    """
+    level = nesting_level(x)
+
+    if level == 2:
+        for x_ in x:
+            yield x_
+    else:
+        raise RuntimeError('Higher-order nesting not yet implemented.')
