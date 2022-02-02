@@ -277,7 +277,13 @@ def batch_iter(x, dim=None):
     """
     level = nesting_level(x)
 
-    if level == 2:
+    # Nothing to do for non-nested data structures, i.e. a single batch
+    # that has been squeezed (for instance). Wrapping the input enables
+    # us to treat it like a regular input again.
+    if level == 1:
+        x = [x]
+
+    if level <= 2:
         def handler(x): return x
 
     # Remove the first dimension but also the subsequent one so that all
