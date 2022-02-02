@@ -3,6 +3,8 @@
 import ot
 import torch
 
+from torch_topological.utils import wrap_if_not_iterable
+
 
 class WassersteinDistance(torch.nn.Module):
     """Implement Wasserstein distance between persistence diagrams.
@@ -86,11 +88,11 @@ class WassersteinDistance(torch.nn.Module):
 
         Parameters
         ----------
-        X : list of :class:`PersistenceInformation`
+        X : list or instance of :class:`PersistenceInformation`
             Topological features of the first space. Supposed to contain
             persistence diagrams and persistence pairings.
 
-        Y : list of :class:`PersistenceInformation`
+        Y : list or instance of :class:`PersistenceInformation`
             Topological features of the second space. Supposed to
             contain persistence diagrams and persistence pairings.
 
@@ -98,9 +100,12 @@ class WassersteinDistance(torch.nn.Module):
         -------
         torch.tensor
             A single scalar tensor containing the distance between the
-            persistence diagrams contained in `X` and `Y`.
+            persistence diagram(s) contained in `X` and `Y`.
         """
         total_cost = 0.0
+
+        X = wrap_if_not_iterable(X)
+        Y = wrap_if_not_iterable(Y)
 
         for pers_info in zip(X, Y):
             D1 = pers_info[0].diagram
