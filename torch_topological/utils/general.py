@@ -31,6 +31,42 @@ def is_iterable(x):
     return result
 
 
+def wrap_if_not_iterable(x):
+    """Wrap variable in case it cannot be iterated over.
+
+    This function provides a convenience wrapper for variables that need
+    to be iterated over. If the variable is already an `iterable`, there
+    is nothing to be done and it will be returned as-is. Otherwise, will
+    will 'wrap' the variable to be the single item of a list.
+
+    The primary purpose of this function is to make it easier for users
+    to interact with certain classes: essentially, one does not have to
+    think any more about single inputs vs. `iterable` inputs.
+
+    Parameters
+    ----------
+    x : any
+        Input object.
+
+    Returns
+    -------
+    list or type of x
+        If `x` can be iterated over, `x` will be returned as-is. Else,
+        will return `[x]`, i.e. a list containing `x`.
+
+    Examples
+    --------
+    >>> wrap_if_not_iterable(1.0)
+    [1.0]
+    >>> wrap_if_not_iterable('Hello, World!')
+    'Hello, World!'
+    """
+    if is_iterable(x):
+        return x
+    else:
+        return [x]
+
+
 def nesting_level(x):
     """Calculate nesting level of a list of objects.
 
