@@ -46,7 +46,7 @@ class SummaryStatisticLoss(torch.nn.Module):
             Source information. Supposed to contain persistence diagrams
             and persistence pairings.
 
-        Y : list of :class:`PersistenceInformation` or None
+        Y : list of :class:`PersistenceInformation` or `None`
             Optional target information. If set, evaluates a difference
             in loss functions as shown in the introduction. If `None`,
             a simpler variant of the loss will be evaluated.
