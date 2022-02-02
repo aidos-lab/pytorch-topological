@@ -278,7 +278,7 @@ def batch_iter(x, dim=None):
     level = nesting_level(x)
 
     if level == 2:
-        handler = lambda a: a
+        def handler(x): return x
 
     # Remove the first dimension but also the subsequent one so that all
     # only iterables containing persistence information about a specific
@@ -286,7 +286,7 @@ def batch_iter(x, dim=None):
     #
     # TODO: Generalise recursively? Do we want to support that?
     else:
-        handler = lambda x: chain.from_iterable(x)
+        def handler(x): return chain.from_iterable(x)
 
     if dim is not None:
         for x_ in x:
