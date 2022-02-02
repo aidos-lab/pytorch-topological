@@ -2,6 +2,7 @@
 
 from .general import is_iterable
 from .general import nesting_level
+from .general import wrap_if_not_iterable
 
 from .summary_statistics import total_persistence
 from .summary_statistics import persistent_entropy
@@ -12,5 +13,6 @@ __all__ = [
     'nesting_level',
     'persistent_entropy',
     'polynomial_function',
-    'total_persistence'
+    'total_persistence',
+    'wrap_if_not_iterable',
 ]
