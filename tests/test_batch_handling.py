@@ -13,6 +13,7 @@ from torch_topological.nn import CubicalComplex
 from torch_topological.nn import VietorisRipsComplex
 
 from torch.utils.data import DataLoader
+from torch.utils.data import RandomSampler
 
 batch_size = 64
 
@@ -50,7 +51,7 @@ class TestVietorisRipsComplexBatchHandling:
             # this batch. Here, `batch_iter` is a little bit like `NoP`,
             # but in general, more complicated nested structures may be
             # present.
-            assert sum( 1 for x in batch_iter(pers_info)) == batch_size
+            assert sum(1 for x in batch_iter(pers_info)) == batch_size
 
 
 class TestCubicalComplexBatchHandling:
@@ -68,8 +69,13 @@ class TestCubicalComplexBatchHandling:
     loader = DataLoader(
         data_set,
         batch_size=batch_size,
-        shuffle=True,
+        shuffle=False,
         drop_last=True,
+        sampler=RandomSampler(
+            data_set,
+            replacement=True,
+            num_samples=100
+        )
     )
 
     cc = CubicalComplex()
@@ -84,3 +90,12 @@ class TestCubicalComplexBatchHandling:
             pers_info_dense = make_tensor(pers_info)
 
             assert pers_info_dense is not None
+
+    def test_batch_iter(self):
+        for (x, y) in self.loader:
+            pers_info = self.cc(x)
+
+            assert pers_info is not None
+            assert len(pers_info) == batch_size
+
+            assert sum(1 for x in batch_iter(pers_info)) == batch_size
