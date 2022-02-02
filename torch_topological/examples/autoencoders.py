@@ -16,7 +16,12 @@ from torch_topological.nn import VietorisRipsComplex
 
 
 class LinearAutoencoder(torch.nn.Module):
-    """Simple linear autoencoder."""
+    """Simple linear autoencoder
+
+    This module performs simple embeddings based on an MSE loss. This is
+    similar to ordinary principal component analysis.
+    """
+
     def __init__(self, input_dim, latent_dim=2):
         super().__init__()
 
