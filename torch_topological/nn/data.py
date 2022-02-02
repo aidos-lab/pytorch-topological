@@ -290,7 +290,7 @@ def batch_iter(x, dim=None):
 
     if dim is not None:
         for x_ in x:
-            yield filter(lambda x: x.dimension == dim, handler(x_))
+            yield list(filter(lambda x: x.dimension == dim, handler(x_)))
     else:
         for x_ in x:
             yield handler(x_)
