@@ -8,6 +8,7 @@ from torch_topological.datasets import SphereVsTorus
 
 from torch_topological.nn.data import batch_iter
 from torch_topological.nn.data import make_tensor
+from torch_topological.nn.data import PersistenceInformation
 
 from torch_topological.nn import CubicalComplex
 from torch_topological.nn import VietorisRipsComplex
@@ -52,6 +53,10 @@ class TestVietorisRipsComplexBatchHandling:
             # but in general, more complicated nested structures may be
             # present.
             assert sum(1 for x in batch_iter(pers_info)) == batch_size
+
+            for x in batch_iter(pers_info):
+                for y in x:
+                    assert isinstance(y, PersistenceInformation)
 
 
 class TestCubicalComplexBatchHandling:
@@ -99,3 +104,7 @@ class TestCubicalComplexBatchHandling:
             assert len(pers_info) == batch_size
 
             assert sum(1 for x in batch_iter(pers_info)) == batch_size
+
+            for x in batch_iter(pers_info):
+                for y in x:
+                    assert isinstance(y, PersistenceInformation)

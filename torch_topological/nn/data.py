@@ -245,7 +245,6 @@ def make_tensor_from_persistence_information(
     return result
 
 
-# TODO: Improve documentation
 def batch_iter(x):
     """Iterate over batches from input data.
 
@@ -253,11 +252,32 @@ def batch_iter(x):
     consisting of :class:`PersistenceInformation` instances. It will
     present inputs in the order in which they appear in a batch such
     that instances belonging to the same data set are kept together.
+
+    Parameters
+    ----------
+    x : recursively-nested list of :class:`PersistenceInformation`
+        Input in sparse form, i.e. a nested structure containing
+        persistence information about a data set.
+
+    Returns
+    -------
+    A generator (iterable) that will either yield direct instances of
+    :class:`PersistenceInformation` objects or further iterators into
+    them. This ensures that it is possible to always iterate over the
+    individual batches, without having to know internal details about
+    the structure of `x`.
     """
     level = nesting_level(x)
 
     if level == 2:
         for x_ in x:
             yield x_
+
+    # Remove the first dimension but also the subsequent one so that all
+    # only iterables containing persistence information about a specific
+    # data set are being returned.
+    #
+    # TODO: Generalise recursively? Do we want to support that?
     else:
-        raise RuntimeError('Higher-order nesting not yet implemented.')
+        for x_ in x:
+            yield chain.from_iterable(x_)
