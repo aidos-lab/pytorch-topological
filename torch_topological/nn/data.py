@@ -40,6 +40,10 @@ class PersistenceInformation(namedtuple(
 
     __slots__ = ()
 
+    # Disable iterating over the class since it collates heterogeneous
+    # information and should rather be treated as a building block.
+    __iter__ = None
+
 
 def make_tensor(x):
     """Create dense tensor representation from sparse inputs.
