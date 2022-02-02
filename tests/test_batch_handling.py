@@ -58,6 +58,15 @@ class TestVietorisRipsComplexBatchHandling:
                 for y in x:
                     assert isinstance(y, PersistenceInformation)
 
+            for x in batch_iter(pers_info, dim=0):
+
+                # Make sure that we have something to iterate over.
+                assert sum(1 for y in x) != 0
+
+                for y in x:
+                    assert isinstance(y, PersistenceInformation)
+                    assert y.dimension == 0
+
 
 class TestCubicalComplexBatchHandling:
     data_set = MNIST(
@@ -108,3 +117,12 @@ class TestCubicalComplexBatchHandling:
             for x in batch_iter(pers_info):
                 for y in x:
                     assert isinstance(y, PersistenceInformation)
+
+            for x in batch_iter(pers_info, dim=0):
+
+                # Make sure that we have something to iterate over.
+                assert sum(1 for y in x) != 0
+
+                for y in x:
+                    assert isinstance(y, PersistenceInformation)
+                    assert y.dimension == 0

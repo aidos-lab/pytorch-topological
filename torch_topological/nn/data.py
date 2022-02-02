@@ -249,7 +249,7 @@ def make_tensor_from_persistence_information(
     return result
 
 
-def batch_iter(x):
+def batch_iter(x, dim=None):
     """Iterate over batches from input data.
 
     This utility function simplifies working with 'sparse' data sets
@@ -263,6 +263,10 @@ def batch_iter(x):
         Input in sparse form, i.e. a nested structure containing
         persistence information about a data set.
 
+    dim : int or `None` 
+        If set, only iterates over persistence information instances of
+        the specified dimension. Else, will iterate over all instances.
+
     Returns
     -------
     A generator (iterable) that will either yield direct instances of
@@ -274,8 +278,7 @@ def batch_iter(x):
     level = nesting_level(x)
 
     if level == 2:
-        for x_ in x:
-            yield x_
+        handler = lambda a: a
 
     # Remove the first dimension but also the subsequent one so that all
     # only iterables containing persistence information about a specific
@@ -283,5 +286,11 @@ def batch_iter(x):
     #
     # TODO: Generalise recursively? Do we want to support that?
     else:
+        handler = lambda x: chain.from_iterable(x)
+
+    if dim is not None:
         for x_ in x:
-            yield chain.from_iterable(x_)
+            yield filter(lambda x: x.dimension == dim, handler(x_))
+    else:
+        for x_ in x:
+            yield handler(x_)
