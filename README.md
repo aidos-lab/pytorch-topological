@@ -53,7 +53,8 @@ code](./torch_topological/examples) and stay tuned for more information.
 
 # Contributing
 
-Check out the [contribution guidelines](CONTRIBUTING.md).
+Check out the [contribution guidelines](CONTRIBUTING.md) or the [road
+map](ROADMAP.md) of the project.
 
 # Acknowledgements
 
