@@ -1,4 +1,9 @@
-"""Demo for topology-regularised autoencoders."""
+"""Demo for topology-regularised autoencoders.
+
+This example demonstrates how to use `pytorch-topological` to create an
+additional differentiable loss term that makes autoencoders aware of
+topological features. See [Moor20a]_ for more information.
+"""
 
 import torch
 import torch.optim as optim
@@ -16,13 +21,18 @@ from torch_topological.nn import VietorisRipsComplex
 
 
 class LinearAutoencoder(torch.nn.Module):
-    """Simple linear autoencoder
+    """Simple linear autoencoder class.
 
     This module performs simple embeddings based on an MSE loss. This is
-    similar to ordinary principal component analysis.
+    similar to ordinary principal component analysis. Notice that the
+    class is only meant to provide a simple example that can be run
+    easily even without the availability of a GPU. In practice, there
+    are many more architectures with improved expressive power
+    available.
     """
 
     def __init__(self, input_dim, latent_dim=2):
+        """Create new autoencoder with pre-defined latent dimension."""
         super().__init__()
 
         self.input_dim = input_dim
@@ -36,18 +46,25 @@ class LinearAutoencoder(torch.nn.Module):
             torch.nn.Linear(self.latent_dim, self.input_dim)
         )
 
-        self.loss = torch.nn.MSELoss()
+        self.loss_fn = torch.nn.MSELoss()
 
     def encode(self, x):
+        """Embed data in latent space."""
         return self.encoder(x)
 
     def decode(self, z):
+        """Decode data from latent space."""
         return self.decoder(z)
 
     def forward(self, x):
+        """Embeds and reconstructs data, returning a loss."""
         z = self.encode(x)
         x_hat = self.decode(z)
-        reconstruction_error = self.loss(x, x_hat)
+
+        # The loss can of course be changed. If this is your first time
+        # working with autoencoders, a good exercise would be to 'grok'
+        # the meaning of different losses.
+        reconstruction_error = self.loss_fn(x, x_hat)
         return reconstruction_error
 
 
@@ -58,9 +75,9 @@ class TopologicalAutoencoder(torch.nn.Module):
 
         self.lam = lam
         self.model = model
-        self.loss = SignatureLoss()
+        self.loss = SignatureLoss(p=2)
 
-        # TODO: Decrease dimensionality...
+        # TODO: Make dimensionality configurable
         self.vr = VietorisRipsComplex(dim=0)
 
     def forward(self, x):
@@ -90,7 +107,7 @@ if __name__ == '__main__':
     model = LinearAutoencoder(input_dim=data_set.dimension)
     topo_model = TopologicalAutoencoder(model, lam=10)
 
-    optimizer = optim.Adam(topo_model.parameters(), lr=1e-2)
+    optimizer = optim.Adam(topo_model.parameters(), lr=1e-3)
 
     n_epochs = 5
 
