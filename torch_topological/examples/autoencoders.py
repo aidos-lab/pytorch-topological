@@ -69,7 +69,11 @@ class LinearAutoencoder(torch.nn.Module):
 
 
 class TopologicalAutoencoder(torch.nn.Module):
-    """Wrapper for a topologically-regularised autoencoder."""
+    """Wrapper for a topologically-regularised autoencoder.
+
+    This class uses another autoencoder model and imbues it with an
+    additional topology-based loss term.
+    """
     def __init__(self, model, lam=1.0):
         super().__init__()
 
@@ -94,6 +98,9 @@ class TopologicalAutoencoder(torch.nn.Module):
 
 
 if __name__ == '__main__':
+    # We first have to create a data set. This follows the original
+    # publication by Moor et al. by introducing a simple 'manifold'
+    # data set consisting of multiple spheres.
     n_spheres = 11
     data_set = Spheres(n_spheres=n_spheres)
 
@@ -104,6 +111,10 @@ if __name__ == '__main__':
         drop_last=True
     )
 
+    # Let's set up the two models that we are training. Note that in
+    # a real application, you would have a more complicated training
+    # setup, potentially with early stopping etc. This training loop
+    # is merely to be seen as a proof of concept.
     model = LinearAutoencoder(input_dim=data_set.dimension)
     topo_model = TopologicalAutoencoder(model, lam=10)
 
@@ -125,6 +136,7 @@ if __name__ == '__main__':
 
         progress.set_postfix(loss=loss.item())
 
+    # Evaluate the autoencoder on a new instance of the data set.
     data_set = Spheres(
         train=False,
         n_samples=2000,
