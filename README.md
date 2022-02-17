@@ -2,7 +2,7 @@
 
 # `pytorch-topological`: A topological machine learning framework for `pytorch`
 
-![Documentation](https://readthedocs.io/projects/pytorch-topological/badge/?version=latest) ![PyPI - License](https://img.shields.io/pypi/l/torch_topological) ![PyPI](https://img.shields.io/pypi/v/torch_topological)
+[![Documentation](https://readthedocs.org/projects/pytorch-topological/badge/?version=latest)](https://pytorch-topological.readthedocs.io/en/latest/?badge=latest) ![PyPI - License](https://img.shields.io/pypi/l/torch_topological) ![PyPI](https://img.shields.io/pypi/v/torch_topological)
 
 `pytorch-topological` (or `torch_topological`) is a topological machine
 learning framework for [PyTorch](https://pytorch.org). It aims to
