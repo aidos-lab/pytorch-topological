@@ -25,6 +25,10 @@ Here are short-term and long-term goals, roughly categorised:
   cubical complexes and [`giotto-ph`](https://github.com/giotto-ai/giotto-ph)
   for Vietoris--Rips complexes. It would be nice to be able to swap
   implementations easily.
+- [ ] Check out the use of sparse tensors; could be a potential way
+  forward for representing persistence information. The drawback is that
+  we cannot fill everything with zeroes; there has to be a way to
+  indicate 'unset' information.
 
 ## Distances and kernels
 
