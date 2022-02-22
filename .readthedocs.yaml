@@ -1,5 +1,9 @@
 version: 2
 
+build:
+  # Required to get access to more recent Python versions.
+  image: testing
+
 sphinx:
   configuration: docs/source/conf.py
 
