@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'torch_topological'
-copyright = '2021, Bastian Rieck'
+copyright = '2022, Bastian Rieck'
 author = 'Bastian Rieck'
 
 # -- General configuration ---------------------------------------------------
@@ -60,5 +60,5 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Ensures that modules are sorted correctly. Since they all pertain to
-# the same package, the prefix itself can be ignored. 
+# the same package, the prefix itself can be ignored.
 modindex_common_prefix = ['torch_topological.']
