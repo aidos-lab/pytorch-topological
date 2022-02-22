@@ -48,8 +48,9 @@ pip install -U torch-topological
 
 # Usage
 
-`torch_topological` is still a work in progress. Check out [some example
-code](./torch_topological/examples) and stay tuned for more information.
+`torch_topological` is still a work in progress. You can [browse the documentation](https://pytorch-topological.readthedocs.io)
+or, if code reading is more your thing, dive directly into [some example
+code](./torch_topological/examples).
 
 # Contributing
 
