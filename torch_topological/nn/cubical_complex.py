@@ -24,8 +24,8 @@ class CubicalComplex(nn.Module):
     References
     ----------
     .. [Rieck20a] B. Rieck et al., "Uncovering the Topology of
-    Time-Varying fMRI Data Using Cubical Complex", *Advances in Neural
-    Information Processing Systems 33*, pp. 6900--6912, 2020.
+       Time-Varying fMRI Data Using Cubical Complex", *Advances in
+       Neural Information Processing Systems 33*, pp. 6900--6912, 2020.
     """
 
     # TODO: Handle different dimensions?
