@@ -6,6 +6,10 @@ topological machine learning can do for you and your projects.
 The purpose of this page is to provide a pithy and coarse, but
 hopefully *useful*, introduction to some concepts.
 
+.. contents:: 
+   :local:
+   :depth: 2
+
 High-level View
 ---------------
 

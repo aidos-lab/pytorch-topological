@@ -11,6 +11,8 @@
    :caption: Getting Started
 
    usage
+   nutshell
+
    examples/index
 
 .. toctree::
