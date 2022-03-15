@@ -45,7 +45,7 @@ This list is **incomplete**.
 
 ## Layers
 
-There are quite a few topology-based layers that have been proposed my
+There are quite a few topology-based layers that have been proposed by
 members of the community. We should include all of them to make them
 available with a single, consistent interface.
 
