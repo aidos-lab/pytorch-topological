@@ -36,6 +36,7 @@ def main(args):
 
     if args.single:
         X = sample_from_unit_cube(n=n, d=2)
+        Y = X.clone()
     else:
         X = sample_from_disk(n=n, r=0.5, R=0.6)
         Y = sample_from_disk(n=n, r=0.9, R=1.0)
@@ -73,7 +74,8 @@ def main(args):
     X = X.detach().numpy()
 
     if args.single:
-        plt.scatter(X[:, 0], X[:, 1], label='Output')
+        plt.scatter(X[:, 0], X[:, 1], label='Result')
+        plt.scatter(Y[:, 0], Y[:, 1], label='Initial')
     else:
         plt.scatter(X[:, 0], X[:, 1], label='Source')
         plt.scatter(Y[:, 0], Y[:, 1], label='Target')
