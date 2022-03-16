@@ -63,6 +63,8 @@ structure:
     loss.backward()
     opt.step()
 
+The rest of this example just involves some nice plotting.
+
 Source code
 -----------
 
