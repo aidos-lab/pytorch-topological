@@ -1,5 +1,5 @@
-Autoencoders with ``torch_topological``
-=======================================
+Autoencoders with geometrical--topological losses
+=================================================
 
 In this example, we will create a simple autoencoder based on the
 *Topological Signature Loss* introduced by Moor et al. [Moor20a]_.
