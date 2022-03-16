@@ -19,6 +19,7 @@
    :maxdepth: 2
    :caption: Modules
 
+   data
    nn
 
 Indices and tables
