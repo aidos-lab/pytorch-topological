@@ -11,3 +11,4 @@ directory on GitHub for more details and full code.
    :caption: Contents:
 
    autoencoders
+   summary_statistics
