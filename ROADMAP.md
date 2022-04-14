@@ -55,11 +55,7 @@ available with a single, consistent interface.
   This requires a conversion from TensorFlow code.
 - [ ] Include [`SLayer`](https://github.com/c-hofer/torchph). This is
   still an ongoing effort.
-- [ ] Include [`TopologyLayer`](https://github.com/bruel-gabrielsson/TopologyLayer).
-  This is still an ongoing effort. The summary statistics based on
-  polynomial functions have already been included. This essentially
-  seems to encompass most of the functionality, but need to make sure
-  that we got everything covered. 
+- [x] Include [`TopologyLayer`](https://github.com/bruel-gabrielsson/TopologyLayer).
 
 ## Loss terms
 
