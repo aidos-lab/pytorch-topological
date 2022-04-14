@@ -1,4 +1,8 @@
-"""GUDHI integration demo."""
+"""Demo for calculating cubical complexes.
+
+This example demonstrates how to perform topological operations on
+a structured array, such as a grey-scale image.
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,13 +16,25 @@ from sklearn.datasets import make_circles
 import torch
 
 
-def _circle(i, j, n):
-    r = np.sqrt((i - n/2.)**2 + (j - n/2.)**2)
-    return np.exp(-(r - n/3.)**2/(n*2))
+def sample_circles(n_cells, n_samples=1000):
+    """Sample two nested circles and bin them.
 
+    Parameters
+    ----------
+    n_cells : int
+        Number of cells for the 2D histogram, i.e. the 'resolution' of
+        the histogram.
 
-def _make_data(n_cells, n_samples=1000):
-    X = make_circles(n_samples, shuffle=True, noise=0.05)[0]
+    n_samples : int
+        Number of samples to use for creating the nested circles
+        coordinates.
+
+    Returns
+    -------
+    np.ndarray of shape ``(n_cells, n_cells)``
+        Structured array containing intensity values for the data set.
+    """ 
+    X = make_circles(n_samples, shuffle=True, noise=0.01)[0]
 
     heatmap, *_ = np.histogram2d(X[:, 0], X[:, 1], bins=n_cells)
     heatmap -= heatmap.mean()
@@ -34,7 +50,7 @@ if __name__ == '__main__':
 
     np.random.seed(23)
 
-    Y = _make_data(50)
+    Y = sample_circles(50)
     Y = torch.as_tensor(Y, dtype=torch.float)
     X = torch.as_tensor(
         Y + np.random.normal(scale=0.05, size=Y.shape),
@@ -53,7 +69,7 @@ if __name__ == '__main__':
     persistence_information_target = cubical_complex(Y)
     persistence_information_target = [persistence_information_target[0]]
 
-    for i in range(500):
+    for i in range(100):
         persistence_information = cubical_complex(X)
         persistence_information = [persistence_information[0]]
 
@@ -71,5 +87,5 @@ if __name__ == '__main__':
 
     X = X.cpu().detach().numpy()
 
-    plt.imshow(X)
+    plt.imshow(Y)
     plt.show()
