@@ -11,7 +11,7 @@ from torch_topological.nn import CubicalComplex
 from torch_topological.nn import SummaryStatisticLoss
 from torch_topological.nn import WassersteinDistance
 
-from sklearn.datasets import make_circles
+from tqdm import tqdm
 
 import torch
 
@@ -34,6 +34,7 @@ def sample_circles(n_cells, n_samples=1000):
     np.ndarray of shape ``(n_cells, n_cells)``
         Structured array containing intensity values for the data set.
     """ 
+    from sklearn.datasets import make_circles
     X = make_circles(n_samples, shuffle=True, noise=0.01)[0]
 
     heatmap, *_ = np.histogram2d(X[:, 0], X[:, 1], bins=n_cells)
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     Y = Y.to(device)
     X = torch.nn.Parameter(X, requires_grad=True).to(device)
 
-    optimizer = torch.optim.Adam([X], lr=1e-2)
+    optimizer = torch.optim.Adam([X], lr=1e-3)
     loss_fn = SummaryStatisticLoss('total_persistence', p=1)
     loss_fn = WassersteinDistance()
 
@@ -69,7 +70,10 @@ if __name__ == '__main__':
     persistence_information_target = cubical_complex(Y)
     persistence_information_target = [persistence_information_target[0]]
 
-    for i in range(100):
+    n_iter = 500
+    progress = tqdm(range(n_iter))
+
+    for i in progress:
         persistence_information = cubical_complex(X)
         persistence_information = [persistence_information[0]]
 
@@ -80,12 +84,12 @@ if __name__ == '__main__':
             persistence_information_target
         )
 
-        print(loss.item())
-
         loss.backward()
         optimizer.step()
 
+        progress.set_postfix(loss=loss.item())
+
     X = X.cpu().detach().numpy()
 
-    plt.imshow(Y)
+    plt.imshow(X)
     plt.show()
