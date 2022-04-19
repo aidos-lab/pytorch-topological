@@ -1,5 +1,12 @@
-Installing and Using ``torch_topological``
+Installing and using ``torch_topological``
 ==========================================
+
+Requirements
+------------
+
+``torch_topological`` requires at least Python 3.9. Normally, version
+resolval should work automatically. The precise mechanism for this
+depends on your installation method (see below).
 
 Installation via ``pip``
 ------------------------
