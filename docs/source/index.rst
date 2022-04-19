@@ -12,6 +12,7 @@
 
    usage
    nutshell
+   comparison
 
    examples/index
 
