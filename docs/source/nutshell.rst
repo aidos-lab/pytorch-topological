@@ -1,4 +1,4 @@
-Topological Machine Learning in a Nutshell
+Topological machine learning in a nutshell
 ==========================================
 
 If you are reading this, you are probably wondering about what
