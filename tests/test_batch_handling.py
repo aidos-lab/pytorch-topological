@@ -16,6 +16,8 @@ from torch_topological.nn import VietorisRipsComplex
 from torch.utils.data import DataLoader
 from torch.utils.data import RandomSampler
 
+import numpy as np
+
 batch_size = 64
 
 
@@ -40,6 +42,19 @@ class TestVietorisRipsComplexBatchHandling:
             pers_info_dense = make_tensor(pers_info)
 
             assert pers_info_dense is not None
+
+    def test_ragged_processing(self):
+        rng = np.random.default_rng()
+
+        data = [
+            np.random.default_rng().uniform(size=(rng.integers(32, 64), 8))
+            for _ in range(batch_size)
+        ]
+
+        pers_info = self.vr(data)
+
+        assert pers_info is not None
+        assert len(pers_info) == batch_size
 
     def test_batch_iter(self):
         for (x, y) in self.loader:

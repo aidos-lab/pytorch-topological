@@ -57,7 +57,8 @@ class VietorisRipsComplex(nn.Module):
             Input point cloud(s). `x` can either be a 2D array of shape
             `(n, d)`, which is treated as a single point cloud, or a 3D
             array/tensor of the form `(b, n, d)`, with `b` representing
-            the batch size.
+            the batch size. Alternatively, you may also specify a list,
+            possibly containing point clouds of non-uniform sizes.
 
         Returns
         -------
@@ -71,16 +72,17 @@ class VietorisRipsComplex(nn.Module):
             :class:`PersistenceInformation` elements.
         """
         # Check whether individual batches need to be handled (3D array)
-        # or not (2D array).
-        if len(x.shape) == 3:
+        # or not (2D array). We default to this type of processing for a
+        # list as well.
+        if isinstance(x, list) or len(x.shape) == 3:
 
             # TODO: This is rather ugly and inefficient but it is the
             # easiest workaround for now.
             return [
-                self._forward(x_) for x_ in x
+                self._forward(torch.as_tensor(x_)) for x_ in x
             ]
         else:
-            return self._forward(x)
+            return self._forward(torch.as_tensor(x))
 
     def _forward(self, x):
         """Handle a *single* point cloud.
