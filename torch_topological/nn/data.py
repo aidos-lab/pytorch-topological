@@ -36,6 +36,11 @@ class PersistenceInformation(namedtuple(
     Due to its lightweight nature, no validity checks are performed, but
     all calculation modules should return a sequence of instances of the
     :class:`PersistenceInformation` class.
+
+    Since this data class is shared with modules that are capable of
+    calculating persistent homology, the exact form of the persistence
+    pairing might change. Please refer to the respective classes for
+    more documentation.
     """
 
     __slots__ = ()
