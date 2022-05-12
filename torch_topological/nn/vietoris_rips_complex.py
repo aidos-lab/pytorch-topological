@@ -70,6 +70,13 @@ class VietorisRipsComplex(nn.Module):
             first dimension denotes the batch and the second dimension
             refers to the individual instances of
             :class:`PersistenceInformation` elements.
+
+            Generators will be represented in the persistence pairing
+            based on vertex--edge pairs (dimension 0) or edge--edge
+            pairs. Thus, the persistence pairing in dimension zero will
+            have three components, corresponding to a vertex and an
+            edge, respectively, while the persistence pairing for higher
+            dimensions will have four components.
         """
         # Check whether individual batches need to be handled (3D array)
         # or not (2D array). We default to this type of processing for a
