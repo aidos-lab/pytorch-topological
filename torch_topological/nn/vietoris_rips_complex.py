@@ -111,7 +111,7 @@ class VietorisRipsComplex(nn.Module):
             dimension in the input data set.
         """
         generators = ripser_parallel(
-            x.detach(),
+            x.cpu().detach(),
             **self.ripser_params
         )['gens']
 
