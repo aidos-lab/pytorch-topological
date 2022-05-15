@@ -16,7 +16,7 @@ class VietorisRipsComplex(nn.Module):
     by calculating a Vietoris--Rips complex of the data.
     """
 
-    def __init__(self, dim=1, p=2):
+    def __init__(self, dim=1, p=2, **kwargs):
         """Initialise new module.
 
         Parameters
@@ -27,6 +27,15 @@ class VietorisRipsComplex(nn.Module):
 
         p : float
             Exponent for the `p`-norm calculation of distances.
+
+        **kwargs
+            Additional arguments to be provided to ``ripser``, i.e. the
+            backend for calculating persistent homology. The `n_threads`
+            parameter, which controls parallelisation, is probably the
+            most relevant parameter to be adjusted.
+            Please refer to the `the gitto-ph documentation
+            <https://giotto-ai.github.io/giotto-ph/build/html/index.html>`_
+            for more details on admissible parameters.
 
         Notes
         -----
@@ -44,6 +53,8 @@ class VietorisRipsComplex(nn.Module):
             'return_generators': True,
             'maxdim': self.dim,
         }
+
+        self.ripser_params.update(kwargs)
 
     def forward(self, x):
         """Implement forward pass for persistence diagram calculation.
