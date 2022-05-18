@@ -68,7 +68,7 @@ class MultiScaleKernel(torch.nn.Module):
 
     @staticmethod
     def _dist(x, y):
-        """Compute the pairwise distance between two persistence diagrams
+        """Compute the distance between two persistence diagrams
 
         The returned tensor is the point-wise squared Euclidean distance
         """
@@ -106,7 +106,7 @@ class MultiScaleKernel(torch.nn.Module):
         >>> vr = VietorisRipsComplex(dim=1)
         >>> vr_x = vr(x)
         >>> vr_y = vr(y)
-        >>> # compute multi-scale distance between persistence
+        >>> # compute kernel value between persistence
         >>> # diagrams with sigma set to 1
         >>> msk = MultiScaleKernel(1.)
         >>> msk_value = msk(vr_x, vr_y)
