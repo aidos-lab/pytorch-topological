@@ -76,7 +76,7 @@ class MultiScaleKernel(torch.nn.Module):
         return dist.pow(2)
 
     def forward(self, X, Y):
-        """Calculate the multi-scale kernel metric between two persistence
+        """Calculate the multi-scale kernel value between two persistence
         diagrams
 
         Parameters
