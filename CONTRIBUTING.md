@@ -9,6 +9,10 @@ to get you started:
 - Check out [open issues](/issues) in case you are looking for things
   to tackle.
 
+**When contributing code, please be aware that your contribution will
+fall under the terms of the [license](https://github.com/aidos-lab/pytorch-topological/blob/main/LICENSE.md)
+of `pytorch-topological`.**
+
 ## Pull requests
 
 If you propose some changes, a pull request is the easiest way to
