@@ -15,16 +15,6 @@ class MultiScaleKernel(torch.nn.Module):
 
     where :math:`z=(z_1, z_2)` and :math:`\overline{z}=(z_2, z_1)`
 
-    Attributes
-    ----------
-    sigma : float
-        Scale parameter
-
-    Methods
-    -------
-    forward(X, Y)
-        Compute the kernel value between two persistence diagrams
-
     References
     ----------
     .. [Reininghaus15] J. Reininghaus, U. Bauer and R. Kwitt, "A Stable
@@ -46,10 +36,8 @@ class MultiScaleKernel(torch.nn.Module):
 
     @staticmethod
     def _check_upper(d):
-        """
-        Check if all points in the diagram are above the diagonal.
-        All points below the diagonal are 'swapped'.
-        """
+        # Check if all points in the diagram are above the diagonal.
+        # All points below the diagonal are 'swapped'.
         is_upper = d[:, 0] < d[:, 1]
         if not torch.all(is_upper):
             d[~is_upper, 0] = d[~is_upper, 1]
@@ -58,26 +46,28 @@ class MultiScaleKernel(torch.nn.Module):
 
     @staticmethod
     def _mirror(x):
-        """Mirror one or multiple points of a persistence diagram at the
-        diagonal
-        """
+        # Mirror one or multiple points of a persistence
+        # diagram at the diagonal
         if len(x.shape) > 1:
             return x[:, [1, 0]]
         # only a single point in the diagram
         return x[[1, 0]]
 
     @staticmethod
-    def _dist(x, y):
-        """Compute the distance between two persistence diagrams
-
-        The returned tensor is the point-wise squared Euclidean distance
-        """
-        dist = torch.cdist(x, y, p=2)
+    def _dist(x, y, p):
+        # Compute the point-wise lp-distance between two
+        # persistence diagrams
+        dist = torch.cdist(x, y, p=p)
         return dist.pow(2)
 
-    def forward(self, X, Y):
+    def forward(self, X, Y, p=2.):
         """Calculate the multi-scale kernel value between two persistence
         diagrams
+
+        The kernel value is computed for each dimension of the persistence
+        diagram individually, according to Equation 10 from Reininghaus et al.
+        The final kernel value is computed as the sum of kernel values over
+        all dimensions.
 
         Parameters
         ----------
@@ -88,6 +78,13 @@ class MultiScaleKernel(torch.nn.Module):
         Y : list or instance of :class:`PersistenceInformation`
             Topological features of the second space. Supposed to
             contain persistence diagrams and persistence pairings.
+
+        p : float or inf, default 2.
+            Specify which p-norm to use for distance calculation.
+            For infinity/maximum norm pass p=float('inf').
+            Please note that using norms other than the 2-norm
+            (Euclidean norm) are not guaranteed to give positive
+            definite results.
 
         Returns
         -------
