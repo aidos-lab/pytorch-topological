@@ -38,7 +38,7 @@ addition to this, several 'pseudo-distances' based on summary statistics
 have been implemented. There are numerous kernels out there that could
 be included:
 
-- [ ] The multi-scale kernel by [Reininghaus et al.](https://openaccess.thecvf.com/content_cvpr_2015/papers/Reininghaus_A_Stable_Multi-Scale_2015_CVPR_paper.pdf)
+- [x] The multi-scale kernel by [Reininghaus et al.](https://openaccess.thecvf.com/content_cvpr_2015/papers/Reininghaus_A_Stable_Multi-Scale_2015_CVPR_paper.pdf)
 - [ ] The sliced Wasserstein distance kernel by [Carrière et al.](https://arxiv.org/abs/1706.03358)
 
 This list is **incomplete**.
