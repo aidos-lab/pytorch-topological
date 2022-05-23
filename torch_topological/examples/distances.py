@@ -1,4 +1,10 @@
-"""Demo for distance minimisations of a point cloud."""
+"""Demo for distance minimisations of a point cloud.
+
+Note
+----
+This demonstration is a work in progress. It is not fully documented and
+tested yet.
+"""
 
 from tqdm import tqdm
 
@@ -51,4 +57,3 @@ if __name__ == '__main__':
 
     plt.legend()
     plt.show()
-

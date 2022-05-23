@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def embed(data, ambient=50):
     """Embed `data` in `ambient` dimensions.
 

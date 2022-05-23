@@ -8,20 +8,23 @@ class MultiScaleKernel(torch.nn.Module):
     r"""Implement the multi-scale kernel between two persistence diagrams
 
     This class implements the multi-scale kernel between two persistence
-    diagrams as defined by Reininghaus et al. as
+    diagrams as defined by Reininghaus et al. [Reininghaus15a]_ as
 
     .. math::
-        k_\sigma(F,G) = \frac{1}{8 \pi \sigma} \sum_{\substack{p \in F\\q \in G}} exp{-\frac{\|p-q\|^2}{8\sigma}} - exp{-\frac{\|p-\overline{q}\|^2}{8\sigma}}
+        k_\sigma(F,G) = \frac{1}{8 \pi \sigma}
+        \sum_{\substack{p \in F\\q \in G}} exp{-\frac{\|p-q\|^2}{8\sigma}}
+        - exp{-\frac{\|p-\overline{q}\|^2}{8\sigma}}
 
     where :math:`z=(z_1, z_2)` and :math:`\overline{z}=(z_2, z_1)`
 
     References
     ----------
-    .. [Reininghaus15] J. Reininghaus, U. Bauer and R. Kwitt, "A Stable
+    .. [Reininghaus15a] J. Reininghaus, U. Bauer and R. Kwitt, "A Stable
        Multi-Scale Kernel for Topological Machine Learning", *Proceedings
-       of the IEEE conference on computer vision and pattern recognition*,
+       of the IEEE Conference on Computer Vision and Pattern Recognition*,
        pp. 4741--4748, 2015.
     """
+
     def __init__(self, sigma):
         """Create a new MultiScaleKernel instance
 

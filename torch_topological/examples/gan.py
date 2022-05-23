@@ -3,9 +3,6 @@
 import torch
 import torchvision
 
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-
 from torch_topological.nn import Cubical
 from torch_topological.nn import SummaryStatisticLoss
 

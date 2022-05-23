@@ -33,7 +33,7 @@ def sample_circles(n_cells, n_samples=1000):
     -------
     np.ndarray of shape ``(n_cells, n_cells)``
         Structured array containing intensity values for the data set.
-    """ 
+    """
     from sklearn.datasets import make_circles
     X = make_circles(n_samples, shuffle=True, noise=0.01)[0]
 

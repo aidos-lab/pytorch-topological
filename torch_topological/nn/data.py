@@ -268,7 +268,7 @@ def batch_iter(x, dim=None):
         Input in sparse form, i.e. a nested structure containing
         persistence information about a data set.
 
-    dim : int or `None` 
+    dim : int or `None`
         If set, only iterates over persistence information instances of
         the specified dimension. Else, will iterate over all instances.
 

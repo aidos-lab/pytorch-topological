@@ -2,6 +2,7 @@
 
 import torch
 
+
 class StructureElementLayer(torch.nn.Module):
     def __init__(
         self,
