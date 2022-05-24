@@ -89,9 +89,12 @@ class AlphaComplex(nn.Module):
         # number of finite persistence pairs.
         pairs = torch.stack(pairs)
 
+        # We have to branch here because the creation of
+        # zero-dimensional persistence diagrams is easy,
+        # whereas higher-dimensional diagrams require an
+        # involved lookup strategy.
         if dim == 0:
             creators = torch.zeros_like(torch.as_tensor(pairs)[:, 0])
-            destroyers = dist[pairs[:, 1], pairs[:, 2]]
 
         # Iterate over the flag complex in order to get (a) the distance
         # of the creator simplex, and (b) the distance of the destroyer.
@@ -105,16 +108,18 @@ class AlphaComplex(nn.Module):
                         for creator in pairs[:, :dim+1]
                     ]
             )
-            destroyers = torch.stack(
-                    [
-                        self._get_filtration_weight(destroyer, dist)
-                        for destroyer in pairs[:, dim+1:]
-                    ]
-            )
+
+        # For the destroyers, we can always rely on the same
+        # construction, regardless of dimensionality.
+        destroyers = torch.stack(
+                [
+                    self._get_filtration_weight(destroyer, dist)
+                    for destroyer in pairs[:, dim+1:]
+                ]
+        )
 
         # Create the persistence diagram from creator and destroyer
         # information. This step is the same for all dimensions.
-
         persistence_diagram = torch.stack(
             (creators, destroyers), 1
         )
@@ -147,7 +152,7 @@ class AlphaComplex(nn.Module):
         torch.tensor
             Scalar tensor containing the filtration weight.
         """
-        weights = torch.as_tensor([
+        weights = torch.stack([
             dist[edge] for edge in itertools.combinations(simplex, 2)
         ])
 
