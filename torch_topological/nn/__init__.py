@@ -4,6 +4,7 @@ from .data import PersistenceInformation
 
 from .distances import WassersteinDistance
 from .sliced_wasserstein_distance import SlicedWassersteinDistance
+from .sliced_wasserstein_kernel import SlicedWassersteinKernel
 from .multi_scale_kernel import MultiScaleKernel
 
 from .loss import SignatureLoss
@@ -23,5 +24,6 @@ __all__ = [
     'VietorisRipsComplex',
     'WassersteinDistance',
     'SlicedWassersteinDistance',
+    'SlicedWassersteinKernel',
     'MultiScaleKernel',
 ]
