@@ -10,7 +10,32 @@ import torch
 
 
 class AlphaComplex(nn.Module):
-    """Calculate persistence diagrams of an alpha complex."""
+    """Calculate persistence diagrams of an alpha complex.
+
+    This module calculates persistence diagrams of an alpha complex,
+    i.e. a subcomplex of the Delaunay triangulation, which is sparse
+    and thus often substantially smaller than other complex.
+
+    It was first described in [Edelsbrunner94]_ and is particularly
+    useful when analysing low-dimensional data.
+
+    Notes
+    -----
+    At the moment, this alpha complex implementation, following other
+    implementations, provides *distance-based filtrations* only. This
+    means that the resulting persistence diagrams do *not* correspond
+    to the circumradius of a simplex.
+
+    In addition, this implementation is **work in progress**. Some of
+    the core features, such as handling of infinite features, are not
+    available at the moment.
+
+    References
+    ----------
+    .. [Edelsbrunner94] H. Edelsbrunner and E.P. Mücke,
+       "Three-dimensional alpha shapes", *ACM Transactions on Graphics*,
+       Volume 13, Number 1, pp. 43--72, 1994.
+    """
 
     def __init__(self, p=2):
         """Initialise new alpha complex calculation module.
@@ -30,6 +55,36 @@ class AlphaComplex(nn.Module):
         self.p = p
 
     def forward(self, x):
+        """Implement forward pass for persistence diagram calculation.
+
+        The forward pass entails calculating persistent homology on
+        a point cloud and returning a set of persistence diagrams.
+
+        Parameters
+        ----------
+        x : array_like
+            Input point cloud(s). `x` can either be a 2D array of shape
+            `(n, d)`, which is treated as a single point cloud, or a 3D
+            array/tensor of the form `(b, n, d)`, with `b` representing
+            the batch size. Alternatively, you may also specify a list,
+            possibly containing point clouds of non-uniform sizes.
+
+        Returns
+        -------
+        list of :class:`PersistenceInformation`
+            List of :class:`PersistenceInformation`, containing both the
+            persistence diagrams and the generators, i.e. the
+            *pairings*, of a certain dimension of topological features.
+            If `x` is a 3D array, returns a list of lists, in which the
+            first dimension denotes the batch and the second dimension
+            refers to the individual instances of
+            :class:`PersistenceInformation` elements.
+
+            Generators will be represented in the persistence pairing
+            based on proper creator--destroyer pairs of simplices. In
+            dimension `k`, for instance, every generator is stored as
+            a `k`-simplex followed by a `k+1` simplex.
+        """
         # TODO: Copied from `VietorisRipsComplex`; needs to be
         # refactored into a unified interface.
         #
