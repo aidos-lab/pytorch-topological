@@ -74,16 +74,6 @@ class AlphaComplex(nn.Module):
             creators = torch.zeros_like(torch.as_tensor(pairs)[:, 0])
             destroyers = dist[pairs[:, 1], pairs[:, 2]]
 
-            persistence_diagram = torch.stack(
-                (creators, destroyers), 1
-            )
-
-            return PersistenceInformation(
-                    pairing=pairs,
-                    diagram=persistence_diagram,
-                    dimension=0
-            )
-
         # Iterate over the flag complex in order to get (a) the distance
         # of the creator simplex, and (b) the distance of the destroyer.
         # We *cannot* look this information up in the filtration itself,
@@ -103,15 +93,18 @@ class AlphaComplex(nn.Module):
                     ]
             )
 
-            persistence_diagram = torch.stack(
-                (creators, destroyers), 1
-            )
+        # Create the persistence diagram from creator and destroyer
+        # information. This step is the same for all dimensions.
 
-            return PersistenceInformation(
-                    pairing=pairs,
-                    diagram=persistence_diagram,
-                    dimension=dim
-            )
+        persistence_diagram = torch.stack(
+            (creators, destroyers), 1
+        )
+
+        return PersistenceInformation(
+                pairing=pairs,
+                diagram=persistence_diagram,
+                dimension=dim
+        )
 
     def _get_filtration_weight(self, simplex, dist):
         """Auxiliary function for querying simplex weights.
