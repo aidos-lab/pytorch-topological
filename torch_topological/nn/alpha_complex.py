@@ -5,6 +5,7 @@ from torch import nn
 from torch_topological.nn import PersistenceInformation
 
 import gudhi
+import itertools
 import torch
 
 class AlphaComplex(nn.Module):
@@ -42,7 +43,7 @@ class AlphaComplex(nn.Module):
         st.persistence()
         persistence_pairs = st.persistence_pairs()
 
-        max_dim = 0  # TODO: Should be x.shape[-1]
+        max_dim = x.shape[-1]
 
         dist = torch.cdist(x, x, p=self.p)
 
@@ -52,7 +53,7 @@ class AlphaComplex(nn.Module):
                 persistence_pairs,
                 dim
             )
-            for dim in range(0, max_dim + 1)
+            for dim in range(0, max_dim)
         ]
 
     def _extract_generators_and_diagrams(self, dist, persistence_pairs, dim):
@@ -89,10 +90,55 @@ class AlphaComplex(nn.Module):
         # because we have to use gradient-imbued information such as the
         # set of pairwise distances.
         else:
-            pass
+            creators = torch.stack(
+                    [
+                        self._get_filtration_weight(creator, dist)
+                        for creator in pairs[:, :dim+1]
+                    ]
+            )
+            destroyers = torch.stack(
+                    [
+                        self._get_filtration_weight(destroyer, dist)
+                        for destroyer in pairs[:, dim+1:]
+                    ]
+            )
 
-        #return PersistenceInformation(
-        #        pairing=None,
-        #        diagram=persistence_diagram,
-        #        dimension=dim
-        #)
+            persistence_diagram = torch.stack(
+                (creators, destroyers), 1
+            )
+
+            return PersistenceInformation(
+                    pairing=pairs,
+                    diagram=persistence_diagram,
+                    dimension=dim
+            )
+
+    def _get_filtration_weight(self, simplex, dist):
+        """Auxiliary function for querying simplex weights.
+
+        This function returns the filtration weight of an arbitrary
+        simplex under a distance-based filtration, i.e. the maximum
+        weight of its cofaces. This function is crucial for getting
+        persistence diagrams that are differentiable.
+
+        Parameters
+        ----------
+        simplex : torch.tensor
+            Simplex to query; must be a sequence of numbers, i.e. of
+            shape `(n, 1)` or of shape `(n, )`.
+
+        dist : torch.tensor
+            Matrix of pairwise distances between points.
+
+        Returns
+        -------
+        torch.tensor
+            Scalar tensor containing the filtration weight.
+        """
+        weights = torch.as_tensor([
+            dist[edge] for edge in itertools.combinations(simplex, 2)
+        ])
+
+        # TODO: Might have to be adjusted depending on filtration
+        # ordering?
+        return torch.max(weights)
