@@ -36,7 +36,8 @@ class AlphaComplex(nn.Module):
 
     def _forward(self, x):
         alpha_complex = gudhi.alpha_complex.AlphaComplex(
-            x.cpu().detach()
+            x.cpu().detach(),
+            precision='fast',
         )
 
         st = alpha_complex.create_simplex_tree()
@@ -44,7 +45,6 @@ class AlphaComplex(nn.Module):
         persistence_pairs = st.persistence_pairs()
 
         max_dim = x.shape[-1]
-
         dist = torch.cdist(x, x, p=self.p)
 
         return [
@@ -65,6 +65,13 @@ class AlphaComplex(nn.Module):
         # TODO: Ignore infinite features for now. Will require different
         # handling in the future.
         pairs = [p for p in pairs if len(p) == 2 * dim + 3]
+
+        if not pairs:
+            return PersistenceInformation(
+                    pairing=[],
+                    diagram=[],
+                    dim=dim
+            )
 
         # Create tensor of shape `(n, 2 * dim + 3)`, with `n` being the
         # number of finite persistence pairs.
