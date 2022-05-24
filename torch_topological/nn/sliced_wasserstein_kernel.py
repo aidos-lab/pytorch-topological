@@ -9,7 +9,7 @@ from torch_topological.utils import wrap_if_not_iterable
 
 
 class SlicedWassersteinKernel(torch.nn.Module):
-    """Calculate sliced Wasserstein distance between persistence diagrams.
+    """Calculate sliced Wasserstein kernel between persistence diagrams.
 
     This is an implementation of the sliced Wasserstein kernel between
     persistence diagrams, following [Carriere17a]_.
