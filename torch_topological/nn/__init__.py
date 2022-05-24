@@ -9,11 +9,13 @@ from .multi_scale_kernel import MultiScaleKernel
 from .loss import SignatureLoss
 from .loss import SummaryStatisticLoss
 
+from .alpha_complex import AlphaComplex
 from .cubical_complex import CubicalComplex
 from .vietoris_rips_complex import VietorisRipsComplex
 
 
 __all__ = [
+    'AlphaComplex',
     'CubicalComplex',
     'PersistenceInformation',
     'SignatureLoss',
