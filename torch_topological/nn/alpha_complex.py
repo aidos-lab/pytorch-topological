@@ -8,14 +8,26 @@ import gudhi
 import itertools
 import torch
 
+
 class AlphaComplex(nn.Module):
     """Calculate persistence diagrams of an alpha complex."""
 
-    def __init__(self):
+    def __init__(self, p=2):
+        """Initialise new alpha complex calculation module.
+
+        Parameters
+        ----------
+        p : float
+            Exponent for the `p`-norm calculation of distances.
+
+        Notes
+        -----
+        This module currently only supports Minkowski norms. It does not
+        yet support other metrics.
+        """
         super().__init__()
 
-        # TODO: Make configurable
-        self.p = 2
+        self.p = p
 
     def forward(self, x):
         # TODO: Copied from `VietorisRipsComplex`; needs to be
@@ -45,7 +57,7 @@ class AlphaComplex(nn.Module):
         persistence_pairs = st.persistence_pairs()
 
         max_dim = x.shape[-1]
-        dist = torch.cdist(x, x, p=self.p)
+        dist = torch.cdist(x.contiguous(), x.contiguous(), p=self.p)
 
         return [
             self._extract_generators_and_diagrams(
