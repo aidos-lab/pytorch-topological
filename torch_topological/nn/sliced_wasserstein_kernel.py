@@ -3,8 +3,7 @@
 
 import torch
 
-import numpy as np
-from torch_topological.nn.sliced_wasserstein_distance import SlicedWassersteinDistance
+from torch_topological.nn import SlicedWassersteinDistance
 
 from torch_topological.utils import wrap_if_not_iterable
 
@@ -30,16 +29,14 @@ class SlicedWassersteinKernel(torch.nn.Module):
         num_directions : int
             Specifies the number of random directions to be sampled for
             computation of the sliced Wasserstein distance.
-        
+
         sigma : int
-            Variance term of the sliced Wasserstein kernel expression. 
+            Variance term of the sliced Wasserstein kernel expression.
         """
         super().__init__()
 
         self.num_directions = num_directions
         self.sigma = sigma
-        
-
 
     def forward(self, X, Y):
         """Calculate sliced Wasserstein kernel based on input tensors.
@@ -68,11 +65,9 @@ class SlicedWassersteinKernel(torch.nn.Module):
         swd = SlicedWassersteinDistance(num_directions=self.num_directions)
 
         for pers_info in zip(X, Y):
-            D1 = pers_info[0].diagram.float()
-            D2 = pers_info[1].diagram.float()
-            
-            cost += torch.exp(-swd(D1, D2)) / self.sigma
+            D1 = pers_info[0]
+            D2 = pers_info[1]
 
-            total_cost += cost
+            total_cost += torch.exp(-swd(D1, D2)) / self.sigma
 
         return total_cost
