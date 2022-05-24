@@ -24,8 +24,8 @@ class SlicedWassersteinDistance(torch.nn.Module):
     References
     ----------
     .. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
-    Persistence Diagrams", *Proceedings of the 34th International
-    Conference on Machine Learning*, PMLR 70, pp. 664--673, 2017.
+       Persistence Diagrams", *Proceedings of the 34th International
+       Conference on Machine Learning*, PMLR 70, pp. 664--673, 2017.
     """
 
     def __init__(self, num_directions=10):
