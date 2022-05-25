@@ -23,7 +23,7 @@ class SlicedWassersteinDistance(torch.nn.Module):
 
     References
     ----------
-    .. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
+.. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
     Persistence Diagrams", *Proceedings of the 34th International
     Conference on Machine Learning*, PMLR 70, pp. 664--673, 2017.
     """
