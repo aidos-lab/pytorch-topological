@@ -30,6 +30,11 @@ Here are short-term and long-term goals, roughly categorised:
   we cannot fill everything with zeroes; there has to be a way to
   indicate 'unset' information.
 
+## Complexes
+
+- [x] Add (rudimentary) support for alpha complexes: a basic
+  implementation is already present.
+
 ## Distances and kernels
 
 At present, the module supports Wasserstein distance calculations and

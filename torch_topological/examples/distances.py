@@ -8,10 +8,10 @@ tested yet.
 
 from tqdm import tqdm
 
+from torch_topological.data import sample_from_disk
+
 from torch_topological.nn import VietorisRipsComplex
 from torch_topological.nn import WassersteinDistance
-
-from torch_topological.utils import make_disk
 
 import torch
 import torch.optim as optim
@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     n = 100
 
-    X = make_disk(r=0.5, R=0.6, n=n)
-    Y = make_disk(r=0.9, R=1.0, n=n)
+    X = sample_from_disk(r=0.5, R=0.6, n=n)
+    Y = sample_from_disk(r=0.9, R=1.0, n=n)
 
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
 
