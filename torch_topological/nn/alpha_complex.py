@@ -137,7 +137,7 @@ class AlphaComplex(nn.Module):
             return PersistenceInformation(
                     pairing=[],
                     diagram=[],
-                    dim=dim
+                    dimension=dim
             )
 
         # Create tensor of shape `(n, 2 * dim + 3)`, with `n` being the
