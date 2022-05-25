@@ -20,12 +20,6 @@ class SlicedWassersteinDistance(torch.nn.Module):
     It computes the expected value of the Wasserstein distance when the
     persistence diagram is projected on a random line passing through
     the origin.
-
-    References
-    ----------
-    .. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
-       Persistence Diagrams", *Proceedings of the 34th International
-       Conference on Machine Learning*, PMLR 70, pp. 664--673, 2017.
     """
 
     def __init__(self, num_directions=10):
