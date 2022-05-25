@@ -16,7 +16,7 @@ class SlicedWassersteinKernel(torch.nn.Module):
 
     References
     ----------
-.. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
+    .. [Carriere17a] M. Carrière et al., "Sliced Wasserstein Kernel for
     Persistence Diagrams", *Proceedings of the 34th International
     Conference on Machine Learning*, PMLR 70, pp. 664--673, 2017.
     """
@@ -30,7 +30,7 @@ class SlicedWassersteinKernel(torch.nn.Module):
             Specifies the number of random directions to be sampled for
             computation of the sliced Wasserstein distance.
 
-        sigma : float
+        sigma : int
             Variance term of the sliced Wasserstein kernel expression.
         """
         super().__init__()
