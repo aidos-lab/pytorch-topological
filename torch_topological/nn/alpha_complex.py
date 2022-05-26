@@ -149,7 +149,10 @@ class AlphaComplex(nn.Module):
         # whereas higher-dimensional diagrams require an
         # involved lookup strategy.
         if dim == 0:
-            creators = torch.zeros_like(torch.as_tensor(pairs)[:, 0])
+            creators = torch.zeros_like(
+                torch.as_tensor(pairs)[:, 0],
+                device=dist.device
+            )
 
         # Iterate over the flag complex in order to get (a) the distance
         # of the creator simplex, and (b) the distance of the destroyer.
