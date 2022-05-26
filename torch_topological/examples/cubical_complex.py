@@ -54,16 +54,18 @@ if __name__ == '__main__':
     Y = sample_circles(50)
     Y = torch.as_tensor(Y, dtype=torch.float)
     X = torch.as_tensor(
-        Y + np.random.normal(scale=0.05, size=Y.shape),
+        Y + np.random.normal(scale=0.20, size=Y.shape),
         dtype=torch.float,
         device=device,
     )
     Y = Y.to(device)
     X = torch.nn.Parameter(X, requires_grad=True).to(device)
 
+    source = X.clone()
+
     optimizer = torch.optim.Adam([X], lr=1e-3)
     loss_fn = SummaryStatisticLoss('total_persistence', p=1)
-    loss_fn = WassersteinDistance()
+    loss_fn = WassersteinDistance(q=1)
 
     cubical_complex = CubicalComplex()
 
@@ -89,7 +91,19 @@ if __name__ == '__main__':
 
         progress.set_postfix(loss=loss.item())
 
-    X = X.cpu().detach().numpy()
+    source = source.detach().numpy()
+    target = Y.cpu().detach().numpy()
+    result = X.cpu().detach().numpy()
 
-    plt.imshow(X)
+    fig, ax = plt.subplots(ncols=3)
+
+    ax[0].imshow(source)
+    ax[0].set_title('Source')
+
+    ax[1].imshow(target)
+    ax[1].set_title('Target')
+
+    ax[2].imshow(result)
+    ax[2].set_title('Result')
+
     plt.show()
