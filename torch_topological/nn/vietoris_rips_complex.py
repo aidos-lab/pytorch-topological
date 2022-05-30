@@ -26,7 +26,12 @@ class VietorisRipsComplex(nn.Module):
             prescribed dimension.
 
         p : float
-            Exponent for the `p`-norm calculation of distances.
+            Exponent indicating which Minkowski `p`-norm to use for the
+            calculation of pairwise distances between points. Note that
+            if `treat_as_distances` is supplied to :func:`forward`, the
+            parameter is ignored and will have no effect. The rationale
+            is to permit clients to use a pre-computed distance matrix,
+            while always falling back to Minkowski norms.
 
         **kwargs
             Additional arguments to be provided to ``ripser``, i.e. the
@@ -40,7 +45,9 @@ class VietorisRipsComplex(nn.Module):
         Notes
         -----
         This module currently only supports Minkowski norms. It does not
-        yet support other metrics.
+        yet support other metrics internally. To use custom metrics, you
+        need to set `treat_as_distances` in the :func:`forward` function
+        instead.
         """
         super().__init__()
 
@@ -56,7 +63,7 @@ class VietorisRipsComplex(nn.Module):
 
         self.ripser_params.update(kwargs)
 
-    def forward(self, x):
+    def forward(self, x, treat_as_distances=False):
         """Implement forward pass for persistence diagram calculation.
 
         The forward pass entails calculating persistent homology on
@@ -70,6 +77,13 @@ class VietorisRipsComplex(nn.Module):
             array/tensor of the form `(b, n, d)`, with `b` representing
             the batch size. Alternatively, you may also specify a list,
             possibly containing point clouds of non-uniform sizes.
+
+        treat_as_distances : bool
+            If set, treats `x` as containing pre-computed distances
+            between points. The semantics of how `x` is handled are
+            not changed; the only difference is that when `x` has a
+            shape of `(n, d)`, the values of `n` and `d` need to be
+            the same.
 
         Returns
         -------
@@ -93,16 +107,18 @@ class VietorisRipsComplex(nn.Module):
         # or not (2D array). We default to this type of processing for a
         # list as well.
         if isinstance(x, list) or len(x.shape) == 3:
-
-            # TODO: This is rather ugly and inefficient but it is the
-            # easiest workaround for now.
+            # TODO: This type of batch handling is rather ugly and
+            # inefficient but at the same time, it is the easiest
+            # workaround for now, permitting even 'ragged' inputs of
+            # different lengths.
             return [
-                self._forward(torch.as_tensor(x_)) for x_ in x
+                self._forward(torch.as_tensor(x_), treat_as_distances)
+                for x_ in x
             ]
         else:
-            return self._forward(torch.as_tensor(x))
+            return self._forward(torch.as_tensor(x), treat_as_distances)
 
-    def _forward(self, x):
+    def _forward(self, x, treat_as_distances=False):
         """Handle a *single* point cloud.
 
         This internal function handles the calculation of topological
@@ -114,6 +130,10 @@ class VietorisRipsComplex(nn.Module):
         x : array_like of shape `(n, d)`
             Single input point cloud.
 
+        treat_as_distances : bool
+            Flag indicating whether `x` should be treated as a distance
+            matrix. See :func:`forward` for more information.
+
         Returns
         -------
         list of class:`PersistenceInformation`
@@ -121,14 +141,16 @@ class VietorisRipsComplex(nn.Module):
             the persistence diagram and the persistence pairing of some
             dimension in the input data set.
         """
+        if treat_as_distances:
+            distances = x
+        else:
+            distances = torch.cdist(x, x, p=self.p)
+
         generators = ripser_parallel(
-            x.cpu().detach(),
+            distances.cpu().detach().numpy(),
+            metric='precomputed',
             **self.ripser_params
         )['gens']
-
-        # TODO: Is this always required? Can we calculate this in
-        # a smarter fashion?
-        distances = torch.cdist(x, x, p=self.p)
 
         # We always have 0D information.
         persistence_information = \
