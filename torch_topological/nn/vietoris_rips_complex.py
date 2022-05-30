@@ -174,7 +174,10 @@ class VietorisRipsComplex(nn.Module):
         if dim0:
             # In a Vietoris--Rips complex, all vertices are created at
             # time zero.
-            creators = torch.zeros_like(torch.as_tensor(gens)[:, 0], device=dist.device)
+            creators = torch.zeros_like(
+                torch.as_tensor(gens)[:, 0],
+                device=dist.device
+            )
             destroyers = dist[gens[:, 1], gens[:, 2]]
 
             persistence_diagram = torch.stack(
