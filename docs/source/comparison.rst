@@ -11,9 +11,9 @@ overview to simplify getting acquainted with the project.
 --------------
 
 `giotto-tda <https://giotto-ai.github.io/gtda-docs>`_ is a flagship
-package, developed by member of L2F. Its primary goal is to provide
-an interface consistent with ``scikit-learn``, thus facilitating an
-integration of topological features into a data science workflow.
+package, developed by numerous members of L2F. Its primary goal is to
+provide an interface consistent with ``scikit-learn``, thus facilitating
+an integration of topological features into a data science workflow.
 
 By contrast, ``torch_topological`` is meant to simplify the development
 of hybrid algorithms that can be easily integrated into deep learning 
