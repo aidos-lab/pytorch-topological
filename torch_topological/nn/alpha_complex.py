@@ -3,6 +3,7 @@
 from torch import nn
 
 from torch_topological.nn import PersistenceInformation
+from torch_topological.nn.data import batch_handler
 
 import gudhi
 import itertools
@@ -85,21 +86,7 @@ class AlphaComplex(nn.Module):
             dimension `k`, for instance, every generator is stored as
             a `k`-simplex followed by a `k+1` simplex.
         """
-        # TODO: Copied from `VietorisRipsComplex`; needs to be
-        # refactored into a unified interface.
-        #
-        # Check whether individual batches need to be handled (3D array)
-        # or not (2D array). We default to this type of processing for a
-        # list as well.
-        if isinstance(x, list) or len(x.shape) == 3:
-
-            # TODO: This is rather ugly and inefficient but it is the
-            # easiest workaround for now.
-            return [
-                self._forward(torch.as_tensor(x_)) for x_ in x
-            ]
-        else:
-            return self._forward(torch.as_tensor(x))
+        return batch_handler(x, self._forward)
 
     def _forward(self, x):
         alpha_complex = gudhi.alpha_complex.AlphaComplex(

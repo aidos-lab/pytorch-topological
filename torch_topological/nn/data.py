@@ -254,6 +254,50 @@ def make_tensor_from_persistence_information(
     return result
 
 
+def batch_handler(x, handler_fn, **kwargs):
+    """Light-weight batch handling function.
+
+    The purpose of this function is to simplify the handling of batches
+    of input data, in particular for modules that deal with point cloud
+    data. The handler essentially checks whether a 2D array (matrix) or
+    a 3D array (tensor) was provided, and calls a handler function. The
+    idea of the handler function is to handle an individual 2D array. 
+
+    Parameters
+    ----------
+    x : array_like
+        Input point cloud(s). Can be either 2D array, indicating
+        a single point cloud, or a 3D array, or even a *list* of
+        point clouds (of potentially different cardinalities).
+
+    handler_fn : callable
+        Function to call for handling a 2D array.
+
+    **kwargs
+        Additional arguments to provide to `handler_fn`.
+
+    Returns
+    -------
+    list or individual value
+        Depending on whether `x` needs to be unwrapped, this function
+        returns either a single value or a list of values, resulting
+        from calling `handler_fn` on individual parts of `x`.
+    """
+    # Check whether individual batches need to be handled (3D array)
+    # or not (2D array). We default to this type of processing for a
+    # list as well.
+    if isinstance(x, list) or len(x.shape) == 3:
+        # TODO: This type of batch handling is rather ugly and
+        # inefficient but at the same time, it is the easiest
+        # workaround for now, permitting even 'ragged' inputs of
+        # different lengths.
+        return [
+            handler_fn(torch.as_tensor(x_), **kwargs) for x_ in x
+        ]
+    else:
+        return handler_fn(torch.as_tensor(x), **kwargs)
+
+
 def batch_iter(x, dim=None):
     """Iterate over batches from input data.
 

@@ -4,6 +4,7 @@ from gph import ripser_parallel
 from torch import nn
 
 from torch_topological.nn import PersistenceInformation
+from torch_topological.nn.data import batch_handler
 
 import torch
 
@@ -103,20 +104,11 @@ class VietorisRipsComplex(nn.Module):
             edge, respectively, while the persistence pairing for higher
             dimensions will have four components.
         """
-        # Check whether individual batches need to be handled (3D array)
-        # or not (2D array). We default to this type of processing for a
-        # list as well.
-        if isinstance(x, list) or len(x.shape) == 3:
-            # TODO: This type of batch handling is rather ugly and
-            # inefficient but at the same time, it is the easiest
-            # workaround for now, permitting even 'ragged' inputs of
-            # different lengths.
-            return [
-                self._forward(torch.as_tensor(x_), treat_as_distances)
-                for x_ in x
-            ]
-        else:
-            return self._forward(torch.as_tensor(x), treat_as_distances)
+        return batch_handler(
+            x,
+            self._forward,
+            treat_as_distances=treat_as_distances
+        )
 
     def _forward(self, x, treat_as_distances=False):
         """Handle a *single* point cloud.

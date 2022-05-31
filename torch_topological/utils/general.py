@@ -17,7 +17,7 @@ def is_iterable(x):
     Returns
     -------
     bool
-        `true` if `x` is iterable.
+        `True` if `x` is iterable.
     """
     result = True
 
