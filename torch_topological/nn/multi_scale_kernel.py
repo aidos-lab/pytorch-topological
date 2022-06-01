@@ -124,10 +124,10 @@ class MultiScaleKernel(torch.nn.Module):
 
             # compute the pairwise distances between the
             # two diagrams
-            nom = self._dist(D1, D2)
+            nom = self._dist(D1, D2, p)
             # distance between diagram 1 and mirrored
             # diagram 2
-            denom = self._dist(D1, self._mirror(D2))
+            denom = self._dist(D1, self._mirror(D2), p)
 
             M = torch.exp(-nom) / (8 * self.sigma)
             M -= torch.exp(-denom) / (8 * self.sigma)
