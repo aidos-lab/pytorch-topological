@@ -122,6 +122,7 @@ class TestCubicalComplexBatchHandling:
 
     data_set = MNIST(
         './data/MNIST',
+        download=True,
         train=False,
         transform=Compose(
             [
