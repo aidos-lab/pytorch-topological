@@ -261,7 +261,7 @@ def batch_handler(x, handler_fn, **kwargs):
     of input data, in particular for modules that deal with point cloud
     data. The handler essentially checks whether a 2D array (matrix) or
     a 3D array (tensor) was provided, and calls a handler function. The
-    idea of the handler function is to handle an individual 2D array. 
+    idea of the handler function is to handle an individual 2D array.
 
     Parameters
     ----------

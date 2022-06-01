@@ -27,7 +27,7 @@ jobs:
           poetry install
       - name: Run linter
         run: |
-          poetry run flake8
+          poetry run flake8 torch_topological
       - name: Run tests
         run: |
           poetry run pytest
