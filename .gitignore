@@ -3,5 +3,6 @@
 *.pyc
 *.swp
 
+data/
 dist/
 __pycache__/
