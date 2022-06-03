@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from torch_topological.nn import CubicalComplex
-from torch_topological.nn import SummaryStatisticLoss
 from torch_topological.nn import WassersteinDistance
 
 from tqdm import tqdm
@@ -64,20 +63,19 @@ if __name__ == '__main__':
     source = X.clone()
 
     optimizer = torch.optim.Adam([X], lr=1e-3)
-    loss_fn = SummaryStatisticLoss('total_persistence', p=1)
-    loss_fn = WassersteinDistance(q=1)
+    loss_fn = WassersteinDistance(q=2)
 
     cubical_complex = CubicalComplex()
 
     persistence_information_target = cubical_complex(Y)
-    persistence_information_target = [persistence_information_target[0]]
+    persistence_information_target = persistence_information_target[0]
 
     n_iter = 500
     progress = tqdm(range(n_iter))
 
     for i in progress:
         persistence_information = cubical_complex(X)
-        persistence_information = [persistence_information[0]]
+        persistence_information = persistence_information[0]
 
         optimizer.zero_grad()
 
