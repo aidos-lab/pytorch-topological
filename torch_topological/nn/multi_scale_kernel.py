@@ -1,3 +1,5 @@
+"""Contains multi-scale kernel (scale space) kernel module."""
+
 import torch
 
 from torch_topological.utils import wrap_if_not_iterable
@@ -5,10 +7,11 @@ from torch_topological.utils import wrap_if_not_iterable
 
 class MultiScaleKernel(torch.nn.Module):
     # TODO: more detailed description
-    r"""Implement the multi-scale kernel between two persistence diagrams
+    r"""Implement the multi-scale kernel between two persistence diagrams.
 
     This class implements the multi-scale kernel between two persistence
-    diagrams as defined by Reininghaus et al. [Reininghaus15a]_ as
+    diagrams (also known as the scale space kernel) as defined by
+    Reininghaus et al. [Reininghaus15a]_ as
 
     .. math::
         k_\sigma(F,G) = \frac{1}{8 \pi \sigma}
@@ -26,7 +29,7 @@ class MultiScaleKernel(torch.nn.Module):
     """
 
     def __init__(self, sigma):
-        """Create a new MultiScaleKernel instance
+        """Create new  instance of the kernel.
 
         Parameters
         ----------
@@ -64,8 +67,7 @@ class MultiScaleKernel(torch.nn.Module):
         return dist.pow(2)
 
     def forward(self, X, Y, p=2.):
-        """Calculate the multi-scale kernel value between two persistence
-        diagrams
+        """Calculate the kernel value between two persistence diagrams.
 
         The kernel value is computed for each dimension of the persistence
         diagram individually, according to Equation 10 from Reininghaus et al.
