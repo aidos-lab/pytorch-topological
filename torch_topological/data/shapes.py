@@ -218,35 +218,3 @@ def sample_from_annulus(n, r, R, random_state=None):
 
     X = np.column_stack((radii * np.cos(thetas), radii * np.sin(thetas)))
     return torch.as_tensor(X)
-
-
-# TODO: Improve documentation
-def sample_from_double_annulus(n, random_state=None):
-    """Sample n points from a double annulus."""
-    if random_state is not None:
-        np.random.seed(random_state)
-
-    X = []
-    y = []
-
-    for i in range(n):
-        while True:
-            t = [
-                    np.random.uniform(-50, 50, 1)[0],
-                    np.random.uniform(-50, 140, 1)[0]
-            ]
-
-            d = np.sqrt(np.dot(t, t))
-            if d <= 50 and d >= 20:
-                X.append(t)
-                y.append(0)
-                break
-
-            d = np.sqrt(t[0] ** 2 + (t[1] - 90) ** 2)
-            if d <= 50 and d >= 40:
-                X.append(t)
-                y.append(1)
-                break
-
-    X = (X - np.min(X)) / (np.max(X) - np.min(X))
-    return np.asarray(X), np.asarray(y)
