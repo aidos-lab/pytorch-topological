@@ -118,6 +118,21 @@ def make_tensor(x):
 
         return N
 
+    # Auxiliary function for padding tensors with `torch.nan` to
+    # a specific dimension. Will always return a `list`; we turn 
+    # it into a tensor depending on the call level.
+    def _pad_tensors(tensors, N, value=torch.nan):
+        return list(
+            map(
+                lambda t: torch.nn.functional.pad(
+                        t,
+                        (0, 0, N - len(t), 0),
+                        mode='constant',
+                        value=value),
+                tensors
+            )
+        )
+
     N = _calculate_length(x, level)
 
     # List of lists: the first axis is treated as the batch axis, while
@@ -130,19 +145,7 @@ def make_tensor(x):
 
         # Pad all tensors to length N in the first dimension, then turn
         # them into a batch.
-        result = torch.stack(
-                list(
-                    map(
-                        lambda t: torch.nn.functional.pad(
-                                t,
-                                (0, 0, N - len(t), 0),
-                                mode='constant',
-                                value=torch.nan),
-                        tensors
-                    )
-                )
-        )
-
+        result = torch.stack(_pad_tensors(tensors, N))
         return result
 
     # List of lists of lists: this indicates image-based data, where we
@@ -171,18 +174,7 @@ def make_tensor(x):
         # them into a batch. We first stack over channels (inner), then
         # over the batch (outer).
         result = torch.stack([
-            torch.stack(
-                list(
-                    map(
-                        lambda t: torch.nn.functional.pad(
-                                t,
-                                (0, 0, N - len(t), 0),
-                                mode='constant',
-                                value=torch.nan),
-                        batch_tensors
-                    )
-                )
-            )
+            torch.stack(_pad_tensors(batch_tensors, N))
             for batch_tensors in tensors
         ])
 
