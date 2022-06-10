@@ -6,7 +6,7 @@ import torch
 from .utils import embed
 
 
-def sample_from_disk(n=100, r=0.9, R=1.0):
+def sample_from_disk(n=100, r=0.9, R=1.0, seed=None):
     """Sample points from disk.
 
     Parameters
@@ -22,6 +22,11 @@ def sample_from_disk(n=100, r=0.9, R=1.0):
         Maximum radius, i.e. the radius of the outer circle of a perfect
         sampling.
 
+    seed : int, instance of `np.random.Generator`, or `None`
+        Seed for the random number generator, or an instance of such
+        a generator. If set to `None`, the default random number
+        generator will be used.
+
     Returns
     -------
     torch.tensor of shape `(n, 2)`
@@ -29,8 +34,10 @@ def sample_from_disk(n=100, r=0.9, R=1.0):
     """
     assert r <= R, RuntimeError('r > R')
 
-    length = np.random.uniform(r, R, size=n)
-    angle = np.pi * np.random.uniform(0, 2, size=n)
+    rng = np.random.default_rng(seed)
+
+    length = rng.uniform(r, R, size=n)
+    angle = np.pi * rng.uniform(0, 2, size=n)
 
     x = np.sqrt(length) * np.cos(angle)
     y = np.sqrt(length) * np.sin(angle)
@@ -39,7 +46,7 @@ def sample_from_disk(n=100, r=0.9, R=1.0):
     return torch.as_tensor(X)
 
 
-def sample_from_unit_cube(n, d=3, random_state=None):
+def sample_from_unit_cube(n, d=3, seed=None):
     """Sample points uniformly from unit cube in `d` dimensions.
 
     Parameters
@@ -50,23 +57,23 @@ def sample_from_unit_cube(n, d=3, random_state=None):
     d : int
         Number of dimensions.
 
-    random_state : `np.random.RandomState` or int
-        Optional random state to use for the pseudo-random number
-        generator.
+    seed : int, instance of `np.random.Generator`, or `None`
+        Seed for the random number generator, or an instance of such
+        a generator. If set to `None`, the default random number
+        generator will be used.
 
     Returns
     -------
     torch.tensor of shape `(n, d)`
         Tensor containing the sampled coordinates.
     """
-    if random_state is not None:
-        np.random.seed(random_state)
+    rng = np.random.default_rng(seed)
+    X = rng.uniform(size=(n, d))
 
-    X = np.random.uniform(size=(n, d))
     return torch.as_tensor(X)
 
 
-def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
+def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None, seed=None):
     """Sample `n` data points from a `d`-sphere in `d + 1` dimensions.
 
     Parameters
@@ -90,6 +97,11 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
         `ambient`. The sphere is randomly rotated into this
         high-dimensional space.
 
+    seed : int, instance of `np.random.Generator`, or `None`
+        Seed for the random number generator, or an instance of such
+        a generator. If set to `None`, the default random number
+        generator will be used.
+
     Returns
     -------
     torch.tensor
@@ -106,13 +118,14 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
     .. [tadasets] https://github.com/scikit-tda/tadasets
 
     """
-    data = np.random.randn(n, d+1)
+    rng = np.random.default_rng(seed)
+    data = rng.standard_normal((n, d+1))
 
     # Normalize points to the sphere
     data = r * data / np.sqrt(np.sum(data**2, 1)[:, None])
 
     if noise:
-        data += noise * np.random.randn(*data.shape)
+        data += noise * rng.standard_normal(data.shape)
 
     if ambient is not None:
         assert ambient > d
@@ -121,7 +134,7 @@ def sample_from_sphere(n=100, d=2, r=1, noise=None, ambient=None):
     return torch.as_tensor(data)
 
 
-def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
+def sample_from_torus(n, d=3, r=1.0, R=2.0, seed=None):
     """Sample points uniformly from torus and embed it in `d` dimensions.
 
     Parameters
@@ -139,28 +152,27 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
         Radius of the torus, i.e. the distance from the centre of the
         'tube' to the centre of the torus.
 
-    random_state : `np.random.RandomState` or int
-        Optional random state to use for the pseudo-random number
-        generator.
+    seed : int, instance of `np.random.Generator`, or `None`
+        Seed for the random number generator, or an instance of such
+        a generator. If set to `None`, the default random number
+        generator will be used.
 
     Returns
     -------
     torch.tensor of shape `(n, d)`
         Tensor of sampled coordinates.
     """
-    if random_state is not None:
-        np.random.seed(random_state)
-
+    rng = np.random.default_rng(seed)
     angles = []
 
     while len(angles) < n:
-        x = np.random.uniform(0, 2 * np.pi)
-        y = np.random.uniform(0, 1 / np.pi)
+        x = rng.uniform(0, 2 * np.pi)
+        y = rng.uniform(0, 1 / np.pi)
 
         f = (1.0 + (r/R) * np.cos(x)) / (2 * np.pi)
 
         if y < f:
-            psi = np.random.uniform(0, 2 * np.pi)
+            psi = rng.uniform(0, 2 * np.pi)
             angles.append((x, psi))
 
     X = []
@@ -176,7 +188,7 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, random_state=None):
     return torch.as_tensor(X)
 
 
-def sample_from_annulus(n, r, R, random_state=None):
+def sample_from_annulus(n, r, R, seed=None):
     """Sample points from a 2D annulus.
 
     This function samples `N` points from an annulus with inner radius `r`
@@ -193,9 +205,10 @@ def sample_from_annulus(n, r, R, random_state=None):
     R : float
         Outer radius of annulus
 
-    random_state : `np.random.RandomState` or int
-        Optional random state to use for the pseudo-random number
-        generator.
+    seed : int, instance of `np.random.Generator`, or `None`
+        Seed for the random number generator, or an instance of such
+        a generator. If set to `None`, the default random number
+        generator will be used.
 
     Returns
     -------
@@ -207,14 +220,12 @@ def sample_from_annulus(n, r, R, random_state=None):
             'Inner radius must be less than or equal to outer radius'
         )
 
-    if random_state is not None:
-        np.random.seed(random_state)
-
-    thetas = np.random.uniform(0, 2 * np.pi, n)
+    rng = np.random.default_rng(seed)
+    thetas = rng.uniform(0, 2 * np.pi, n)
 
     # Need to sample based on squared radii to account for density
     # differences.
-    radii = np.sqrt(np.random.uniform(r ** 2, R ** 2, n))
+    radii = np.sqrt(rng.uniform(r ** 2, R ** 2, n))
 
     X = np.column_stack((radii * np.cos(thetas), radii * np.sin(thetas)))
     return torch.as_tensor(X)
