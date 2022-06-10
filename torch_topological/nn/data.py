@@ -119,7 +119,7 @@ def make_tensor(x):
         return N
 
     # Auxiliary function for padding tensors with `torch.nan` to
-    # a specific dimension. Will always return a `list`; we turn 
+    # a specific dimension. Will always return a `list`; we turn
     # it into a tensor depending on the call level.
     def _pad_tensors(tensors, N, value=torch.nan):
         return list(
