@@ -24,28 +24,35 @@ import torch
 import torch.optim as optim
 
 
-def main(args):
-    """Run example."""
+def create_data_set(args):
+    """Create data set based on user-provided arguments."""
     n = args.n_samples
-    n_iterations = args.n_iterations
-    statistic = args.statistic
-    p = args.p
-    q = args.q
-
-    vr = VietorisRipsComplex(dim=2)
-
     if args.single:
         X = sample_from_unit_cube(n=n, d=2)
         Y = X.clone()
     else:
         X = sample_from_disk(n=n, r=0.5, R=0.6)
         Y = sample_from_disk(n=n, r=0.9, R=1.0)
-        pi_target = vr(Y)
 
     # Make source point cloud adjustable by treating it as a parameter.
     # This enables topological loss functions to influence the shape of
     # `X`.
     X = torch.nn.Parameter(torch.as_tensor(X), requires_grad=True)
+    return X, Y
+
+
+def main(args):
+    """Run example."""
+    n_iterations = args.n_iterations
+    statistic = args.statistic
+    p = args.p
+    q = args.q
+
+    X, Y = create_data_set(args)
+    vr = VietorisRipsComplex(dim=2)
+
+    if not args.single:
+        pi_target = vr(Y)
 
     loss_fn = SummaryStatisticLoss(
         summary_statistic=statistic,
@@ -54,7 +61,6 @@ def main(args):
     )
 
     opt = optim.SGD([X], lr=0.05)
-
     progress = tqdm(range(n_iterations))
 
     for i in progress:
