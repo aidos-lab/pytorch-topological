@@ -60,10 +60,7 @@ def create_sphere_dataset(n_samples=500, n_spheres=11, d=100, r=5, seed=None):
         *Proceedings of the 37th International Conference on Machine
         Learning*, PMLR 119, pp. 7045--7054, 2020.
     """
-    if seed is None:
-        rng = np.random.default_rng()
-    else:
-        rng = np.random.default_rng(seed)
+    rng = np.random.default_rng(seed)
 
     variance = 10 / np.sqrt(d)
     shift_matrix = rng.normal(0, variance, [n_spheres, d+1])
