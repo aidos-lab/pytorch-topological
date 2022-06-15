@@ -31,7 +31,7 @@ extensions = [
     'sphinx.ext.linkcode',
 ]
 
-# Ensure that member functoins are documented. These are sane defaults.
+# Ensure that member functions are documented. These are sane defaults.
 autodoc_default_options = {
     'members': True,
     'member-order': 'bysource',
