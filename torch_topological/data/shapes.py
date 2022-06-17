@@ -178,8 +178,9 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, seed=None):
     X = []
 
     for theta, psi in angles:
-        x = (R + r * np.cos(theta)) * np.cos(psi)
-        y = (R + r * np.cos(theta)) * np.sin(psi)
+        a = R + r * np.cos(theta)
+        x = a * np.cos(psi)
+        y = a * np.sin(psi)
         z = r * np.sin(theta)
 
         X.append((x, y, z))
