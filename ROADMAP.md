@@ -44,7 +44,7 @@ have been implemented. There are numerous kernels out there that could
 be included:
 
 - [x] The multi-scale kernel by [Reininghaus et al.](https://openaccess.thecvf.com/content_cvpr_2015/papers/Reininghaus_A_Stable_Multi-Scale_2015_CVPR_paper.pdf)
-- [ ] The sliced Wasserstein distance and kernel by [Carrière et al.](https://arxiv.org/abs/1706.03358). The sliced Wasserstein distance has been implemented already; the kernel is still an ongoing effort.
+- [x] The sliced Wasserstein distance and kernel by [Carrière et al.](https://arxiv.org/abs/1706.03358).
 
 This list is **incomplete**.
 
