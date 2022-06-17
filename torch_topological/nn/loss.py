@@ -63,22 +63,22 @@ class SummaryStatisticLoss(torch.nn.Module):
             In case no target tensor `Y` has been provided, the latter part
             of the expression amounts to `0`.
         """
-        stat_src = torch.sum(
-            torch.stack([
-                self.stat_fn(pi.diagram, **self.kwargs) for pi in X
-            ])
-        )
+        stat_src = self._evaluate_stat_fn(X)
 
         if Y is not None:
-            stat_target = torch.sum(
-                torch.stack([
-                    self.stat_fn(pi.diagram, **self.kwargs) for pi in Y
-                ])
-            )
-
+            stat_target = self._evaluate_stat_fn(Y)
             return (stat_target - stat_src).abs().pow(self.p)
         else:
             return stat_src.abs().pow(self.p)
+
+    def _evaluate_stat_fn(self, X):
+        """Evaluate statistic function for a given tensor."""
+        return torch.sum(
+            torch.stack([
+                self.stat_fn(pers_info.diagram, **self.kwargs)
+                for pers_info in X
+            ])
+        )
 
 
 class SignatureLoss(torch.nn.Module):
