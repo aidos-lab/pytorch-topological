@@ -158,15 +158,8 @@ class SignatureLoss(torch.nn.Module):
             for dim in self.dimensions
         ]
 
-        XY_dist = [
-            0.5 * torch.linalg.vector_norm(XX - YX, ord=self.p)
-            for XX, YX in zip(X_sig_X, Y_sig_X)
-        ]
-
-        YX_dist = [
-            0.5 * torch.linalg.vector_norm(YY - XY, ord=self.p)
-            for YY, XY in zip(Y_sig_Y, X_sig_Y)
-        ]
+        XY_dist = self._partial_distance(X_sig_X, Y_sig_X)
+        YX_dist = self._partial_distance(Y_sig_Y, X_sig_Y)
 
         return torch.stack(XY_dist).sum() + torch.stack(YX_dist).sum()
 
@@ -191,3 +184,16 @@ class SignatureLoss(torch.nn.Module):
             )
 
         return selected_distances
+
+    def _partial_distance(self, A, B):
+        """Calculate partial distances between pairings.
+
+        The purpose of this function is to calculate a partial distance
+        for the loss, depending on distances selected from the pairing.
+        """
+        dist = [
+            0.5 * torch.linalg.vector_norm(a - b, ord=self.p)
+            for a, b in zip(A, B)
+        ]
+
+        return dist
