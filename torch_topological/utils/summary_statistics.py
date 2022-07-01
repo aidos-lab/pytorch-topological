@@ -48,10 +48,10 @@ def polynomial_function(D, p, q, **kwargs):
         :math:`x` denoting the creation of a topological feature and
         :math:`y` denoting its destruction.
 
-    p : int
+    p : float
         Exponent for persistence differences in the diagram.
 
-    q : int
+    q : float
         Exponent for mean persistence in the diagram.
 
     Returns
@@ -81,8 +81,8 @@ def polynomial_function(D, p, q, **kwargs):
 def total_persistence(D, p=2, **kwargs):
     """Calculate total persistence of a persistence diagram.
 
-    This function will calculate the totla persistence of a persistence
-    diagram. Infinite value will be ignored.
+    This function will calculate the total persistence of a persistence
+    diagram. Infinite values will be ignored.
 
     Parameters
     ----------
@@ -97,9 +97,37 @@ def total_persistence(D, p=2, **kwargs):
 
     Returns
     -------
-    Total persistence of `D`.
+    float
+        Total persistence of `D`.
     """
     persistence = torch.diff(D)
     persistence = persistence[torch.isfinite(persistence)]
 
     return persistence.abs().pow(p).sum()
+
+
+def p_norm(D, p=2, **kwargs):
+    """Calculate :math:`p`-norm of a persistence diagram.
+
+    This function will calculate the :math:`p`-norm of a persistence
+    diagram. Infinite value will be ignored.
+
+    Parameters
+    ----------
+    D : `torch.tensor`
+        Persistence diagram, assumed to be in shape `(n, 2)`, where each
+        entry corresponds to a tuple of the form :math:`(x, y)`, with
+        :math:`x` denoting the creation of a topological feature and
+        :math:`y` denoting its destruction.
+
+    p : float
+        Weight parameter for the norm calculation. It must be valid to
+        raise a term to the :math:`p`th power, but the function has no
+        additional checks for this.
+
+    Returns
+    -------
+    float
+        :math:`p`-norm of `D`.
+    """
+    return torch.pow(total_persistence(D), 1.0 / p)

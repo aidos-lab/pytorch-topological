@@ -23,7 +23,16 @@ class SummaryStatisticLoss(torch.nn.Module):
         Parameters
         ----------
         summary_statistic : str
-            Indicates which summary statistic function to use.
+            Indicates which summary statistic function to use. Must be
+            a summary statistics function that exists in the utilities
+            module, i.e. :mod:`torch_topological.utils`.
+
+            At present, the following choices are valid:
+
+            - `torch_topological.utils.persistent_entropy`
+            - `torch_topological.utils.polynomial_function`
+            - `torch_topological.utils.total_persistence`
+            - `torch_topological.utils.p_norm`
 
         **kwargs
             Optional keyword arguments, to be passed to the
