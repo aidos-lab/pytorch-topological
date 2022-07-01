@@ -31,8 +31,11 @@ to get you started:
 - Hensel et al., [*A Survey of Topological Machine Learning Methods*](https://www.frontiersin.org/articles/10.3389/frai.2021.681108/full),
   Frontiers in Artificial Intelligence, 2021.
 
-# Installation
+# Installation and requirements
 
+`torch_topological` requires Python 3.9. More recent versions might work
+but necessitate building some dependencies by yourself; Python 3.9
+currently offers the smoothest experience.
 It is recommended to use the excellent [`poetry`](https://python-poetry.org) framework
 to install `torch_topological`:
 
@@ -51,6 +54,15 @@ pip install -U torch-topological
 `torch_topological` is still a work in progress. You can [browse the documentation](https://pytorch-topological.readthedocs.io)
 or, if code reading is more your thing, dive directly into [some example
 code](./torch_topological/examples).
+
+Here is a list of *other* projects that are using `torch_topological`:
+
+- [SHAPR](https://github.com/marrlab/SHAPR_torch), a method for for
+  predicting the 3D cell shape of individual cells based on 2D
+  microscopy images
+
+This list is incomplete---you can help expanding it by using
+`torch_topological` in your own projects! :innocent:
 
 # Contributing
 
