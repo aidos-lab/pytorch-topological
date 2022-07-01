@@ -40,6 +40,11 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
+# Tries to assign some semantic meaning to arguments provided with
+# single backtics, such as `x`. This way, we can ignore `func` and
+# `class` targets etc. (They still work, though!)
+default_role = 'obj'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
