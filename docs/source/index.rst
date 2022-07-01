@@ -23,6 +23,7 @@ framework you should feel right at home.
 
    data
    nn
+   utils
 
 Indices and tables
 ==================
