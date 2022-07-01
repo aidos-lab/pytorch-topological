@@ -1,10 +1,11 @@
-.. torch_topological documentation master file, created by
-   sphinx-quickstart on Sun Dec 12 15:31:57 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ``torch_topological`` -- Topological Machine Learning with ``pytorch``
 =======================================================================
+
+``pytorch-topological``, also known as ``torch_topological``, brings the
+power of topological methods to **your** machine learning project.
+``torch_topological`` is specifically geared towards working well with
+other ``PyTorch`` projects, so if you are already familiar with this
+framework you should feel right at home.
 
 .. toctree::
    :maxdepth: 2
