@@ -28,5 +28,9 @@ Additional Resources
 
 Here are some additional resources that might be of interest:
 
+- Amézquita et al., "The Shape of Things to Come: Topological Data Analysis and Biology,
+  from Molecules to Organisms", Developmental Dynamics
+  Volume 249, Issue 7, pp. 816--833, 2020. `doi:10.1002/dvdy.175 <https://doi.org/10.1002/dvdy.175>`_
+
 - Hensel et al., "A Survey of Topological Machine Learning Methods",
   Frontiers in Artificial Intelligence. `doi:10.3389/frai.2021.681108 <https://doi.org/10.3389/frai.2021.681108>`_
