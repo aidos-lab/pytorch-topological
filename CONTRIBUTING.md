@@ -33,3 +33,6 @@ You can check this using the great [`flake8`](https://flake8.pycqa.org/) tool:
 ```console
 $ flake8 script.py
 ```
+
+When creating a pull request, your code will be automatically checked
+for coding convention conformity.
