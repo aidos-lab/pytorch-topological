@@ -88,6 +88,8 @@ machine learning:
 
 - [`Ripser`](https://github.com/Ripser/ripser) by [Ulrich Bauer](https://github.com/ubauer)
 
+- [`Teaspoon`](https://lizliz.github.io/teaspoon/) by [Elizabeth Munch](https://elizabethmunch.com/) and her team
+
 - [`TopologyLayer`](https://github.com/bruel-gabrielsson/TopologyLayer) by [Rickard Brüel Gabrielsson](https://github.com/bruel-gabrielsson)
 
 - [`topological-autoencoders`](https://github.com/BorgwardtLab/topological-autoencoders) by [Michael Moor](https://github.com/mi92), [Max Horn](https://github.com/ExpectationMax), and [Bastian Rieck](https://github.com/Pseudomanifold)

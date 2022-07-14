@@ -22,6 +22,15 @@ more professional development agenda, whereas ``torch_topological`` is
 geared more towards researchers that want to prototype the integration
 of topological features.
 
+``Teaspoon``
+------------
+
+`Teaspoon <https://lizliz.github.io/teaspoon>`_ is a library that
+targets topological signal processing applications, such as the analysis
+of time-varying systems or complex networks. ``Teaspoon`` integrates
+very nicely with ``scikit-learn`` and targets a different set of
+applications than ``torch_topological``.
+
 ``TopologyLayer``
 -----------------
 
