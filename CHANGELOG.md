@@ -3,6 +3,26 @@
 `pytorch-topological` follows the [semantic versioning](https://semver.org).
 This changelog contains all notable changes in the project.
 
+# v0.1.5
+
+## Added
+
+- A bunch of new test cases
+- Alpha complex class (`AlphaComplex`)
+- Dimension selector class (`SelectByDimension`)
+- Discussing additional packages in documentation
+- Linting for pull requests
+
+## Fixed
+
+- Improved contribution guidelines
+- Improved documentation of summary statistics loss
+- Improved overall maintainability
+- Improved test cases
+- Simplified multi-scale kernel usage (distance calculations with different exponents)
+- Test case for cubical complexes
+- Usage of seed parameter for shape generation (following `numpy guidelines`)
+
 # v0.1.4
 
 ## Added
