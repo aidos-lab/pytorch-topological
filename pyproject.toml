@@ -26,3 +26,9 @@ flake8 = "^4.0.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[project.urls]
+homepage = "https://github.com/aidos-lab/pytorch-topological"
+documentation = "https://pytorch-topological.readthedocs.io/"
+issues = "https://github.com/aidos-lab/pytorch-topological/issues"
+changelog = "https://github.com/aidos-lab/pytorch-topological/blob/main/CHANGELOG.md"
