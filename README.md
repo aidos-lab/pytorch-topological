@@ -1,4 +1,4 @@
-<img src="torch_topological.svg" height=128 alt="`pytorch-topological` icon" />
+<img src="https://raw.githubusercontent.com/aidos-lab/pytorch-topological/main/torch_topological.svg" height=128 alt="`pytorch-topological` icon" />
 
 # `pytorch-topological`: A topological machine learning framework for `pytorch`
 
