@@ -8,8 +8,10 @@ from torch_topological.nn import VietorisRipsComplex
 from torch_topological.nn import WassersteinDistance
 
 from torch import cdist
+from torch import isinf
 from torch.utils.data import DataLoader
 
+import torch
 import pytest
 
 import numpy as np
@@ -51,6 +53,27 @@ class TestVietorisRipsComplex:
             for pi1, pi2 in zip(pers_info1, pers_info2):
                 dist = WassersteinDistance()(pi1, pi2)
                 assert dist == pytest.approx(0.0)
+
+
+class TestVietorisRipsComplexThreshold:
+    data_set = SphereVsTorus(n_point_clouds=3 * batch_size)
+    loader = DataLoader(
+        data_set,
+        batch_size=batch_size,
+        shuffle=True,
+        drop_last=False,
+    )
+
+    vr = VietorisRipsComplex(dim=1, p=1, threshold=0.1)
+
+    def test_threshold(self):
+        for (x, y) in self.loader:
+            pers_info = self.vr(x)
+
+            assert pers_info is not None
+            assert len(pers_info) == batch_size
+
+            assert(torch.any(isinf(pers_info[0][0].diagram.flatten().sum())))
 
 
 class TestVietorisRipsComplexBatchHandling:

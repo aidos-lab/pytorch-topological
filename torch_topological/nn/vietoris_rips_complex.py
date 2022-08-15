@@ -20,7 +20,7 @@ class VietorisRipsComplex(nn.Module):
     by calculating a Vietoris--Rips complex of the data.
     """
 
-    def __init__(self, dim=1, p=2, **kwargs):
+    def __init__(self, dim=1, p=2, threshold=numpy.inf, **kwargs):
         """Initialise new module.
 
         Parameters
@@ -36,6 +36,11 @@ class VietorisRipsComplex(nn.Module):
             parameter is ignored and will have no effect. The rationale
             is to permit clients to use a pre-computed distance matrix,
             while always falling back to Minkowski norms.
+
+        threshold : float
+            If set, only calculates topological features up to the
+            specified distance threshold. This will result in sets
+            of infinite features in persistence pairings.
 
         **kwargs
             Additional arguments to be provided to ``ripser``, i.e. the
@@ -57,12 +62,14 @@ class VietorisRipsComplex(nn.Module):
 
         self.dim = dim
         self.p = p
+        self.threshold = threshold
 
         # Ensures that the same parameters are used whenever calling
         # `ripser`.
         self.ripser_params = {
             'return_generators': True,
             'maxdim': self.dim,
+            'thresh': self.threshold
         }
 
         self.ripser_params.update(kwargs)
