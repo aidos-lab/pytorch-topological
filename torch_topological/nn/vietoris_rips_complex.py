@@ -1,11 +1,14 @@
 """Vietoris--Rips complex calculation module(s)."""
 
+from itertools import starmap
+
 from gph import ripser_parallel
 from torch import nn
 
 from torch_topological.nn import PersistenceInformation
 from torch_topological.nn.data import batch_handler
 
+import numpy
 import torch
 
 
@@ -152,6 +155,14 @@ class VietorisRipsComplex(nn.Module):
                 dim0=True,
             )
 
+        persistence_information_inf = \
+            self._extract_generators_and_diagrams(
+                distances,
+                generators,
+                finite=False,
+                dim0=True,
+            )
+
         # Check whether we have any higher-dimensional information that
         # we should return.
         if self.dim >= 1:
@@ -162,6 +173,19 @@ class VietorisRipsComplex(nn.Module):
                     dim0=False,
                 )
             )
+
+            persistence_information_inf.extend(
+                self._extract_generators_and_diagrams(
+                    distances,
+                    generators,
+                    finite=False,
+                    dim0=False,
+                )
+            )
+
+        persistence_information = self._concatenate_features(
+            persistence_information, persistence_information_inf
+        )
 
         return persistence_information
 
@@ -178,21 +202,40 @@ class VietorisRipsComplex(nn.Module):
         `ripser_parallel` and the required output of this function.
         """
         index = 1 if not dim0 else 0
+
+        # Perform index shift to find infinite features in the tensor.
+        if not finite:
+            index += 2
+
         gens = gens[index]
 
-        # TODO: Handling of infinite features not provided yet, but the
-        # index shift is already correct.
-        if not finite:
-            index += 1
-
         if dim0:
-            # In a Vietoris--Rips complex, all vertices are created at
-            # time zero.
-            creators = torch.zeros_like(
-                torch.as_tensor(gens)[:, 0],
-                device=dist.device
-            )
-            destroyers = dist[gens[:, 1], gens[:, 2]]
+            if finite:
+                # In a Vietoris--Rips complex, all vertices are created at
+                # time zero.
+                creators = torch.zeros_like(
+                    torch.as_tensor(gens)[:, 0],
+                    device=dist.device
+                )
+
+                destroyers = dist[gens[:, 1], gens[:, 2]]
+            else:
+                creators = torch.zeros_like(
+                    torch.as_tensor(gens)[:],
+                    device=dist.device
+                )
+
+                destroyers = torch.full_like(
+                    torch.as_tensor(gens)[:],
+                    torch.inf,
+                    dtype=torch.float,
+                    device=dist.device
+                )
+
+                inf_pairs = numpy.full(
+                    shape=(gens.shape[0], 2), fill_value=-1
+                )
+                gens = numpy.column_stack((gens, inf_pairs))
 
             persistence_diagram = torch.stack(
                 (creators, destroyers), 1
@@ -203,16 +246,38 @@ class VietorisRipsComplex(nn.Module):
             result = []
 
             for index, gens_ in enumerate(gens):
-                creators = dist[gens_[:, 0], gens_[:, 1]]
-                destroyers = dist[gens_[:, 2], gens_[:, 3]]
+                # Dimension zero is handled differently, so we need to
+                # use an offset here. Note that this is not used as an
+                # index into the `gens` array any more.
+                dimension = index + 1
+
+                if finite:
+                    creators = dist[gens_[:, 0], gens_[:, 1]]
+                    destroyers = dist[gens_[:, 2], gens_[:, 3]]
+
+                    persistence_diagram = torch.stack(
+                        (creators, destroyers), 1
+                    )
+                else:
+                    creators = dist[gens_[:, 0], gens_[:, 1]]
+
+                    destroyers = torch.full_like(
+                        torch.as_tensor(gens_)[:, 0],
+                        torch.inf,
+                        dtype=torch.float,
+                        device=dist.device
+                    )
+
+                    # Create special infinite pairs; we pretend that we
+                    # are concatenating with unknown edges here.
+                    inf_pairs = numpy.full(
+                        shape=(gens_.shape[0], 2), fill_value=-1
+                    )
+                    gens_ = numpy.column_stack((gens_, inf_pairs))
 
                 persistence_diagram = torch.stack(
                     (creators, destroyers), 1
                 )
-
-                # Dimension zero is handled differently, so we need to
-                # use an offset here.
-                dimension = index + 1
 
                 result.append(
                     PersistenceInformation(
@@ -222,3 +287,20 @@ class VietorisRipsComplex(nn.Module):
                 )
 
         return result
+
+    def _concatenate_features(self, pers_info_finite, pers_info_infinite):
+        """Concatenate finite and infinite features."""
+        def _apply(fin, inf):
+            assert fin.dimension == inf.dimension
+
+            diagram = torch.concat((fin.diagram, inf.diagram))
+            pairing = numpy.concatenate((fin.pairing, inf.pairing), axis=0)
+            dimension = fin.dimension
+
+            return PersistenceInformation(
+                pairing=pairing,
+                diagram=diagram,
+                dimension=dimension
+            )
+
+        return list(starmap(_apply, zip(pers_info_finite, pers_info_infinite)))
