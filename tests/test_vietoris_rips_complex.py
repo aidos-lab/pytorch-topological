@@ -64,7 +64,12 @@ class TestVietorisRipsComplexThreshold:
         drop_last=False,
     )
 
-    vr = VietorisRipsComplex(dim=1, p=1, threshold=0.1)
+    vr = VietorisRipsComplex(
+        dim=1,
+        p=1,
+        threshold=0.1,
+        keep_infinite_features=True
+    )
 
     def test_threshold(self):
         for (x, y) in self.loader:

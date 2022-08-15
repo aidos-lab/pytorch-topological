@@ -20,7 +20,14 @@ class VietorisRipsComplex(nn.Module):
     by calculating a Vietoris--Rips complex of the data.
     """
 
-    def __init__(self, dim=1, p=2, threshold=numpy.inf, **kwargs):
+    def __init__(
+        self,
+        dim=1,
+        p=2,
+        threshold=numpy.inf,
+        keep_infinite_features=False,
+        **kwargs
+    ):
         """Initialise new module.
 
         Parameters
@@ -38,9 +45,17 @@ class VietorisRipsComplex(nn.Module):
             while always falling back to Minkowski norms.
 
         threshold : float
-            If set, only calculates topological features up to the
-            specified distance threshold. This will result in sets
-            of infinite features in persistence pairings.
+            If set to a finite number, only calculates topological
+            features up to the specified distance threshold. Thus,
+            any persistence pairings may contain infinite features
+            as well.
+
+        keep_infinite_features : bool
+            If set, keeps infinite features. This flag is disabled by
+            default. The rationale for this is that infinite features
+            require more deliberate handling and, in case `threshold`
+            is not changed, only a *single* infinite feature will not
+            be considered in subsequent calculations.
 
         **kwargs
             Additional arguments to be provided to ``ripser``, i.e. the
@@ -63,6 +78,7 @@ class VietorisRipsComplex(nn.Module):
         self.dim = dim
         self.p = p
         self.threshold = threshold
+        self.keep_infinite_features = keep_infinite_features
 
         # Ensures that the same parameters are used whenever calling
         # `ripser`.
@@ -162,13 +178,14 @@ class VietorisRipsComplex(nn.Module):
                 dim0=True,
             )
 
-        persistence_information_inf = \
-            self._extract_generators_and_diagrams(
-                distances,
-                generators,
-                finite=False,
-                dim0=True,
-            )
+        if self.keep_infinite_features:
+            persistence_information_inf = \
+                self._extract_generators_and_diagrams(
+                    distances,
+                    generators,
+                    finite=False,
+                    dim0=True,
+                )
 
         # Check whether we have any higher-dimensional information that
         # we should return.
@@ -181,18 +198,22 @@ class VietorisRipsComplex(nn.Module):
                 )
             )
 
-            persistence_information_inf.extend(
-                self._extract_generators_and_diagrams(
-                    distances,
-                    generators,
-                    finite=False,
-                    dim0=False,
+            if self.keep_infinite_features:
+                persistence_information_inf.extend(
+                    self._extract_generators_and_diagrams(
+                        distances,
+                        generators,
+                        finite=False,
+                        dim0=False,
+                    )
                 )
-            )
 
-        persistence_information = self._concatenate_features(
-            persistence_information, persistence_information_inf
-        )
+        # Concatenation is only necessary if we want to keep infinite
+        # features.
+        if self.keep_infinite_features:
+            persistence_information = self._concatenate_features(
+                persistence_information, persistence_information_inf
+            )
 
         return persistence_information
 
