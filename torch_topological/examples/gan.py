@@ -1,10 +1,14 @@
-"""Example of topology-based GANs."""
+"""Example of topology-based GANs.
+
+This is a work in progress, demonstrating how to add a simple
+adversarial loss into a GAN architecture.
+"""
 
 import torch
 import torchvision
 
 from torch_topological.nn import CubicalComplex
-from torch_topological.nn import SummaryStatisticLoss
+from torch_topological.nn import WassersteinDistance
 
 from tqdm import tqdm
 
@@ -13,6 +17,8 @@ import matplotlib.pyplot as plt
 
 
 class Generator(torch.nn.Module):
+    """Simple generator module."""
+
     def __init__(self, latent_dim, shape):
         super().__init__()
 
@@ -25,15 +31,15 @@ class Generator(torch.nn.Module):
             layers = [
                 torch.nn.Linear(input_dim, output_dim),
                 torch.nn.BatchNorm1d(output_dim, 0.8),
-                torch.nn.LeakyReLU(0.2)
+                torch.nn.LeakyReLU(0.2),
             ]
             return layers
 
         self.model = torch.nn.Sequential(
-            *_make_layer(self.latent_dim, 64),
+            *_make_layer(self.latent_dim, 32),
+            *_make_layer(32, 64),
             *_make_layer(64, 128),
-            *_make_layer(128, 256),
-            torch.nn.Linear(256, self.output_dim),
+            torch.nn.Linear(128, self.output_dim),
             torch.nn.Sigmoid()
         )
 
@@ -45,6 +51,8 @@ class Generator(torch.nn.Module):
 
 
 class Discriminator(torch.nn.Module):
+    """Simple discriminator module."""
+
     def __init__(self, shape):
         super().__init__()
 
@@ -52,11 +60,11 @@ class Discriminator(torch.nn.Module):
 
         # Inspired by the original GAN. THERE CAN ONLY BE ONE!
         self.model = torch.nn.Sequential(
-            torch.nn.Linear(input_dim, 512),
+            torch.nn.Linear(input_dim, 256),
             torch.nn.LeakyReLU(0.2),
-            torch.nn.Linear(512, 256),
+            torch.nn.Linear(256, 128),
             torch.nn.LeakyReLU(0.2),
-            torch.nn.Linear(256, 1),
+            torch.nn.Linear(128, 1),
             torch.nn.Sigmoid(),
         )
 
@@ -67,24 +75,33 @@ class Discriminator(torch.nn.Module):
 
 
 class TopologicalAdversarialLoss(torch.nn.Module):
+    """Loss term incorporating topological features."""
+
     def __init__(self):
         super().__init__()
 
         self.cubical = CubicalComplex()
-        self.loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
+        self.loss = WassersteinDistance(q=2) 
 
     def forward(self, real, synthetic):
+        """Calculate loss between real and synthetic images."""
 
         loss = 0.0
 
+        # This could potentially be solved by stacking as well. Note
+        # that the interface of `torch_topological` permits slightly
+        # similar constructions.
         for x, y in zip(real, synthetic):
+            # Remove single-channel information. For multiple channels,
+            # this will have to be adapted.
             x = x.squeeze()
             y = y.squeeze()
-
+            
             pi_real = self.cubical(x)[0]
             pi_synthetic = self.cubical(y)[0]
 
-            loss += self.loss([pi_real], [pi_synthetic])
+            loss += self.loss(pi_real, pi_synthetic)
+            self.loss(pi_real, pi_synthetic)
 
         return loss
 
@@ -100,12 +117,12 @@ def show(imgs):
         axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     n_epochs = 5
 
     img_size = 16
     shape = (1, img_size, img_size)
+
     batch_size = 32
     latent_dim = 200
 
@@ -118,7 +135,7 @@ if __name__ == '__main__':
                 [
                     torchvision.transforms.Resize(img_size),
                     torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize([0.5], [0.5])
+                    torchvision.transforms.Normalize([0.5], [0.5]),
                 ]
             ),
         ),
@@ -135,15 +152,9 @@ if __name__ == '__main__':
     opt_d = torch.optim.Adam(discriminator.parameters(), lr=1e-4)
 
     for epoch in range(n_epochs):
-        for batch, (imgs, _) in tqdm(enumerate(data_loader), desc='Batch'):
+        for batch, (imgs, _) in tqdm(enumerate(data_loader), desc="Batch"):
             z = torch.autograd.Variable(
-                torch.Tensor(
-                    np.random.normal(
-                        0,
-                        1,
-                        (imgs.shape[0], latent_dim)
-                    )
-                )
+                torch.Tensor(np.random.normal(0, 1, (imgs.shape[0], latent_dim)))
             )
 
             real_labels = torch.as_tensor([1.0] * len(imgs)).view(-1, 1)
