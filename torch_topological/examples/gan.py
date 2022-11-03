@@ -81,7 +81,7 @@ class TopologicalAdversarialLoss(torch.nn.Module):
         super().__init__()
 
         self.cubical = CubicalComplex()
-        self.loss = WassersteinDistance(q=2) 
+        self.loss = WassersteinDistance(q=2)
 
     def forward(self, real, synthetic):
         """Calculate loss between real and synthetic images."""
@@ -96,7 +96,7 @@ class TopologicalAdversarialLoss(torch.nn.Module):
             # this will have to be adapted.
             x = x.squeeze()
             y = y.squeeze()
-            
+
             pi_real = self.cubical(x)[0]
             pi_synthetic = self.cubical(y)[0]
 
@@ -154,7 +154,9 @@ if __name__ == "__main__":
     for epoch in range(n_epochs):
         for batch, (imgs, _) in tqdm(enumerate(data_loader), desc="Batch"):
             z = torch.autograd.Variable(
-                torch.Tensor(np.random.normal(0, 1, (imgs.shape[0], latent_dim)))
+                torch.Tensor(
+                    np.random.normal(0, 1, (imgs.shape[0], latent_dim))
+                )
             )
 
             real_labels = torch.as_tensor([1.0] * len(imgs)).view(-1, 1)
