@@ -3,7 +3,7 @@
 import torch
 import torchvision
 
-from torch_topological.nn import Cubical
+from torch_topological.nn import CubicalComplex
 from torch_topological.nn import SummaryStatisticLoss
 
 from tqdm import tqdm
@@ -70,7 +70,7 @@ class TopologicalAdversarialLoss(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.cubical = Cubical()
+        self.cubical = CubicalComplex()
         self.loss = SummaryStatisticLoss('polynomial_function', p=2, q=2)
 
     def forward(self, real, synthetic):
