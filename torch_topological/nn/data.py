@@ -138,7 +138,9 @@ def make_tensor(x):
 
     # List of lists: the first axis is treated as the batch axis, while
     # the second axis is treated as the dimension of diagrams or pairs.
-    if level == 2:
+    # This also handles ordinary lists, which will result in a batch of
+    # size 1.
+    if level <= 2:
         tensors = [
             make_tensor_from_persistence_information(pers_infos)
             for pers_infos in x
