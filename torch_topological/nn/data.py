@@ -93,17 +93,18 @@ def make_tensor(x):
         if len(x) == 0:
             return 0
 
-        # `chain.from_iterable()` only removes one layer of nesting, but
-        # we may have more.
-        elif level > 2:
-            x = list(chain.from_iterable(x))
+        # Each `chain.from_iterable()` removes an additional layer of
+        # nesting. We only have to start from level 2; we get level 1
+        # for free because we can always iterate over a list.
+        for i in range(2, level + 1):
+            x = chain.from_iterable(x)
 
         # Collect information that we need to create the full tensor. An
         # entry of the resulting list contains the length of the diagram
         # and the dimension, making it possible to derive padding values
         # for all entries.
         M = list(map(
-            lambda a: (len(a.diagram), a.dimension), chain.from_iterable(x)
+            lambda a: (len(a.diagram), a.dimension), x
         ))
 
         # Get maximum dimension
