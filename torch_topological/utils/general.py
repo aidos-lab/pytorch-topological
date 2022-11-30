@@ -37,7 +37,7 @@ def wrap_if_not_iterable(x):
     This function provides a convenience wrapper for variables that need
     to be iterated over. If the variable is already an `iterable`, there
     is nothing to be done and it will be returned as-is. Otherwise, will
-    will 'wrap' the variable to be the single item of a list.
+    'wrap' the variable to be the single item of a list.
 
     The primary purpose of this function is to make it easier for users
     to interact with certain classes: essentially, one does not have to
