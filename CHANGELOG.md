@@ -3,6 +3,13 @@
 `pytorch-topological` follows the [semantic versioning](https://semver.org).
 This changelog contains all notable changes in the project.
 
+# v0.1.6
+
+## Fixed
+
+- Fixed various documentation typos
+- Fixed bug in `make_tensor` creation for single batches
+
 # v0.1.5
 
 ## Added
