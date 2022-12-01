@@ -38,7 +38,6 @@ class TopologicalModel(torch.nn.Module):
 
 
 if __name__ == '__main__':
-
     batch_size = 32
     n_epochs = 50
     n_elements = 10
@@ -52,7 +51,9 @@ if __name__ == '__main__':
         drop_last=False,
     )
 
-    model = TopologicalModel(n_elements)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    model = TopologicalModel(n_elements).to(device)
     loss_fn = torch.nn.CrossEntropyLoss()
     opt = torch.optim.Adam(model.parameters(), lr=1e-4)
 
@@ -60,6 +61,9 @@ if __name__ == '__main__':
 
     for epoch in progress:
         for batch, (x, y) in enumerate(loader):
+            x = x.to(device)
+            y = y.to(device)
+
             output = model(x)
             loss = loss_fn(output, y)
 
