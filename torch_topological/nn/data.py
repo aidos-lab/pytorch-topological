@@ -241,7 +241,11 @@ def make_tensor_from_persistence_information(
 
     dimensions = torch.cat(
         [
-            torch.as_tensor([x.dimension] * len(x.diagram), dtype=torch.long)
+            torch.as_tensor(
+                [x.dimension] * len(x.diagram),
+                dtype=torch.long,
+                device=x.diagram.device,
+            )
             for x in pers_info
         ]
     )
