@@ -37,7 +37,7 @@ class TopologicalModel(torch.nn.Module):
         return self.model(pers_info)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     batch_size = 32
     n_epochs = 50
     n_elements = 10
@@ -74,7 +74,4 @@ if __name__ == '__main__':
             pred = torch.argmax(output, dim=1)
             acc = (pred == y).sum() / len(y)
 
-            progress.set_postfix(
-                    loss=f'{loss.item():.08f}',
-                    acc=f'{acc:.02f}'
-            )
+            progress.set_postfix(loss=f"{loss.item():.08f}", acc=f"{acc:.02f}")
