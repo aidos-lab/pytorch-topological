@@ -11,17 +11,18 @@ from torch_topological.utils import nesting_level
 import torch
 
 
-class PersistenceInformation(namedtuple(
-            'PersistenceInformation',
-            [
-                'pairing',
-                'diagram',
-                'dimension',
-            ],
-            # Ensures that there is always a dimension specified, albeit an
-            # 'incorrect' one.
-            defaults=[None]
-        )
+class PersistenceInformation(
+    namedtuple(
+        "PersistenceInformation",
+        [
+            "pairing",
+            "diagram",
+            "dimension",
+        ],
+        # Ensures that there is always a dimension specified, albeit an
+        # 'incorrect' one.
+        defaults=[None],
+    )
 ):
     """Persistence information data structure.
 
@@ -103,19 +104,19 @@ def make_tensor(x):
         # entry of the resulting list contains the length of the diagram
         # and the dimension, making it possible to derive padding values
         # for all entries.
-        M = list(map(
-            lambda a: (len(a.diagram), a.dimension), x
-        ))
+        M = list(map(lambda a: (len(a.diagram), a.dimension), x))
 
         # Get maximum dimension
         dim = max(M, key=itemgetter(1))[1]
 
         # Get *sum* of maximum number of entries for each dimension.
         # This is calculated over all batches.
-        N = sum([
-            max([L for L in M if L[1] == d], key=itemgetter(0))[0]
-            for d in range(dim + 1)
-        ])
+        N = sum(
+            [
+                max([L for L in M if L[1] == d], key=itemgetter(0))[0]
+                for d in range(dim + 1)
+            ]
+        )
 
         return N
 
@@ -126,11 +127,9 @@ def make_tensor(x):
         return list(
             map(
                 lambda t: torch.nn.functional.pad(
-                        t,
-                        (0, 0, N - len(t), 0),
-                        mode='constant',
-                        value=value),
-                tensors
+                    t, (0, 0, N - len(t), 0), mode="constant", value=value
+                ),
+                tensors,
             )
         )
 
@@ -176,17 +175,18 @@ def make_tensor(x):
         # Pad all tensors to length N in the first dimension, then turn
         # them into a batch. We first stack over channels (inner), then
         # over the batch (outer).
-        result = torch.stack([
-            torch.stack(_pad_tensors(batch_tensors, N))
-            for batch_tensors in tensors
-        ])
+        result = torch.stack(
+            [
+                torch.stack(_pad_tensors(batch_tensors, N))
+                for batch_tensors in tensors
+            ]
+        )
 
         return result
 
 
 def make_tensor_from_persistence_information(
-    pers_info,
-    extract_generators=False
+    pers_info, extract_generators=False
 ):
     """Convert (sequence) of persistence information entries to tensor.
 
@@ -223,8 +223,9 @@ def make_tensor_from_persistence_information(
     # Looks a little bit cumbersome, but since `namedtuple` is iterable
     # as well, we need to ensure that we are actually dealing with more
     # than one instance here.
-    if len(pers_info) > 1 and not \
-            isinstance(pers_info[0], PersistenceInformation):
+    if len(pers_info) > 1 and not isinstance(
+        pers_info[0], PersistenceInformation
+    ):
         pers_info = [pers_info]
 
     # TODO: This might not always work since the size of generators
@@ -286,9 +287,7 @@ def batch_handler(x, handler_fn, **kwargs):
         # inefficient but at the same time, it is the easiest
         # workaround for now, permitting even 'ragged' inputs of
         # different lengths.
-        return [
-            handler_fn(torch.as_tensor(x_), **kwargs) for x_ in x
-        ]
+        return [handler_fn(torch.as_tensor(x_), **kwargs) for x_ in x]
     else:
         return handler_fn(torch.as_tensor(x), **kwargs)
 
@@ -328,7 +327,9 @@ def batch_iter(x, dim=None):
         x = [x]
 
     if level <= 2:
-        def handler(x): return x
+
+        def handler(x):
+            return x
 
     # Remove the first dimension but also the subsequent one so that all
     # only iterables containing persistence information about a specific
@@ -336,7 +337,9 @@ def batch_iter(x, dim=None):
     #
     # TODO: Generalise recursively? Do we want to support that?
     else:
-        def handler(x): return chain.from_iterable(x)
+
+        def handler(x):
+            return chain.from_iterable(x)
 
     if dim is not None:
         for x_ in x:
