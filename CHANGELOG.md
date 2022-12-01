@@ -3,6 +3,13 @@
 `pytorch-topological` follows the [semantic versioning](https://semver.org).
 This changelog contains all notable changes in the project.
 
+# v0.1.7
+
+## Fixed
+
+- Fixed bug in `make_tensor` that caused the loss of device information.
+  Device handling should now be transparent for clients.
+
 # v0.1.6
 
 ## Fixed
