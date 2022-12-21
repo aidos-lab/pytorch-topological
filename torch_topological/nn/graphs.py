@@ -10,6 +10,7 @@ from torch_scatter import scatter
 
 import torch
 import torch.nn as nn
+import torch.functional as F
 
 
 class DeepSetLayer(nn.Module):
@@ -121,6 +122,35 @@ class TOGL(nn.Module):
         # the output of this function should be.
         return None
 
+    def forward(self, data):
+        """Implement forward pass through data."""
+        # TODO: Is this the best signature? `data` is following directly
+        # the convention of `PyG`.
+
+        x, edge_index = data.x, data.edge_index
+
+        vertex_slices = torch.Tensor(data._slice_dict["x"]).long()
+        edge_slices = torch.Tensor(data._slice_dict["edge_index"]).long()
+        batch = data.batch
+
+        persistence_pairs = self.compute_persistent_homology(
+            x, edge_index, vertex_slices, edge_slices, batch
+        )
+
+        x0 = persistence_pairs.permute(1, 0, 2).reshape(
+            persistence_pairs.shape[1], -1
+        )
+
+        for layer in self.set_fn:
+            if isinstance(layer, DeepSetLayer):
+                x0 = layer(x0, batch)
+            else:
+                x0 = layer(x0)
+
+        # TODO: Residual step; could be made optional. Plus, the optimal
+        # order of operations is not clear.
+        x = x + self.batch_norm(F.relu(x0))
+        return x
 
 
 class TopoGCN(torch.nn.Module):
