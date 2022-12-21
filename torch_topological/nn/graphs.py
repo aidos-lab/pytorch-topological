@@ -91,6 +91,37 @@ class TOGL(nn.Module):
 
         self.batch_norm = nn.BatchNorm1d(n_features)
 
+    def compute_persistent_homology(
+        self,
+        x,
+        edge_index,
+        vertex_slices,
+        edge_slices,
+        batch,
+        return_filtration=False,
+    ):
+        """Return persistence pairs (i.e. generators)."""
+        # Apply filtrations to node attributes. For the edge values, we
+        # use a sublevel set filtration.
+        #
+        # TODO: Support different ways of filtering?
+        filtered_v = self.filtrations(x)
+        filtered_e, _ = torch.max(
+            torch.stack(
+                (filtered_v[edge_index[0]], filtered_v[edge_index[1]])
+            ),
+            axis=0,
+        )
+
+        filtered_v = filtered_v.transpose(1, 0).cpu().contiguous()
+        filtered_e = filtered_e.transpose(1, 0).cpu().contiguous()
+        edge_index = edge_index.cpu().transpose(1, 0).contiguous()
+
+        # TODO: Calculate persistence tuples here. Not quite clear what
+        # the output of this function should be.
+        return None
+
+
 
 class TopoGCN(torch.nn.Module):
     pass
