@@ -49,6 +49,53 @@ class DeepSetLayer(nn.Module):
         return x
 
 
+class TOGL(nn.Module):
+    """Implementation of TOGL, a topological graph layer.
+
+    Some caveats: this implementation only focuses on a set function
+    aggregation of topological features. At the moment, it is not as
+    powerful and feature-complete as the original implementation.
+    """
+
+    def __init__(
+        self,
+        n_features,
+        n_filtrations,
+        hidden_dim,
+        out_dim,
+        aggregation_fn,
+    ):
+        super().__init__()
+
+        self.filtrations = nn.Sequential(
+            nn.Linear(n_features, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, n_filtrations),
+        )
+
+        self.n_filtrations = n_filtrations
+
+        self.set_fn = nn.ModuleList(
+            [
+                nn.Linear(n_filtrations * 2, out_dim),
+                nn.ReLU(),
+                DeepSetLayer(out_dim, out_dim, aggregation_fn),
+                nn.ReLU(),
+                DeepSetLayer(
+                    out_dim,
+                    n_features,
+                    aggregation_fn,
+                ),
+            ]
+        )
+
+        self.batch_norm = nn.BatchNorm1d(n_features)
+
+
+class TopoGCN(torch.nn.Module):
+    pass
+
+
 B = 64
 N = 100
 p = 0.2
