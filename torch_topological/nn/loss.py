@@ -138,10 +138,11 @@ class SignatureLoss(torch.nn.Module):
             self.dimensions = [self.dimensions]
 
     def forward(self, X, Y):
-        """
-        Calculates the signature loss between two point clouds. This loss funcion uses the persistent
-        homology from each point cloud in order to retrieve the topologically relevant distances from 
-        a distance matrix calculuted from the point clouds. For more information, see [Moor20a]_.
+        """Calculates the signature loss between two point clouds.
+        
+        This loss funcion uses the persistent homology from each point cloud in order to retrieve 
+        the topologically relevant distances from a distance matrix calculuted from the point clouds.
+        For more information, see [Moor20a]_.
 
         Parameters
         ----------
@@ -206,10 +207,7 @@ class SignatureLoss(torch.nn.Module):
         return torch.stack(XY_dist).sum() + torch.stack(YX_dist).sum()
 
     def _select_distances(self, pairwise_distance_matrix, generators):
-        """
-        Selects the topologically relevant edges from the pairwise distance matrix
-        given the indices of the edges in the simplicial complex that correspond to birth/death
-        pairs when computing persistent homology.
+        """Selects the topologically relevant edges from the pairwise distance matrix.
 
         Parameters
         ----------
