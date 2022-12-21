@@ -3,6 +3,8 @@
 from torch_geometric.data import Batch
 from torch_geometric.data import Data
 
+from torch_geometric.loader import DataLoader
+
 from torch_geometric.utils import erdos_renyi_graph
 
 import torch
@@ -11,17 +13,19 @@ B = 64
 N = 100
 p = 0.2
 
-X = [
+data_list = [
     Data(x=torch.rand(N, 1), edge_index=erdos_renyi_graph(N, p), num_nodes=N)
+    for i in range(B)
 ]
 
-X = Batch.from_data_list(X)
+loader = DataLoader(data_list, batch_size=8)
 
-vertex_slices = torch.Tensor(X._slice_dict['x']).long()
-edge_slices = torch.Tensor(X._slice_dict['edge_index']).long()
-
-print(vertex_slices)
-print(edge_slices)
+for index, batch in enumerate(loader):
+    vertex_slices = torch.Tensor(batch._slice_dict['x']).long()
+    edge_slices = torch.Tensor(batch._slice_dict['edge_index']).long()
+    
+    print(vertex_slices)
+    print(edge_slices)
 
 
 #def calculate_persistent_homology(G, k=3):
