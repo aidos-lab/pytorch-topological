@@ -6,6 +6,9 @@ from torch_geometric.loader import DataLoader
 
 from torch_geometric.utils import erdos_renyi_graph
 
+from torch_geometric.nn import GCNConv
+from torch_geometric.nn import global_mean_pool
+
 from torch_scatter import scatter
 
 import torch
@@ -154,7 +157,23 @@ class TOGL(nn.Module):
 
 
 class TopoGCN(torch.nn.Module):
-    pass
+    def __init__(self):
+        super().__init__()
+
+        self.layers = nn.ModuleList(
+            [GCNConv(1, 16), GCNConv(16, 2)]
+        )
+
+        self.pooling_fn = global_mean_pool
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        for layer in self.layers:
+            x = layer(x, edge_index=edge_index, data=data)
+
+        x = self.pooling_fn(x, data.batch)
+        return x
 
 
 B = 64
