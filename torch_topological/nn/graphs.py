@@ -171,12 +171,12 @@ class TopoGCN(torch.nn.Module):
         x, edge_index = data.x, data.edge_index
 
         for layer in self.layers[:1]:
-            x = layer(x, edge_index=edge_index, data=data)
+            x = layer(x, edge_index)
 
-        x = self.togl(x)
+        # x = self.togl(x)
 
-        for layer in self.layers[:1]:
-            x = layer(x, edge_index=edge_index, data=data)
+        for layer in self.layers[1:]:
+            x = layer(x, edge_index)
 
         x = self.pooling_fn(x, data.batch)
         return x
@@ -193,12 +193,16 @@ data_list = [
 
 loader = DataLoader(data_list, batch_size=8)
 
+model = TopoGCN()
+
 for index, batch in enumerate(loader):
     vertex_slices = torch.Tensor(batch._slice_dict["x"]).long()
     edge_slices = torch.Tensor(batch._slice_dict["edge_index"]).long()
 
     print(vertex_slices)
     print(edge_slices)
+
+    model(batch)
 
 
 # def calculate_persistent_homology(G, k=3):
