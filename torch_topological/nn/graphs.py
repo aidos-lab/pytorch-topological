@@ -165,11 +165,17 @@ class TopoGCN(torch.nn.Module):
         )
 
         self.pooling_fn = global_mean_pool
+        self.togl = TOGL(16, 16, 32, 16, "mean")
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
 
-        for layer in self.layers:
+        for layer in self.layers[:1]:
+            x = layer(x, edge_index=edge_index, data=data)
+
+        x = self.togl(x)
+
+        for layer in self.layers[:1]:
             x = layer(x, edge_index=edge_index, data=data)
 
         x = self.pooling_fn(x, data.batch)
