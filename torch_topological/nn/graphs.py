@@ -125,12 +125,18 @@ class TOGL(nn.Module):
         # the output of this function should be.
         return None
 
-    def forward(self, data):
+    def forward(self, x, data):
         """Implement forward pass through data."""
         # TODO: Is this the best signature? `data` is following directly
         # the convention of `PyG`.
+        #
+        # x : current node attributes of layer; we should not use the
+        # original attributes here because they are not informed by a
+        # previous layer.
+        #
+        # data : edge slice information etc.
 
-        x, edge_index = data.x, data.edge_index
+        edge_index = data.edge_index
 
         vertex_slices = torch.Tensor(data._slice_dict["x"]).long()
         edge_slices = torch.Tensor(data._slice_dict["edge_index"]).long()
@@ -173,7 +179,7 @@ class TopoGCN(torch.nn.Module):
         for layer in self.layers[:1]:
             x = layer(x, edge_index)
 
-        # x = self.togl(x)
+        x = self.togl(x, data)
 
         for layer in self.layers[1:]:
             x = layer(x, edge_index)
