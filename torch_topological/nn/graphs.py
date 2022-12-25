@@ -1,5 +1,7 @@
 """Layers for topological data analysis based on graphs."""
 
+import itertools
+
 from torch_geometric.data import Data
 
 from torch_geometric.loader import DataLoader
@@ -14,6 +16,17 @@ from torch_scatter import scatter
 import torch
 import torch.nn as nn
 import torch.functional as F
+
+import gudhi as gd
+
+
+# TODO: should be put into utils? This is available in `itertools`
+# directly but only for Python 3.10+.
+def pairwise(iterable):
+    """Return pairwise iterator."""
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
 
 class DeepSetLayer(nn.Module):
@@ -102,6 +115,7 @@ class TOGL(nn.Module):
         vertex_slices,
         edge_slices,
         batch,
+        n_nodes,
         return_filtration=False,
     ):
         """Return persistence pairs (i.e. generators)."""
@@ -121,9 +135,43 @@ class TOGL(nn.Module):
         filtered_e = filtered_e.transpose(1, 0).cpu().contiguous()
         edge_index = edge_index.cpu().transpose(1, 0).contiguous()
 
+        # TODO: Do we have to enforce contiguous indices here? 
+        vertex_index = torch.arange(end=n_nodes, dtype=int)
+
+        for (vi, vj), (ei, ej) in zip(
+            pairwise(vertex_slices), pairwise(edge_slices)
+        ):
+            vertices = vertex_index[vi:vj]
+            edges = edge_index[ei:ej]
+
+            self._compute_persistent_homology(vertices, edges)
+
         # TODO: Calculate persistence tuples here. Not quite clear what
         # the output of this function should be.
         return None
+
+    # Helper function for doing the actual calculation of topological
+    # features of a graph.
+    #
+    # TODO: Missing filtration values for vertices and edges here.
+    #
+    # TODO: Need to think about how to handle different filtrations
+    # etc.; what should be the best return value?
+    def _compute_persistent_homology(self, vertices, edges):
+        st = gd.SimplexTree()
+
+        for v in vertices:
+            st.insert([v], filtration=0.0)
+
+        for u, v in  edges:
+            st.insert([u, v], filtration=0.0)
+
+        st.make_filtration_non_decreasing()
+        st.expansion(2)
+        persistence_pairs = st.persistence()
+
+        generators = st.lower_star_persistence_generators()
+        return generators
 
     def forward(self, x, data):
         """Implement forward pass through data."""
@@ -143,7 +191,12 @@ class TOGL(nn.Module):
         batch = data.batch
 
         persistence_pairs = self.compute_persistent_homology(
-            x, edge_index, vertex_slices, edge_slices, batch
+            x,
+            edge_index,
+            vertex_slices,
+            edge_slices,
+            batch,
+            n_nodes=data.num_nodes,
         )
 
         x0 = persistence_pairs.permute(1, 0, 2).reshape(
@@ -166,9 +219,7 @@ class TopoGCN(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.layers = nn.ModuleList(
-            [GCNConv(1, 16), GCNConv(16, 2)]
-        )
+        self.layers = nn.ModuleList([GCNConv(1, 16), GCNConv(16, 2)])
 
         self.pooling_fn = global_mean_pool
         self.togl = TOGL(16, 16, 32, 16, "mean")
@@ -202,11 +253,10 @@ loader = DataLoader(data_list, batch_size=8)
 model = TopoGCN()
 
 for index, batch in enumerate(loader):
+    print(batch)
+
     vertex_slices = torch.Tensor(batch._slice_dict["x"]).long()
     edge_slices = torch.Tensor(batch._slice_dict["edge_index"]).long()
-
-    print(vertex_slices)
-    print(edge_slices)
 
     model(batch)
 
