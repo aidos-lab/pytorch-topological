@@ -15,7 +15,6 @@ from torch_scatter import scatter
 
 import torch
 import torch.nn as nn
-import torch.functional as F
 
 import gudhi as gd
 
@@ -135,11 +134,12 @@ class TOGL(nn.Module):
         edge_index = edge_index.cpu().transpose(1, 0).contiguous()
 
         # TODO: Do we have to enforce contiguous indices here?
-        vertex_index = torch.arange(end=n_nodes, dtype=int)
+        vertex_index = torch.arange(end=n_nodes, dtype=torch.int)
 
         # Fill all persistence information at the same time.
         persistence_diagrams = torch.empty(
-            (self.n_filtrations, n_nodes, 2), dtype=float
+            (self.n_filtrations, n_nodes, 2),
+            dtype=torch.float,
         )
 
         for filt_index in range(self.n_filtrations):
@@ -194,7 +194,9 @@ class TOGL(nn.Module):
 
         # FIXME: Fill the diagram up based on the generator information.
         # Might have to do some index shifting here.
-        persistence_diagram = torch.zeros(size=(len(vertices), 2), dtype=float)
+        persistence_diagram = torch.zeros(
+            size=(len(vertices), 2), dtype=torch.float
+        )
         return persistence_diagram
 
     def forward(self, x, data):
@@ -228,11 +230,19 @@ class TOGL(nn.Module):
         )
 
         for layer in self.set_fn:
-            x0 = layer(x0, batch)
+            print(layer)
+            # Preserve batch information for our set function layer
+            # instead of treating all inputs the same.
+            if isinstance(layer, DeepSetLayer):
+                print("DEEP", x0.shape, x0.dtype)
+                x0 = layer(x0, batch)
+            else:
+                print("REGULAR", x0.shape, x0.dtype)
+                x0 = layer(x0)
 
         # TODO: Residual step; could be made optional. Plus, the optimal
         # order of operations is not clear.
-        x = x + self.batch_norm(F.relu(x0))
+        x = x + self.batch_norm(nn.functional.relu(x0))
         return x
 
 
@@ -240,7 +250,7 @@ class TopoGCN(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.layers = nn.ModuleList([GCNConv(1, 8), GCNConv(16, 2)])
+        self.layers = nn.ModuleList([GCNConv(1, 8), GCNConv(8, 2)])
 
         self.pooling_fn = global_mean_pool
         self.togl = TOGL(8, 16, 32, 16, "mean")
@@ -252,6 +262,7 @@ class TopoGCN(torch.nn.Module):
             x = layer(x, edge_index)
 
         x = self.togl(x, data)
+        print("AFTER TOPO:", x.shape)
 
         for layer in self.layers[1:]:
             x = layer(x, edge_index)
