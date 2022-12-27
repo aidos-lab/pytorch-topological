@@ -157,25 +157,32 @@ class TOGL(nn.Module):
 
     # Helper function for doing the actual calculation of topological
     # features of a graph.
-    #
-    # TODO: Missing filtration values for vertices and edges here.
-    #
-    # TODO: Need to think about how to handle different filtrations
-    # etc.; what should be the best return value?
-    def _compute_persistent_homology(self, vertices, edges):
+    def _compute_persistent_homology(
+        self, vertices, f_vertices, edges, f_edges
+    ):
+        assert len(vertices) == len(f_vertices)
+        assert len(edges) == len(f_edges)
+
         st = gd.SimplexTree()
 
-        for v in vertices:
-            st.insert([v], filtration=0.0)
+        for v, f in zip(vertices, f_vertices):
+            st.insert([v], filtration=f)
 
-        for u, v in  edges:
-            st.insert([u, v], filtration=0.0)
+        for (u, v), f in zip(edges, f_edges):
+            st.insert([u, v], filtration=f)
 
         st.make_filtration_non_decreasing()
         st.expansion(2)
-        persistence_pairs = st.persistence()
+        st.persistence()
 
+        # The generators are split into "regular" and "essential"
+        # vertices, sorted by dimension.
+        #
+        # TODO: Let's think about how to leverage *all* generators here.
+        # This is not a priori clear.
         generators = st.lower_star_persistence_generators()
+        generators_regular, generators_essential = generators
+
         return generators
 
     def forward(self, x, data):
