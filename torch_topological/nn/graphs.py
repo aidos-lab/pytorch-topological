@@ -149,11 +149,13 @@ class TOGL(nn.Module):
                 vertices = vertex_index[vi:vj]
                 edges = edge_index[ei:ej]
 
+                offset = vi
+
                 f_vertices = filtered_v[filt_index][vi:vj]
                 f_edges = filtered_e[filt_index][ei:ej]
 
                 persistence_diagram = self._compute_persistent_homology(
-                    vertices, f_vertices, edges, f_edges
+                    vertices, f_vertices, edges, f_edges, offset
                 )
 
                 persistence_diagrams[filt_index, vi:vj] = persistence_diagram
@@ -167,7 +169,7 @@ class TOGL(nn.Module):
     # Helper function for doing the actual calculation of topological
     # features of a graph.
     def _compute_persistent_homology(
-        self, vertices, f_vertices, edges, f_edges
+        self, vertices, f_vertices, edges, f_edges, offset
     ):
         assert len(vertices) == len(f_vertices)
         assert len(edges) == len(f_edges)
@@ -186,17 +188,26 @@ class TOGL(nn.Module):
 
         # The generators are split into "regular" and "essential"
         # vertices, sorted by dimension.
-        #
-        # TODO: Let's think about how to leverage *all* generators here.
-        # This is not a priori clear.
         generators = st.lower_star_persistence_generators()
         generators_regular, generators_essential = generators
 
-        # FIXME: Fill the diagram up based on the generator information.
-        # Might have to do some index shifting here.
-        persistence_diagram = torch.zeros(
-            size=(len(vertices), 2), dtype=torch.float
-        )
+        # TODO: Let's think about how to leverage *all* generators in
+        # *all* dimensions.
+        generators_regular = torch.as_tensor(generators_regular[0])
+        generators_regular = generators_regular - offset
+        generators_regular = generators_regular.sort(dim=0, stable=True)[0]
+
+        # By default, every vertex is paired with itself, so we just
+        # duplicate the information here.
+        persistence_diagram = torch.stack((f_vertices, f_vertices), dim=1)
+
+        # Map generators back to filtration values, thus adding non-trivial
+        # tuples to the persistence diagram while preserving gradients.
+        if len(generators_regular) > 0:
+            persistence_diagram[generators_regular[:, 0], 1] = f_vertices[
+                generators_regular[:, 1]
+            ]
+
         return persistence_diagram
 
     def forward(self, x, data):
