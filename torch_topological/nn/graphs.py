@@ -192,7 +192,10 @@ class TOGL(nn.Module):
         generators = st.lower_star_persistence_generators()
         generators_regular, generators_essential = generators
 
-        return generators
+        # FIXME: Fill the diagram up based on the generator information.
+        # Might have to do some index shifting here.
+        persistence_diagram = torch.zeros(size=(len(vertices), 2), dtype=float)
+        return persistence_diagram
 
     def forward(self, x, data):
         """Implement forward pass through data."""
@@ -237,10 +240,10 @@ class TopoGCN(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.layers = nn.ModuleList([GCNConv(1, 16), GCNConv(16, 2)])
+        self.layers = nn.ModuleList([GCNConv(1, 8), GCNConv(16, 2)])
 
         self.pooling_fn = global_mean_pool
-        self.togl = TOGL(16, 16, 32, 16, "mean")
+        self.togl = TOGL(8, 16, 32, 16, "mean")
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
