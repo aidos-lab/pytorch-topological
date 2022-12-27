@@ -57,7 +57,6 @@ class DeepSetLayer(nn.Module):
 
     def forward(self, x, batch):
         """Implement forward pass through layer."""
-
         xm = scatter(x, batch, dim=0, reduce=self.aggregation_fn)
         xm = self.Lambda(xm)
 
@@ -135,7 +134,7 @@ class TOGL(nn.Module):
         filtered_e = filtered_e.transpose(1, 0).cpu().contiguous()
         edge_index = edge_index.cpu().transpose(1, 0).contiguous()
 
-        # TODO: Do we have to enforce contiguous indices here? 
+        # TODO: Do we have to enforce contiguous indices here?
         vertex_index = torch.arange(end=n_nodes, dtype=int)
 
         for (vi, vj), (ei, ej) in zip(
@@ -144,7 +143,13 @@ class TOGL(nn.Module):
             vertices = vertex_index[vi:vj]
             edges = edge_index[ei:ej]
 
-            self._compute_persistent_homology(vertices, edges)
+            for filt_index in range(self.n_filtrations):
+                f_vertices = filtered_v[filt_index][vi:vj]
+                f_edges = filtered_e[filt_index][ei:ej]
+
+                self._compute_persistent_homology(
+                    vertices, f_vertices, edges, f_edges
+                )
 
         # TODO: Calculate persistence tuples here. Not quite clear what
         # the output of this function should be.
