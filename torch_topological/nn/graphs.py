@@ -230,14 +230,11 @@ class TOGL(nn.Module):
         )
 
         for layer in self.set_fn:
-            print(layer)
             # Preserve batch information for our set function layer
             # instead of treating all inputs the same.
             if isinstance(layer, DeepSetLayer):
-                print("DEEP", x0.shape, x0.dtype)
                 x0 = layer(x0, batch)
             else:
-                print("REGULAR", x0.shape, x0.dtype)
                 x0 = layer(x0)
 
         # TODO: Residual step; could be made optional. Plus, the optimal
@@ -262,7 +259,6 @@ class TopoGCN(torch.nn.Module):
             x = layer(x, edge_index)
 
         x = self.togl(x, data)
-        print("AFTER TOPO:", x.shape)
 
         for layer in self.layers[1:]:
             x = layer(x, edge_index)
