@@ -216,10 +216,7 @@ class TOGL(nn.Module):
         )
 
         for layer in self.set_fn:
-            if isinstance(layer, DeepSetLayer):
-                x0 = layer(x0, batch)
-            else:
-                x0 = layer(x0)
+            x0 = layer(x0, batch)
 
         # TODO: Residual step; could be made optional. Plus, the optimal
         # order of operations is not clear.
