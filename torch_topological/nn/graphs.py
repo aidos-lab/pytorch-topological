@@ -83,13 +83,13 @@ class TOGL(nn.Module):
     ):
         super().__init__()
 
+        self.n_filtrations = n_filtrations
+
         self.filtrations = nn.Sequential(
             nn.Linear(n_features, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, n_filtrations),
         )
-
-        self.n_filtrations = n_filtrations
 
         self.set_fn = nn.ModuleList(
             [
@@ -137,23 +137,32 @@ class TOGL(nn.Module):
         # TODO: Do we have to enforce contiguous indices here?
         vertex_index = torch.arange(end=n_nodes, dtype=int)
 
-        for (vi, vj), (ei, ej) in zip(
-            pairwise(vertex_slices), pairwise(edge_slices)
-        ):
-            vertices = vertex_index[vi:vj]
-            edges = edge_index[ei:ej]
+        # Fill all persistence information at the same time.
+        persistence_diagrams = torch.empty(
+            (self.n_filtrations, n_nodes, 2), dtype=float
+        )
 
-            for filt_index in range(self.n_filtrations):
+        for filt_index in range(self.n_filtrations):
+            for (vi, vj), (ei, ej) in zip(
+                pairwise(vertex_slices), pairwise(edge_slices)
+            ):
+                vertices = vertex_index[vi:vj]
+                edges = edge_index[ei:ej]
+
                 f_vertices = filtered_v[filt_index][vi:vj]
                 f_edges = filtered_e[filt_index][ei:ej]
 
-                self._compute_persistent_homology(
+                persistence_diagram = self._compute_persistent_homology(
                     vertices, f_vertices, edges, f_edges
                 )
 
-        # TODO: Calculate persistence tuples here. Not quite clear what
-        # the output of this function should be.
-        return None
+                persistence_diagrams[filt_index, vi:vj] = persistence_diagram
+
+        # Make sure that the tensor is living on the proper device here;
+        # all subsequent operations can happen either on the CPU *or* on
+        # the GPU.
+        persistence_diagrams = persistence_diagrams.to(x.device)
+        return persistence_diagrams
 
     # Helper function for doing the actual calculation of topological
     # features of a graph.
