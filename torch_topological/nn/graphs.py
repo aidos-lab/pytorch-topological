@@ -291,32 +291,3 @@ for index, batch in enumerate(loader):
     edge_slices = torch.Tensor(batch._slice_dict["edge_index"]).long()
 
     model(batch)
-
-
-# def calculate_persistent_homology(G, k=3):
-#    """Calculate persistent homology of graph clique complex."""
-#    st = gd.SimplexTree()
-#
-#    for v, w in G.nodes(data=True):
-#        weight = w["curvature"]
-#        st.insert([v], filtration=weight)
-#
-#    for u, v, w in G.edges(data=True):
-#        weight = w["curvature"]
-#        st.insert([u, v], filtration=weight)
-#
-#    st.make_filtration_non_decreasing()
-#    st.expansion(k)
-#    persistence_pairs = st.persistence()
-#
-#    diagrams = []
-#
-#    for dimension in range(k + 1):
-#        diagram = [
-#            (c, d) for dim, (c, d) in persistence_pairs if dim == dimension
-#        ]
-#
-#        diagrams.append(diagram)
-#
-#    return diagrams
-#
