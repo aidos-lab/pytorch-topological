@@ -12,12 +12,12 @@ from .summary_statistics import persistent_entropy
 from .summary_statistics import polynomial_function
 
 __all__ = [
-    'is_iterable',
-    'nesting_level',
-    'pairwise',
-    'persistent_entropy',
-    'polynomial_function',
-    'total_persistence',
-    'wrap_if_not_iterable',
-    'SelectByDimension',
+    "is_iterable",
+    "nesting_level",
+    "pairwise",
+    "persistent_entropy",
+    "polynomial_function",
+    "total_persistence",
+    "wrap_if_not_iterable",
+    "SelectByDimension",
 ]
