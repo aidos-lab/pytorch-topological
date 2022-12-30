@@ -16,7 +16,7 @@ gudhi = "^3.4.1"
 POT = "^0.8.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = ">=5.2"
 Sphinx = "^4.3.1"
 sphinx-rtd-theme = "^1.0.0"
 tqdm = "^4.62.3"
