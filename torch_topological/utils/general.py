@@ -5,6 +5,36 @@ the code base. If a function is 'relatively small' and somewhat generic
 it should be put here.
 """
 
+import itertools
+
+
+def pairwise(iterable):
+    """Return iterator to iterate over consecutive pairs.
+
+    Parameters
+    ----------
+    iterable : iterable
+
+    Returns
+    -------
+    iterator
+        An iterator to iterate over consecutive pairs of the input data.
+
+    Notes
+    -----
+    A similar function appears in more recent versions of the
+    ``collections`` module. For compatibility with old Python
+    versions, we provide our own implementation.
+
+    Examples
+    --------
+    >>> [x for x in pairwise(["ABC"])]
+    ["AB", "BC"]
+    """
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
 
 def is_iterable(x):
     """Check whether variable is iterable.
