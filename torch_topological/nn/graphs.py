@@ -1,4 +1,23 @@
-"""Layers for topological data analysis based on graphs."""
+"""Layers for topological data analysis based on graphs.
+
+This is a work-in-progress module. The goal is to provide
+a functionality similar to what is described in TOGL; see
+https://github.com/BorgwardtLab/TOGL.
+
+At the moment, the following functionality is present:
+    - simple deep set layer
+    - simple TOGL implementation with deep set functions
+    - basic GCN with TOGL
+
+The following aspects are currently ignored:
+    - handling higher-order information properly
+    - expanding simplicial complexes
+    - making use of the dimension of features
+
+On the other hand, the current implementation is simplified in the sense
+of showing that *lower star filtrations* (and their corresponding
+generators) may be useful.
+"""
 
 import itertools
 
