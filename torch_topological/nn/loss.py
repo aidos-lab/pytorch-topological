@@ -17,7 +17,7 @@ class SummaryStatisticLoss(torch.nn.Module):
     a scalar-valued summary of a persistence diagram.
     """
 
-    def __init__(self, summary_statistic='total_persistence', **kwargs):
+    def __init__(self, summary_statistic="total_persistence", **kwargs):
         """Create new loss function based on summary statistic.
 
         Parameters
@@ -40,10 +40,11 @@ class SummaryStatisticLoss(torch.nn.Module):
         """
         super().__init__()
 
-        self.p = kwargs.get('p', 1.0)
+        self.p = kwargs.get("p", 1.0)
         self.kwargs = kwargs
 
         import torch_topological.utils.summary_statistics as stat
+
         self.stat_fn = getattr(stat, summary_statistic, None)
 
     def forward(self, X, Y=None):
@@ -83,10 +84,12 @@ class SummaryStatisticLoss(torch.nn.Module):
     def _evaluate_stat_fn(self, X):
         """Evaluate statistic function for a given tensor."""
         return torch.sum(
-            torch.stack([
-                self.stat_fn(pers_info.diagram, **self.kwargs)
-                for pers_info in X
-            ])
+            torch.stack(
+                [
+                    self.stat_fn(pers_info.diagram, **self.kwargs)
+                    for pers_info in X
+                ]
+            )
         )
 
 
@@ -138,34 +141,38 @@ class SignatureLoss(torch.nn.Module):
             self.dimensions = [self.dimensions]
 
     def forward(self, X, Y):
-        """Calculates the signature loss between two point clouds.
-        
-        This loss funcion uses the persistent homology from each point cloud in order to retrieve 
-        the topologically relevant distances from a distance matrix calculuted from the point clouds.
-        For more information, see [Moor20a]_.
+        """Calculate the signature loss between two point clouds.
+
+        This loss function uses the persistent homology from each point
+        cloud in order to retrieve the topologically relevant distances
+        from a distance matrix calculated from the point clouds. For
+        more information, see [Moor20a]_.
 
         Parameters
         ----------
-        X: Tuple[torch.tensor, PersistentInformation]
-            A tuple consisting of the point cloud and the persistence information of the point cloud. The persistent
-            information is calculated by performing persistence homology calculation to retrieve a list of topologically
-            relevant edges.
+        X: Tuple[torch.tensor, PersistenceInformation]
+            A tuple consisting of the point cloud and the persistence
+            information of the point cloud. The persistent information
+            is calculated by performing persistent homology calculation
+            to retrieve a list of topologically relevant edges.
 
-        Y: Tuple[torch.tensor, PersistentInformation]
-            A tuple consisting of the point cloud and the persistence information of the point cloud. The persistent
-            information is calculated by performing persistence homology calculation to retrieve a list of topologically
-            relevant edges.
+        Y: Tuple[torch.tensor, PersistenceInformation]
+            A tuple consisting of the point cloud and the persistence
+            information of the point cloud. The persistent information
+            is calculated by performing persistent homology calculation
+            to retrieve a list of topologically relevant edges.
 
         Returns
         -------
-        torch.tensor:
-            A scalar representing the topological loss term given the two datasets.
+        torch.tensor
+            A scalar representing the topological loss term for the two
+            data sets.
         """
         X_point_cloud, X_persistence_info = X
         Y_point_cloud, Y_persistence_info = Y
 
-        # Calculate the pairwise distance matrix between points in the point cloud.
-        # Distances are calculated using the p-norm.
+        # Calculate the pairwise distance matrix between points in the
+        # point cloud. Distances are calculated using the p-norm.
         X_pairwise_dist = torch.cdist(X_point_cloud, X_point_cloud, self.p)
         Y_pairwise_dist = torch.cdist(Y_point_cloud, Y_point_cloud, self.p)
 
@@ -173,31 +180,43 @@ class SignatureLoss(torch.nn.Module):
             X_pairwise_dist = X_pairwise_dist / X_pairwise_dist.max()
             Y_pairwise_dist = Y_pairwise_dist / Y_pairwise_dist.max()
 
-        # Using the topologically relevant edges from point cloud X, retrieve the
-        # corresponding distances from the pairwise distance matrix of X.
+        # Using the topologically relevant edges from point cloud X,
+        # retrieve the corresponding distances from the pairwise
+        # distance matrix of X.
         X_sig_X = [
-            self._select_distances(X_pairwise_dist, X_persistence_info[dim].pairing)
+            self._select_distances(
+                X_pairwise_dist, X_persistence_info[dim].pairing
+            )
             for dim in self.dimensions
         ]
 
-        # Using the topologically relevant edges from point cloud Y, retrieve the
-        # corresponding distances from the pairwise distance matrix of X.
+        # Using the topologically relevant edges from point cloud Y,
+        # retrieve the corresponding distances from the pairwise
+        # distance matrix of X.
         X_sig_Y = [
-            self._select_distances(X_pairwise_dist, Y_persistence_info[dim].pairing)
+            self._select_distances(
+                X_pairwise_dist, Y_persistence_info[dim].pairing
+            )
             for dim in self.dimensions
         ]
 
-        # Using the topologically relevant edges from point cloud X, retrieve the
-        # corresponding distances from the pairwise distance matrix of Y.
+        # Using the topologically relevant edges from point cloud X,
+        # retrieve the corresponding distances from the pairwise
+        # distance matrix of Y.
         Y_sig_X = [
-            self._select_distances(Y_pairwise_dist, X_persistence_info[dim].pairing)
+            self._select_distances(
+                Y_pairwise_dist, X_persistence_info[dim].pairing
+            )
             for dim in self.dimensions
         ]
 
-        # Using the topologically relevant edges from point cloud Ys, retrieve the
-        # corresponding distances from the pairwise distance matrix of Y.
+        # Using the topologically relevant edges from point cloud Y,
+        # retrieve the corresponding distances from the pairwise
+        # distance matrix of Y.
         Y_sig_Y = [
-            self._select_distances(Y_pairwise_dist, Y_persistence_info[dim].pairing)
+            self._select_distances(
+                Y_pairwise_dist, Y_persistence_info[dim].pairing
+            )
             for dim in self.dimensions
         ]
 
@@ -207,7 +226,7 @@ class SignatureLoss(torch.nn.Module):
         return torch.stack(XY_dist).sum() + torch.stack(YX_dist).sum()
 
     def _select_distances(self, pairwise_distance_matrix, generators):
-        """Selects the topologically relevant edges from the pairwise distance matrix.
+        """Select topologically relevant edges from a pairwise distance matrix.
 
         Parameters
         ----------
@@ -215,29 +234,37 @@ class SignatureLoss(torch.nn.Module):
             NxN pairwise distance matrix of a point cloud.
 
         generators: np.ndarray
-            A 2D numpy array consisting of indices corresponding to edges that correspond to the
-            birth/destruction of some topological feature during persistent homology calculation.
-
-            If the generator corresponds to topological features in 0-dimension (connected components),
-            we only consider the edges which destroy connected components (don't consider vertices).
-
-            If the generator corresponds to topological features in > 0 dimensions (e.g holes, voids),
-            we consider edges which create/destroy such topological features.
+            A 2D array consisting of indices corresponding to edges that
+            correspond to the birth/destruction of some topological
+            feature during persistent homology calculation. If the
+            generator corresponds to topological features in
+            0-dimension, i.e. connected components, we only consider the
+            edges that destroy connected components (we do not consider
+            vertices). If the generator corresponds to topological
+            features in > 0 dimensions, e.g holes or voids, we consider
+            edges that create/destroy such topological features.
 
         Returns
         -------
-        torch.tensor:
-            A vector which contains all of the topologically relevant distances.
+        torch.tensor
+            A vector that contains all of the topologically relevant
+            distances.
         """
         # Dimension 0: only a mapping of vertices--edges is present, and
         # we must *only* access the edges.
         if generators.shape[1] == 3:
-            selected_distances = pairwise_distance_matrix[generators[:, 1], generators[:, 2]]
+            selected_distances = pairwise_distance_matrix[
+                generators[:, 1], generators[:, 2]
+            ]
 
         # Dimension > 0: we can access all distances
         else:
-            creator_distances = pairwise_distance_matrix[generators[:, 0], generators[:, 1]]
-            destroyer_distances = pairwise_distance_matrix[generators[:, 2], generators[:, 3]]
+            creator_distances = pairwise_distance_matrix[
+                generators[:, 0], generators[:, 1]
+            ]
+            destroyer_distances = pairwise_distance_matrix[
+                generators[:, 2], generators[:, 3]
+            ]
 
             # Need to use `torch.abs` here because of the way the
             # signature lookup works. We are *not* guaranteed  to
