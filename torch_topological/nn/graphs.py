@@ -19,7 +19,10 @@ of showing that *lower star filtrations* (and their corresponding
 generators) may be useful.
 """
 
-import itertools
+import torch
+import torch.nn as nn
+
+import gudhi as gd
 
 from torch_geometric.data import Data
 
@@ -32,19 +35,7 @@ from torch_geometric.nn import global_mean_pool
 
 from torch_scatter import scatter
 
-import torch
-import torch.nn as nn
-
-import gudhi as gd
-
-
-# TODO: should be put into utils? This is available in `itertools`
-# directly but only for Python 3.10+.
-def pairwise(iterable):
-    """Return pairwise iterator."""
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
+from torch_topological.utils import pairwise
 
 
 class DeepSetLayer(nn.Module):
