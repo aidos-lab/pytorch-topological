@@ -28,7 +28,6 @@ class CubicalComplex(nn.Module):
        Neural Information Processing Systems 33*, pp. 6900--6912, 2020.
     """
 
-    # TODO: Handle different dimensions?
     def __init__(self, superlevel=False, dim=None):
         """Initialise new module.
 
@@ -47,6 +46,11 @@ class CubicalComplex(nn.Module):
             present, will be treated as batches or channels. If not set
             to an integer value, :func:`forward` will just *guess* what
             to do with an input (which should work in most cases).
+
+            For example, when dealing with volume data, i.e. 3D tensors,
+            set `dim=3` when instantiating the class. This will permit a
+            seamless user experience with *both* batched and non-batched
+            input data sets.
         """
         super().__init__()
 
@@ -66,11 +70,18 @@ class CubicalComplex(nn.Module):
         contain the image data. If `dim` is not set, image dimensions
         will be guessed as follows:
 
-        1. Tensor of `dim = 2`: a single 2D image
-        2. Tensor of `dim = 3`: a single 2D image with channels
-        3. Tensor of `dim = 4`: a batch of 2D images with channels
+        1. Tensor of dimension 2: a single image
+        2. Tensor of dimension 3: a single 2D image with channels
+        3. Tensor of dimension 4: a batch of 2D images with channels
 
-        See parameters for more details.
+        This is a conservative way of handling the data, ensuring that
+        by default, 2D tensors with channel information and a potential
+        batch information can be handled, since this is the default for
+        many applications.
+
+        To ensure that the class can handle e.g. 3D volume data, it is
+        sufficient to set `dim = 3` when initialising the class. Refer
+        to the examples and parameters sections for more details.
 
         Parameters
         ----------
@@ -100,6 +111,12 @@ class CubicalComplex(nn.Module):
             :class:`PersistenceInformation` elements. Similar for
             higher-order tensors.
 
+        Examples
+        --------
+        # Handling 3D tensors (volumes), either in batches or presented
+        # individually to the function.
+        >> cubical_complex = CubicalComplex(dim=3)
+        >> cubical_complex(x)
         """
         # Dimension was provided; this makes calculating the *effective*
         # dimension of the tensor much easier: take everything but the
