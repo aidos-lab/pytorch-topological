@@ -49,6 +49,12 @@ Alternatively, use `pip` to install the package:
 pip install -U torch-topological
 ```
 
+**A note on older versions.** Older versions of Python are not
+explicitly supported, and things may break in unexpected ways.
+If you want to use a different version, check `pyproject.toml`
+and adjust the Python requirement to your preference. This may
+or may not work, good luck!
+
 # Usage
 
 `torch_topological` is still a work in progress. You can [browse the documentation](https://pytorch-topological.readthedocs.io)
