@@ -150,7 +150,7 @@ if __name__ == '__main__':
     )
 
     X, y = next(iter(test_loader))
-    Z = model.encode(X).detach().numpy()
+    Z = topo_model.model.encode(X).detach().numpy()
 
     plt.scatter(
         Z[:, 0], Z[:, 1],
