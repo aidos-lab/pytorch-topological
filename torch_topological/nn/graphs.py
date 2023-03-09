@@ -292,6 +292,13 @@ B = 64
 N = 100
 p = 0.2
 
+if torch.cuda.is_available():
+    dev = "cuda:0"
+else:
+    dev = "cpu"
+
+print("Selected device:", dev)
+
 data_list = [
     Data(x=torch.rand(N, 1), edge_index=erdos_renyi_graph(N, p), num_nodes=N)
     for i in range(B)
@@ -299,10 +306,11 @@ data_list = [
 
 loader = DataLoader(data_list, batch_size=8)
 
-model = TopoGCN()
+model = TopoGCN().to(dev)
 
 for index, batch in enumerate(loader):
     print(batch)
+    batch = batch.to(dev)
 
     vertex_slices = torch.Tensor(batch._slice_dict["x"]).long()
     edge_slices = torch.Tensor(batch._slice_dict["edge_index"]).long()
