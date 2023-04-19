@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from torch_topological.nn import Cubical
+from torch_topological.nn import CubicalComplex
 from torch_topological.nn import SummaryStatisticLoss
 
 from sklearn.datasets import make_circles
@@ -29,9 +29,12 @@ class TopologicalSimplification(torch.nn.Module):
 
     def forward(self, x):
         persistence_information = cubical(x)
-        persistence_information = [persistence_information[0]]
+        persistence_information = persistence_information[0]
 
-        gens, pd = persistence_information[0]
+        gens, pd = (
+            persistence_information.pairing,
+            persistence_information.diagram,
+        )
 
         persistence = (pd[:, 1] - pd[:, 0]).abs()
         indices = persistence <= self.theta
@@ -40,9 +43,7 @@ class TopologicalSimplification(torch.nn.Module):
 
         indices = torch.vstack((gens[:, 0:2], gens[:, 2:]))
 
-        indices = np.ravel_multi_index(
-            (indices[:, 0], indices[:, 1]), x.shape
-        )
+        indices = np.ravel_multi_index((indices[:, 0], indices[:, 1]), x.shape)
 
         x.ravel()[indices] = 0.0
 
@@ -52,7 +53,7 @@ class TopologicalSimplification(torch.nn.Module):
         return x, persistence_information
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     np.random.seed(23)
 
@@ -63,17 +64,16 @@ if __name__ == '__main__':
     )
 
     theta = torch.nn.Parameter(
-        torch.as_tensor(1.0), requires_grad=True,
+        torch.as_tensor(1.0),
+        requires_grad=True,
     )
 
     topological_simplification = TopologicalSimplification(theta)
 
-    optimizer = torch.optim.Adam(
-        [theta], lr=1e-2
-    )
-    loss_fn = SummaryStatisticLoss('total_persistence', p=1)
+    optimizer = torch.optim.Adam([theta], lr=1e-2)
+    loss_fn = SummaryStatisticLoss("total_persistence", p=1)
 
-    cubical = Cubical()
+    cubical = CubicalComplex()
 
     persistence_information_target = cubical(Y)
     persistence_information_target = [persistence_information_target[0]]
@@ -83,10 +83,7 @@ if __name__ == '__main__':
 
         optimizer.zero_grad()
 
-        loss = loss_fn(
-            persistence_information,
-            persistence_information_target
-        )
+        loss = loss_fn(persistence_information, persistence_information_target)
 
         print(loss.item(), theta.item())
 
