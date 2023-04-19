@@ -1,4 +1,9 @@
-"""Demonstrate image smoothing based on topology."""
+"""Demo for image smoothing based on topology.
+
+This is a work in progress, which at the moment merely showcases
+a simple topology-based loss applied to an image. There's *much*
+more to be done here.
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
