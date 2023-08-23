@@ -13,20 +13,22 @@ from .loss import SummaryStatisticLoss
 from .alpha_complex import AlphaComplex
 from .cubical_complex import CubicalComplex
 from .vietoris_rips_complex import VietorisRipsComplex
+
 from .weighted_euler_characteristic_transform import WeightedEulerCurve
 from .weighted_euler_characteristic_transform import EulerDistance
 
+
 __all__ = [
-    'AlphaComplex',
-    'CubicalComplex',
-    'PersistenceInformation',
-    'SignatureLoss',
-    'SummaryStatisticLoss',
-    'VietorisRipsComplex',
-    'WassersteinDistance',
-    'SlicedWassersteinDistance',
-    'SlicedWassersteinKernel',
-    'MultiScaleKernel',
-    'WeightedEulerCurve',
-    'EulerDistance'
+    "AlphaComplex",
+    "CubicalComplex",
+    "EulerDistance",
+    "MultiScaleKernel",
+    "PersistenceInformation",
+    "SignatureLoss",
+    "SlicedWassersteinDistance",
+    "SlicedWassersteinKernel",
+    "SummaryStatisticLoss",
+    "VietorisRipsComplex",
+    "WassersteinDistance",
+    "WeightedEulerCurve"
 ]
