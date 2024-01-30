@@ -83,8 +83,8 @@ class SlicedWassersteinDistance(torch.nn.Module):
             diag = torch.tensor([0.5, 0.5], dtype=torch.float32)
 
             # Project both the diagrams onto the diagonals.
-            D1_diag = torch.vstack([torch.sum(x) * diag for x in D1])
-            D2_diag = torch.vstack([torch.sum(x) * diag for x in D2])
+            D1_diag = torch.sum(D1, dim=1, keepdim=True) * diag
+            D2_diag = torch.sum(D2, dim=1, keepdim=True) * diag
 
             cost = 0.0
 
