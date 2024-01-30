@@ -162,6 +162,10 @@ def sample_from_torus(n, d=3, r=1.0, R=2.0, seed=None):
     torch.tensor of shape `(n, d)`
         Tensor of sampled coordinates.
     """
+    if r > R:
+        raise RuntimeError('Radius of the tube must be less than ' +
+                           'or equal to radius of the torus')
+
     rng = np.random.default_rng(seed)
     angles = []
 
