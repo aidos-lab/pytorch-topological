@@ -131,8 +131,8 @@ class MultiScaleKernel(torch.nn.Module):
             # diagram 2
             denom = self._dist(D1, self._mirror(D2), p)
 
-            M = torch.exp(-nom) / (8 * self.sigma)
-            M -= torch.exp(-denom) / (8 * self.sigma)
+            M = torch.exp(-nom / (8 * self.sigma))
+            M -= torch.exp(-denom / (8 * self.sigma))
 
             # sum over all points
             k_sigma += M.sum() / (8. * self.sigma * torch.pi)
