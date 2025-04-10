@@ -89,7 +89,7 @@ class AlphaComplex(nn.Module):
         return batch_handler(x, self._forward)
 
     def _forward(self, x):
-        alpha_complex = gudhi.alpha_complex.AlphaComplex(
+        alpha_complex = gudhi.AlphaComplex(
             x.cpu().detach(),
             precision='fast',
         )

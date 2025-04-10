@@ -1,8 +1,10 @@
-[tool.poetry]
+[project]
 name = "torch_topological"
 version = "0.1.7"
 description = "A framework for topological machine learning based on `pytorch`."
-authors = ["Bastian Rieck <bastian@rieck.me>"]
+authors = [
+    {name = "Bastian Rieck", email = "bastian@rieck.me"},
+]
 license = "BSD-3-Clause"
 readme = "README.md"
 include = ["README.md"]
@@ -13,7 +15,7 @@ matplotlib = "^3.5.0"
 giotto-ph = "^0.2.0"
 torch = ">=1.12.0"
 gudhi = "^3.4.1"
-POT = "^0.8.0"
+POT = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=5.2"
