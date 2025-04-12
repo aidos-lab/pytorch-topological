@@ -13,8 +13,8 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Install `poetry` 
+      - uses: actions/checkout@v4
+      - name: Install `poetry`
         run: |
           pipx install poetry
           poetry --version
