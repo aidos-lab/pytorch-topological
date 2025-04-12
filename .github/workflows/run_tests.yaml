@@ -26,6 +26,7 @@ jobs:
       - name: Install package
         run: |
           poetry install --with test,docs
+          pip install importlib-metadata<5
       - name: Run linter
         run: |
           poetry run flake8 torch_topological
