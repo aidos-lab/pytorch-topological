@@ -25,7 +25,7 @@ jobs:
           cache: 'poetry'
       - name: Install package
         run: |
-          poetry install --with test,doc
+          poetry install --with test,docs
       - name: Run linter
         run: |
           poetry run flake8 torch_topological
