@@ -10,25 +10,30 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: ["3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Install `poetry` 
+      - uses: actions/checkout@v4
+
+      - name: Install uv
         run: |
-          pipx install poetry
-          poetry --version
+          curl -Ls https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+
       - name: Install package
-        run: |
-          poetry install
+        run: uv sync
+
       - name: Run linter
         run: |
-          poetry run flake8 torch_topological
+          source .venv/bin/activate
+          flake8 torch_topological
+
       - name: Run tests
         run: |
-          poetry run pytest
+          source .venv/bin/activate
+          pytest
