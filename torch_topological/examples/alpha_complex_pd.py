@@ -46,12 +46,12 @@ if __name__ == '__main__':
         pers_info = alpha_complex(X)
         pers_info = selector(pers_info)
 
-        data=pers_info[0].diagram
+        data = pers_info[0].diagram
         data = data.detach().cpu().numpy()
         ax.clear()
         plt.xlabel("Birth")
         plt.ylabel("Death")
-        ax.plot(data[:, 0], data[:, 1], 'ro', [0,0.8], [0,0.8], 'k-')
+        ax.plot(data[:, 0], data[:, 1], 'ro', [0, 0.8], [0, 0.8], 'k-')
         plt.pause(0.2)
 
         # Evaluate the loss; notice that we want to *maximise* it in

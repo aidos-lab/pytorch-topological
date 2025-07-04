@@ -234,8 +234,8 @@ class WeightedEulerCurve(nn.Module):
         return torch.tensor([x, y, z], dtype=torch.double)
 
     def _genSquares(self, x):
-        """Obtains coordinates and values of the adjacent squares in the 3D tensor
-        Input: x - 3D tensor"""
+        """Obtains coordinates and values of the adjacent squares in the 3D
+        tensor. Input: x - 3D tensor"""
         device = x.device
         arr = torch.clone(x)
         arr = arr.unsqueeze(0).float()
@@ -311,8 +311,8 @@ class WeightedEulerCurve(nn.Module):
         return coords.float(), sqVals
 
     def _genCubes(self, x):
-        """Obtains coordinates and values of the adjacent cubes in the 3D tensor
-        Input: x - 3D tensor"""
+        """Obtains coordinates and values of the adjacent cubes in the 3D
+        tensor. Input: x - 3D tensor"""
         device = x.device
         x_ = torch.clone(x)
         x_ = x_.unsqueeze(0).unsqueeze(0).float()
@@ -387,8 +387,8 @@ class WeightedEulerCurve(nn.Module):
         return torch.transpose(torch.nonzero(x), 0, 1).float()
 
     def _genEdges(self, x):
-        """Obtains coordinates and values of the adjacent edges in the 3D tensor
-        Input: x - 3D tensor"""
+        """Obtains coordinates and values of the adjacent edges in the 3D
+        tensor. Input: x - 3D tensor"""
         device = x.device
         arr = torch.clone(x)
         arr = arr.unsqueeze(0).float()
