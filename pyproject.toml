@@ -7,30 +7,38 @@ authors = [
 ]
 license = "BSD-3-Clause"
 readme = "README.md"
-include = ["README.md"]
+requires-python = ">=3.11,<4"
 
-[tool.poetry.dependencies]
-python = ">=3.9"
-matplotlib = "^3.5.0"
-giotto-ph = "^0.2.0"
-torch = ">=1.12.0"
-gudhi = "^3.4.1"
-POT = "^0.9.0"
+dependencies = [
+    "matplotlib>=3.5",
+    "giotto-ph>=0.2",
+    "torch>=1.12",
+    "gudhi>=3.4",
+    "POT>=0.9",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = ">=5.2"
-Sphinx = ">=4.3.1"
-sphinx-rtd-theme = "^1.0.0"
-tqdm = "^4.62.3"
-torchvision = ">=0.11.2"
-flake8 = "^4.0.1"
+[tool.uv]
+prerelease = "allow"
+index-strategy = "unsafe-best-match"
+dev-dependencies = [
+    "pytest>=5.2",
+    "Sphinx>=4.3",
+    "sphinx-rtd-theme>=1.0",
+    "tqdm>=4.62",
+    "torchvision>=0.11",
+    "flake8>=4.0",
+]
+
 
 [tool.black]
 line-length = 79
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ['torch_topological']
 
 [project.urls]
 homepage = "https://github.com/aidos-lab/pytorch-topological"
