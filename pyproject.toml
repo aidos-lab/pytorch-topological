@@ -1,6 +1,6 @@
 [project]
 name = "torch_topological"
-version = "0.1.7"
+version = "0.1.8"
 description = "A framework for topological machine learning based on `pytorch`."
 authors = [
     {name = "Bastian Rieck", email = "bastian@rieck.me"},
