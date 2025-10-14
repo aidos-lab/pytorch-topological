@@ -1,6 +1,6 @@
 [project]
 name = "torch_topological"
-version = "0.1.8"
+version = "0.1.9"
 description = "A framework for topological machine learning based on `pytorch`."
 authors = [
     {name = "Bastian Rieck", email = "bastian@rieck.me"},
@@ -34,11 +34,8 @@ dev-dependencies = [
 line-length = 79
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-py-modules = ['torch_topological']
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project.urls]
 homepage = "https://github.com/aidos-lab/pytorch-topological"

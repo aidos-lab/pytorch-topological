@@ -7,6 +7,7 @@ This changelog contains all notable changes in the project.
 
 ## Fixed
 
+- Correct build system
 - Using `uv` instead of `poetry`
 - Improved examples
 
