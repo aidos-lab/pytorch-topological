@@ -17,13 +17,31 @@ from .vietoris_rips_complex import VietorisRipsComplex
 from .weighted_euler_characteristic_transform import WeightedEulerCurve
 from .weighted_euler_characteristic_transform import EulerDistance
 
+from .perslay import (PersLay,
+                     PermutationEquivariant,
+                     Image,
+                     Landscape,
+                     BettiCurve,
+                     Entropy,
+                     Exponential,
+                     Rational,
+                     RationalHat)
 
 __all__ = [
     "AlphaComplex",
+    "BettiCurve",
     "CubicalComplex",
+    "Entropy",
     "EulerDistance",
+    "Exponential",
+    "Image",
+    "Landscape",
     "MultiScaleKernel",
     "PersistenceInformation",
+    "PermutationEquivariant",
+    "PersLay",
+    "Rational",
+    "RationalHat",
     "SignatureLoss",
     "SlicedWassersteinDistance",
     "SlicedWassersteinKernel",
