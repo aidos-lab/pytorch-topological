@@ -2,7 +2,7 @@ import torch
 from torch_topological.datasets import SphereVsTorus
 from torch_topological.nn import VietorisRipsComplex
 from torch.utils.data import DataLoader
-from perslay import (PersLay,
+from torch_topological.nn import (PersLay,
                      PermutationEquivariant,
                      Image,
                      Landscape,
