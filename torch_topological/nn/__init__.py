@@ -18,14 +18,14 @@ from .weighted_euler_characteristic_transform import WeightedEulerCurve
 from .weighted_euler_characteristic_transform import EulerDistance
 
 from .perslay import (PersLay,
-                     PermutationEquivariant,
-                     Image,
-                     Landscape,
-                     BettiCurve,
-                     Entropy,
-                     Exponential,
-                     Rational,
-                     RationalHat)
+                      PermutationEquivariant,
+                      Image,
+                      Landscape,
+                      BettiCurve,
+                      Entropy,
+                      Exponential,
+                      Rational,
+                      RationalHat)
 
 __all__ = [
     "AlphaComplex",
