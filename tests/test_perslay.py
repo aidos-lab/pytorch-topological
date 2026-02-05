@@ -3,14 +3,14 @@ from torch_topological.datasets import SphereVsTorus
 from torch_topological.nn import VietorisRipsComplex
 from torch.utils.data import DataLoader
 from torch_topological.nn import (PersLay,
-                     PermutationEquivariant,
-                     Image,
-                     Landscape,
-                     BettiCurve,
-                     Entropy,
-                     Exponential,
-                     Rational,
-                     RationalHat)
+                                  PermutationEquivariant,
+                                  Image,
+                                  Landscape,
+                                  BettiCurve,
+                                  Entropy,
+                                  Exponential,
+                                  Rational,
+                                  RationalHat)
 
 batch_size = 64
 num_barcodes = 30
