@@ -1,6 +1,6 @@
 import torch
 from torch_topological.datasets import SphereVsTorus
-from torch_topological.nn import VietorisRipsComplex
+from torch_topological.nn import VietorisRipsComplex, PersistenceInformation
 from torch.utils.data import DataLoader
 from torch_topological.nn import (PersLay,
                                   PermutationEquivariant,
@@ -16,6 +16,7 @@ batch_size = 64
 num_barcodes = 30
 image_size = (10, 20)
 output_dim = 10
+num_barcodes_l = [20, 30, 40, 10]
 
 
 class TestPersLayPersInfoHandling:
@@ -39,6 +40,34 @@ class TestPersLayPersInfoHandling:
             assert pers_info is not None
             assert output is not None
             assert len(output) == batch_size
+
+        pers_info_batch = [
+            self.persinfo_generator(num_barcodes_l[0], num_barcodes_l[1]),
+            self.persinfo_generator(num_barcodes_l[2], num_barcodes_l[3])
+        ]
+        diagram = pl.preprocessing(pers_info_batch[0])
+        diagram_batch = pl.preprocessing(pers_info_batch)
+
+        assert diagram is not None
+        assert diagram_batch is not None
+        assert diagram.size() == torch.Size([num_barcodes_l[0], 2])
+        assert diagram_batch.size() == (torch.Size(
+            [2, max(num_barcodes_l[0], num_barcodes_l[2]), 2]
+        ))
+
+    def persinfo_generator(self, num_0, num_1):
+        pers_info_0 = PersistenceInformation(
+            pairing=torch.randint(low=0, high=100, size=(num_0, 3)),
+            diagram=torch.rand((num_0, 2)),
+            dimension=0
+        )
+        pers_info_1 = PersistenceInformation(
+            pairing=torch.randint(low=0, high=100, size=(num_1, 5)),
+            diagram=torch.rand((num_1, 2)),
+            dimension=1
+        )
+
+        return [pers_info_0, pers_info_1]
 
 
 class TestPersLay:
