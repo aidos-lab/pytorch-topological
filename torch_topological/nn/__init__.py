@@ -26,6 +26,7 @@ from .perslay import (PersLay,
                       Exponential,
                       Rational,
                       RationalHat)
+from .pllay import PLLay
 
 __all__ = [
     "AlphaComplex",
@@ -40,6 +41,7 @@ __all__ = [
     "PersistenceInformation",
     "PermutationEquivariant",
     "PersLay",
+    "PLLay",
     "Rational",
     "RationalHat",
     "SignatureLoss",
