@@ -13,6 +13,7 @@ from .loss import SummaryStatisticLoss
 from .alpha_complex import AlphaComplex
 from .cubical_complex import CubicalComplex
 from .vietoris_rips_complex import VietorisRipsComplex
+from .lower_star_persistence import LowerStarPersistence
 
 from .weighted_euler_characteristic_transform import WeightedEulerCurve
 from .weighted_euler_characteristic_transform import EulerDistance
@@ -37,6 +38,7 @@ __all__ = [
     "Exponential",
     "Image",
     "Landscape",
+    "LowerStarPersistence",
     "MultiScaleKernel",
     "PersistenceInformation",
     "PermutationEquivariant",
