@@ -125,15 +125,14 @@ class LowerStarPersistence(nn.Module):
     def _forward(self, x, filtration, batch=None):
 
         st = gudhi.SimplexTree()
-        device = filtration.device
-        filtration = filtration.cpu()
+        filtration_values = filtration.clone().detach().cpu()
 
         for v in torch.arange(x[0], device=torch.device('cpu'))[:, None]:
-            st.insert(v, filtration=filtration[v])
+            st.insert(v, filtration=filtration_values[v])
 
         for i in range(1, len(x)):
             for f in x[i].t().cpu():
-                st.insert(f, filtration=torch.max(filtration[f]))
+                st.insert(f, filtration=torch.max(filtration_values[f]))
 
         st.compute_persistence(**self.compute_persistence_kwargs)
         persistence_pairs = st.persistence_pairs()
@@ -148,7 +147,6 @@ class LowerStarPersistence(nn.Module):
                 filtration,
                 persistence_pairs,
                 dim,
-                device,
                 batch
             ) for dim in range(max_dim + 1)
         ]
@@ -156,7 +154,9 @@ class LowerStarPersistence(nn.Module):
         return persistence_information
 
     def _extract_generators_and_diagrams(self, filtration, persistence_pairs,
-                                         dim, device, batch):
+                                         dim, batch):
+
+        device = filtration.device
 
         pairs = []
         for p in persistence_pairs:
@@ -191,8 +191,6 @@ class LowerStarPersistence(nn.Module):
                 pairs_batch = torch.zeros(pairs.size(0))
                 for i in range(pairs.size(0)):
                     pairs_batch[i] = batch[pairs[i, 0]]
-
-            filtration = filtration.to(device)
 
             birth = torch.amax(filtration[pairs[:, :dim + 1]], 1)[:, None]
             death = filtration[pairs[:, dim + 1:]]
