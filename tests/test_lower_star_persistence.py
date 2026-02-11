@@ -56,12 +56,14 @@ class TestLowerStarPersistence:
     simplex_1 = torch.tensor([[0, 1, 2, 3, 0, 1], [1, 2, 3, 0, 2, 3]])
     simplex_2 = torch.tensor([[0, 0, 1], [1, 2, 2], [3, 3, 3]])
     simplex = [simplex_0, simplex_1, simplex_2]
-    filtration = torch.tensor([0., 1., 2., 3.])
+    filtration = torch.tensor([0., 1., 2., 3.], requires_grad=True)
     ls = LowerStarPersistence()
 
     def test_simplex(self):
         pers_info = self.ls(self.simplex, self.filtration)
         diagram_0 = torch.tensor([[0., torch.inf]])
         diagram_1 = torch.tensor([[2., 3.]])
+        assert pers_info[0].diagram.grad_fn is not None
+        assert pers_info[1].diagram.grad_fn is not None
         assert torch.all(torch.isclose(pers_info[0].diagram, diagram_0)).item()
         assert torch.all(torch.isclose(pers_info[1].diagram, diagram_1)).item()
